@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tracker Web App</title>
+</head>
+<body>
+    <h1>Tracker Web App</h1>
+    {% for key in keylist %}
+    <form name="tracker" action="/track" method="POST">
+        <label for="item">Item:</label>
+        <input type="text" id="item" name="item" value="{{ key }}" required>
+        <label for="rate">Rate:</label>
+        <input type="text" id="rate" name="rate" required>
+        <input type="text" id="user" name="user" value="{{ user }}"  >
+        <input type="text" id="key" name="key" value="{{ keylist[key][0] }}"  >
+        <input type="text" id="time" name="time" value="{{ keylist[key][1] }}"  >
+        <button type="submit">Start</button>
+    </form>
+    {% endfor %}
+</body>
+</html>
