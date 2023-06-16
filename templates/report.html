@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TNegco Web App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Negco Web App</h1>
+    {% for record in list %}
+        <h2>{{record['item']}}</h2>
+        <div>
+            <label for="date-{{ loop.index }}">Date: </label>
+            <input id="date-{{ loop.index }}" type="text" value="{{record['date']}}">
+            <label for="duration-{{ loop.index }}">Duration: </label>
+            <input id="'duration-{{ loop.index }}" type="text" value="{{record['duration']}}" readonly>
+            <label for="usage-{{ loop.index }}">Usage: </label>
+            <input id="usage-{{ loop.index }}" type="text" value="{{record['usage']}}" readonly>
+        </div>
+    {% endfor %}
+    <div id="x-axis" style="display: none;">{{ x }}</div>
+    <div id="y-axis" style="display: none;">{{ y }}</div>
+    <canvas id="myChart"></canvas>
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var dates = JSON.parse(document.getElementById('y-axis').innerHTML);
+        var dataset = JSON.parse(document.getElementById('x-axis').innerHTML);
+        var data = {
+          labels: dataset,
+          datasets: [{
+            label: 'Example Dataset',
+            data: dates,
+            borderColor: 'black',
+            fill: false
+          }]
+        };
+      
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: data,
+          options: {}
+        });
+      </script>
+</body>
+</html>

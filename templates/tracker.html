@@ -2,20 +2,52 @@
 <html>
 <head>
     <title>Tracker Web App</title>
+    <script>
+        function startTimer(startTime, elementId) {
+            if (startTime !== 'None') {
+                var startDate = new Date(startTime);
+                var element = document.getElementById(elementId);
+                console.log(element.value)
+                var interval = setInterval(function() {
+                    var currentDate = new Date();
+                    var elapsedTime = currentDate - startDate; 
+                    
+                    var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+                    var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                    
+                    var elapsedTimeString = hours + 'h ' + minutes + 'm ' + seconds + 's';
+
+                    element.value = elapsedTimeString;
+                }, 1000);
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Tracker Web App</h1>
     {% for key in keylist %}
-    <form name="tracker" action="/track" method="POST">
-        <label for="item">Item:</label>
-        <input type="text" id="item" name="item" value="{{ key }}" required>
-        <label for="rate">Rate:</label>
-        <input type="text" id="rate" name="rate" required>
-        <input type="text" id="user" name="user" value="{{ user }}"  >
-        <input type="text" id="key" name="key" value="{{ keylist[key][0] }}"  >
-        <input type="text" id="time" name="time" value="{{ keylist[key][1] }}"  >
-        <button type="submit">Start</button>
-    </form>
+    <div id="'trackercard">
+        {{ key }}:<input type="text" id="timer-{{ key }}" value="0h 0m 0s" readonly>
+        <form name="tracker" action="/track" method="POST">
+            <input type="text" id="item" name="item" value="{{ key }}" required style="display: none;">
+            <label for="rate">Rate:</label>
+            <input type="text" id="rate" name="rate" required >
+            <input type="text" id="user" name="user" value="{{ user }}" style="display: none;">
+            <input type="text" id="key" name="key" value="{{ keylist[key][0] }}" >
+            <input type="text" id="time" name="time" value="{{ keylist[key][1] }}" >
+            <button type="submit">Start</button>
+        </form>
+        <script>
+            var startTime = "{{ keylist[key][1] }}";
+            var elementId = "timer-{{ key }}";
+            startTimer(startTime, elementId);
+        </script>
+    </div>
     {% endfor %}
+    <form name="tracker" action="/report" method="POST">
+        <input type="text" id="user" name="user" value="{{ user }}" style="display: none;">
+        <button type="submit">Report</button>
+    </form>
 </body>
 </html>
