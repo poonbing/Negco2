@@ -11,7 +11,7 @@ def show_users():
         print(user)
         if user.role == "admin":
             all_users = User.query.all()
-            return render_template("users.html", users=all_users)
+            return render_template("admin/users.html", users=all_users)
         else:
             return redirect(url_for("user.dashboard"))
     else:

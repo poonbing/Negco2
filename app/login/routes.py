@@ -15,14 +15,14 @@ def login():
             if False:
                 # if not xcaptcha.verify():
                 error = "xCaptcha verification failed. Please try again."
-                return render_template("login.html", error=error)
+                return render_template("login/login.html", error=error)
             session["username"] = username
             return redirect(url_for("user.dashboard"))
         else:
             error = "Invalid username or password."
-            return render_template("login.html", error=error)
+            return render_template("login/login.html", error=error)
 
-    return render_template("login.html")
+    return render_template("login/login.html")
 
 
 @bp.route("/logout")

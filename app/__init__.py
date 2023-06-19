@@ -3,7 +3,6 @@ from flask_xcaptcha import XCaptcha
 
 # Local Modules
 from config import Config
-from .models import User
 from .extensions import db
 
 

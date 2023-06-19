@@ -8,7 +8,7 @@ from ..extensions import db
 def dashboard():
     if "username" in session:
         username = session["username"]
-        return render_template("dashboard.html", username=username)
+        return render_template("user/dashboard.html", username=username)
     else:
         return redirect(url_for("login.login"))
 
@@ -38,7 +38,7 @@ def settings():
                 else:
                     error_message = "Password and confirm password do not match."
                     return render_template(
-                        "settings.html",
+                        "user/settings.html",
                         username=username,
                         user=user,
                         error_message=error_message,
@@ -48,12 +48,12 @@ def settings():
 
             success_message = "User information updated successfully!"
             return render_template(
-                "settings.html",
+                "user/settings.html",
                 username=username,
                 user=user,
                 success_message=success_message,
             )
         else:
-            return render_template("settings.html", user=user)
+            return render_template("user/settings.html", user=user)
     else:
         return redirect(url_for("login.login"))

@@ -25,9 +25,9 @@ def forgot_password():
             return redirect(url_for("password_recovery.enter_access_code", email=email))
         else:
             error = "Invalid email address."
-            return render_template("forgot_password.html", error=error)
+            return render_template("password/forgot_password.html", error=error)
 
-    return render_template("forgot_password.html")
+    return render_template("password/forgot_password.html")
 
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
@@ -46,14 +46,14 @@ def enter_access_code():
             return redirect(url_for("password_recovery.success", email=email))
         else:
             error = "Invalid access code."
-            return render_template("enter_access_code.html", error=error)
+            return render_template("password/enter_access_code.html", error=error)
 
-    return render_template("enter_access_code.html", email=email)
+    return render_template("password/enter_access_code.html", email=email)
 
 
 @bp.route("/success", methods=["GET", "POST"])
 def success():
-    return render_template("success.html")
+    return render_template("password/success.html")
 
 
 @bp.route("/reset_password", methods=["GET", "POST"])
@@ -73,4 +73,4 @@ def reset_password():
         db.session.commit()
         return redirect(url_for("login.login"))
 
-    return render_template("reset_password.html")
+    return render_template("password/reset_password.html")
