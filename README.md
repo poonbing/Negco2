@@ -65,13 +65,22 @@ _Below is an example of how to install and set up NEGC02._
    ```
 
 6. Enter your API in `config.py`
-   ```js
-   SQLALCHEMY_DATABASE_URI = "ENTER DATABASE URI";
-   XCAPTCHA_SITE_KEY = "ENTER API SITE KEY";
-   XCAPTCHA_SECRET_KEY = "ENTER API SECRET KEY";
+   ```python
+   SQLALCHEMY_DATABASE_URI = "ENTER DATABASE URI"
+   XCAPTCHA_SITE_KEY = "ENTER API SITE KEY"
+   XCAPTCHA_SECRET_KEY = "ENTER API SECRET KEY"
+   ```
+7. Enter your Email Username and Password
+   ```python
+    MAIL_USERNAME = "ENTER USERNAME"
+    MAIL_PASSWORD = "ENTER PASSWORD"
    ```
 
 ## Usage
+
+1. Run `run.py`
+2. Go to 127.0.0.1:5000
+
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
