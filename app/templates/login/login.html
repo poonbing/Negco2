@@ -47,9 +47,11 @@
             <p class="text-red-500">{{ error }}</p>
             {% endif %}
             <form
+              id="login-form"
               class="space-y-4 md:space-y-6"
               method="POST"
               action="{{ url_for('login.login') }}"
+              onsubmit="signInHandler()"
             >
               <div>
                 <label
@@ -126,5 +128,6 @@
         </div>
       </div>
     </section>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
   </body>
 </html>

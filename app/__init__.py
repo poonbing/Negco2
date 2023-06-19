@@ -3,7 +3,8 @@ from flask_xcaptcha import XCaptcha
 
 # Local Modules
 from config import Config
-from .extensions import db
+from .extensions import db, mail
+from .models import User, LockedUser
 
 
 def create_app(config_class=Config):
@@ -12,10 +13,9 @@ def create_app(config_class=Config):
 
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
+    mail.init_app(app)
 
     with app.app_context():
-        db.create_all()
-
         from app.main import bp as main_bp
         from app.login import bp as login_bp
         from app.user import bp as user_bp

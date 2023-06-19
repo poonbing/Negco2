@@ -11,16 +11,25 @@ def login():
         password = request.form.get("password")
 
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
-            if False:
-                # if not xcaptcha.verify():
-                error = "xCaptcha verification failed. Please try again."
+        if user:
+            if user.is_account_locked():
+                error = "Account locked. Contact the admin for assistance."
                 return render_template("login/login.html", error=error)
-            session["username"] = username
-            return redirect(url_for("user.dashboard"))
-        else:
-            error = "Invalid username or password."
-            return render_template("login/login.html", error=error)
+            elif user.password == password:
+                if not xcaptcha.verify():
+                    error = "xCaptcha verification failed. Please try again."
+                    return render_template("login/login.html", error=error)
+                user.reset_login_attempts()
+                session["username"] = username
+                return redirect(url_for("user.dashboard"))
+            else:
+                user.increment_login_attempts()
+                if user.login_attempts >= 3:
+                    user.lock_account()
+                    error = "Account locked. Contact the admin for assistance."
+                    return render_template("login/login.html", error=error)
+        error = "Invalid username or password."
+        return render_template("login/login.html", error=error)
 
     return render_template("login/login.html")
 

@@ -15,6 +15,14 @@ class Config:
         "postgresql://postgres:1817postgres%40pg@localhost:5432/users"
     )
 
-    # Other application settings
+    # Flask-Mail configuration
+    MAIL_SERVER = "smtp.gmail.com"
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = "your-email@gmail.com"
+    MAIL_PASSWORD = "your-password"
+    MAIL_DEFAULT_SENDER = ("NEGCO2", "your-email@gmail.com")
+
+    # Static configuration
     STATIC_URL_PATH = "/static"
     STATIC_FOLDER = "static"
