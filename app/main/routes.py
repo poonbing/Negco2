@@ -1,7 +1,10 @@
-from flask import render_template, request
+from flask import render_template, request, redirect, session, url_for
 from app.main import bp
+from ..models import User
 
 
-@bp.route("/mains")
-def mains():
-    return "<h1>Main</h1>"
+@bp.route("/")
+def home():
+    if "username" in session:
+        return redirect(url_for("user.dashboard"))
+    return redirect(url_for("login.login"))
