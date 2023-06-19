@@ -11,8 +11,9 @@ class Config:
     XCAPTCHA_DIV_CLASS = "h-captcha"
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = "mysql://DB%20Admin:NegcoAdmin@115.66.121.173/Negco"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = (
+        "postgresql://postgres:1817postgres%40pg@localhost:5432/users"
+    )
 
     # Other application settings
     STATIC_URL_PATH = "/static"
