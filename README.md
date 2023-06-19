@@ -30,8 +30,8 @@ The Environment Sustainability project aims to create a web application that pro
 
 ### Built With
 
-- [![Flask][Flask]]
-- [![Tailwind][Tailwind]]
+- ![Flask][Flask]
+- ![Tailwind][Tailwind]
 
 ## Getting Started
 
