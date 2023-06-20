@@ -1,16 +1,11 @@
-from flask import render_template, request, redirect, session, url_for
-from app.user import bp
+import os
+from flask import render_template, request, session, redirect, url_for
+from werkzeug.utils import secure_filename
 from ..models import User
+from config import Config
+from app.user import bp
+
 from ..extensions import db
-
-
-@bp.route("/dashboard")
-def dashboard():
-    if "username" in session:
-        username = session["username"]
-        return render_template("user/dashboard.html", username=username)
-    else:
-        return redirect(url_for("login.login"))
 
 
 @bp.route("/settings", methods=["GET", "POST"])
@@ -20,6 +15,17 @@ def settings():
         user = User.query.filter_by(username=username).first()
 
         if request.method == "POST":
+            if request.files.get("profile_picture"):
+                profile_picture = request.files["profile_picture"]
+                if profile_picture.filename != "":
+                    filename = secure_filename(profile_picture.filename)
+                    profile_picture.save(
+                        profile_picture.save(
+                            os.path.join(Config.UPLOAD_FOLDER, filename)
+                        )
+                    )
+                    user.profile_picture = filename
+
             if request.form.get("first_name"):
                 user.first_name = request.form.get("first_name")
             if request.form.get("last_name"):
@@ -55,5 +61,14 @@ def settings():
             )
         else:
             return render_template("user/settings.html", user=user)
+    else:
+        return redirect(url_for("login.login"))
+
+
+@bp.route("/dashboard")
+def dashboard():
+    if "username" in session:
+        username = session["username"]
+        return render_template("user/dashboard.html", username=username)
     else:
         return redirect(url_for("login.login"))

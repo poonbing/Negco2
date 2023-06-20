@@ -3,7 +3,23 @@
   <head>
     <title>Settings</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
-    <!-- Add your CSS and other head elements here -->
+    <script>
+      function previewProfilePicture(event) {
+        const input = event.target;
+        const previewImage = document.getElementById('profile_picture_preview');
+        
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+          };
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          previewImage.src = ''; // Clear the preview if no file is selected
+        }
+      }
+    </script>
+    
   </head>
   <body>
     {% include "navbar.html" %}
@@ -17,12 +33,14 @@
           <div class="mb-6">
             <label for="profile_picture" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Picture</label>
             <div class="flex items-center">
-              <input type="file" name="profile_picture" accept="image/*" class="hidden" id="profile_picture_input" />
+              <input type="file" name="profile_picture" accept="image/*" class="hidden" id="profile_picture_input" onchange="previewProfilePicture(event)" />
               <label for="profile_picture_input" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">
                 Browse
               </label>
             </div>
+            <img id="profile_picture_preview" class="mt-2" style="max-width: 200px; max-height: 200px;" />
           </div>
+          
           
           
           <div>
@@ -85,4 +103,5 @@
 {% endif %}
     </div>
   </body>
+  
 </html>

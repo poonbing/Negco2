@@ -26,3 +26,13 @@ class Config:
     # Static configuration
     STATIC_URL_PATH = "/static"
     STATIC_FOLDER = "static"
+
+    # File upload configuration
+    UPLOAD_FOLDER = "/static/img"  # Update with your desired upload folder path
+    ALLOWED_EXTENSIONS = {
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+    }  # Set the allowed file extensions
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Set the maximum file size (in bytes)
