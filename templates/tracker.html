@@ -18,7 +18,7 @@
                     
                     var elapsedTimeString = hours + 'h ' + minutes + 'm ' + seconds + 's';
 
-                    element.value = elapsedTimeString;
+                    element.innerHTML = elapsedTimeString;
                 }, 1000);
             }
         }
@@ -28,25 +28,27 @@
     <h1>Tracker Web App</h1>
     {% for key in keylist %}
     <div id="'trackercard">
-        {{ key }}:<input type="text" id="timer-{{ key }}" value="0h 0m 0s" readonly>
+        <h2>{{ key }}</h2>
+        {{ keylist[key][0] }}
         <form name="tracker" action="/track" method="POST">
-            <input type="text" id="item" name="item" value="{{ key }}" required style="display: none;">
-            <label for="rate">Rate:</label>
-            <input type="text" id="rate" name="rate" required >
-            <input type="text" id="user" name="user" value="{{ user }}" style="display: none;">
-            <input type="text" id="key" name="key" value="{{ keylist[key][0] }}" >
-            <input type="text" id="time" name="time" value="{{ keylist[key][1] }}" >
-            <button type="submit">Start</button>
+            <span id="timer-{{ key }}"> 0h 0m 0s</span>
+            <input type="text" id="item" name="item" value="{{ key }}" style="display: none;">
+            <br>
+            <label for="rate">Rate: {{ keylist[key][1] }} Watts/Second</label>
+            <input type="text" id="rate" name="rate" value="{{ keylist[key][1] }}" style="display: none;">
+            <input type="text" id="key" name="key" value="{{ keylist[key][2] }}" style="display: none;">
+            <input type="text" id="time" name="time" value="{{ keylist[key][3] }}" style="display: none;">
+            <br>
+            <button name="start_tracker" type="submit">Start</button>
         </form>
         <script>
-            var startTime = "{{ keylist[key][1] }}";
+            var startTime = "{{ keylist[key][3] }}";
             var elementId = "timer-{{ key }}";
             startTimer(startTime, elementId);
         </script>
     </div>
     {% endfor %}
     <form name="tracker" action="/report" method="POST">
-        <input type="text" id="user" name="user" value="{{ user }}" style="display: none;">
         <button type="submit">Report</button>
     </form>
 </body>

@@ -1,70 +1,79 @@
 from datetime import datetime
-import calendar
 import shelve
+import uuid
 
-class Tracker():
-    def calculate_time_difference(start_time, end_time):
-        format_string = '%Y-%m-%dT%H:%M:%S'
-        start_datetime = datetime.strptime(start_time, format_string)
-        end_datetime = datetime.strptime(end_time, format_string)
-        
-        time_difference = end_datetime - start_datetime
-        
-        hours = time_difference.seconds // 3600
-        minutes = (time_difference.seconds % 3600) // 60
-        seconds = time_difference.seconds % 60
-        
-        formatted_difference = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-        
-        return formatted_difference
-    
-    def calculate_usage(rate, time):
-        format_string = '%H:%M:%S'
-        duration = datetime.strptime(time, format_string)-datetime.strptime("0", "%H")
-        hours = duration.total_seconds() % 60
+class Tracker:
+    def __init__(self):
+        pass
 
-        total = int(float(rate)*hours)
+    #setter & gettter
 
-        return total
-    
-    def generate_report(user):
-        items = []
+    def get_active_trackers(self, user):
+        try:
+            with shelve.open('user') as db:
+                data = db[user]
+            return data
+        except:
+            data = {'Air Conditioning':['Aircon', 10, None, None], 'Shower':['Shower', 10, None, None], 'Room Lights':['Lights', 10, None, None]}
+            self.set_active_trackers(user, data)
+            return data
+
+    def set_active_trackers(self, user, data):
+        try:
+            with shelve.open('user') as db:
+                db[user] = data
+        except:
+            data = {'Air Conditioning':['Aircon', 10, None, None], 'Shower':['Shower', 10, None, None], 'Room Lights':['Lights', 10, None, None]}
+            self.set_active_trackers(user, data)
+
+    def get_tracker_session(self, tracker_id):
         year = datetime.now().year
         month = datetime.now().strftime("%m")
         with shelve.open(f'tracker{year}{month}') as db:
-            for i in db:
-                if db[i]['user'] == user:
-                    usetime = Tracker.calculate_time_difference(db[i]['time_start'], db[i]['time_end'])
-                    usage = Tracker.calculate_usage(db[i]['rate'], usetime)
-                    date = db[i]['time_start'][0:10]
-                    dict = {
-                        'item':db[i]['item'],
-                        'date':date,
-                        'duration':usetime,
-                        'usage':usage
-                    }
-                    items.append(dict)
-        return items
+            data = db[tracker_id]
+        return data
 
-    def generate_datapoints(list):
-        x_axis = []
-        y_axis = []
-        total = 0
+    def set_tracker_session(self, tracker_id, data):
         year = datetime.now().year
         month = datetime.now().strftime("%m")
-        current_date = datetime.now().strftime("%d")
-        num_days = calendar.monthrange(year, int(month))[1]
-        for i in range(1, num_days+1):
-            if i <= int(current_date):
-                records = list
-                count = 0
-                for record in records:
-                    if int(record['date'][8:10]) == int(i):
-                        total += int(record['usage'])
-                        list.pop(count)
-                    else:
-                        count += 1
-                y_axis.append(total)
-            date = int(f'{i:02d}')
-            x_axis.append(int(date))
-        return x_axis, y_axis
+        with shelve.open(f'tracker{year}{month}') as db:
+            db[tracker_id] = data
+
+    #relative functions
+
+    def stop_active_tracker(self, user, tracker_id):
+        tracker_tray = self.get_active_trackers(user)
+        for id in tracker_tray:
+            if id == tracker_id:
+                item = tracker_tray[id][0]
+                rate = tracker_tray[id][1]
+                tracker_tray[id] = [item, rate, None, None]
+                self.set_active_trackers(user, tracker_tray)
+                break
+        print(f'{tracker_id} tracker defaulted')
+
+    def start_active_tracker(self, user, tracker_id, session_id, rate, start_time):
+        tracker_tray = self.get_active_trackers(user)
+        for i in tracker_tray:
+            item = tracker_tray[i][0]
+            if i == tracker_id:
+                tracker_tray[i] = [item, rate, session_id, start_time]
+                self.set_active_trackers(user, tracker_tray)
+                break
+        print(f'{tracker_id} tracker started')
+
+    def update_tracker_session(self, item, rate, user, key):
+        if key == 'None':
+            key = str(uuid.uuid4())
+            print(key)
+            current_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            data = {'user':user, 'item': item,  'rate':rate,  'time_start': current_time,  'time_end': None}
+            self.set_tracker_session(key, data)
+            self.start_active_tracker(user, item, key, rate, current_time)
+        elif key != 'None':
+            current_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            data = self.get_tracker_session(key)
+            data['time_end'] = current_time
+            self.set_tracker_session(key, data)
+            self.stop_active_tracker(user, item)
+

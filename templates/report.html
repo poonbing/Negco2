@@ -17,6 +17,11 @@
             <input id="usage-{{ loop.index }}" type="text" value="{{record['usage']}}" readonly>
         </div>
     {% endfor %}
+    <div id='return'>
+      <form name="tracker" action="/track" method="POST">
+        <button type="submit">Tracker</button>
+      </form>
+    </div>
     <div id="x-axis" style="display: none;">{{ x }}</div>
     <div id="y-axis" style="display: none;">{{ y }}</div>
     <canvas id="myChart"></canvas>

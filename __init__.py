@@ -1,77 +1,44 @@
 from flask import Flask, render_template, redirect, url_for, request, session
-import shelve
-from datetime import datetime
-import uuid
 from functions.tracker import Tracker
+from functions.report import Report
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = '3d6f45a5fc12445dbac2f59c3b6c7cb1'
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'GET': 
+    if request.method == 'GET':
+        session.pop('user', None)
         return render_template('index.html')
 
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-    if 'item' in request.form:
+    if 'start_tracker' in request.form:
+        print('create')
         item = request.form.get('item')
         rate = request.form.get('rate')
-        user = request.form.get('user')
         key = request.form.get('key')
-        start_time = request.form.get('time')
-        print(item, rate, user, key, start_time)
-        if key == 'None':
-            print(f'create entry, {item}')
-            tracker_id = str(uuid.uuid4())
-            current_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-            year = datetime.now().year
-            month = datetime.now().strftime("%m")
-            with shelve.open(f'tracker{year}{month}') as tracker_db:
-                tracker_db[tracker_id] = {
-                    'user':user,
-                    'item': item, 
-                    'rate':rate, 
-                    'time_start': current_time, 
-                    'time_end': None}
-            with shelve.open('user') as user_db:
-                timers = user_db[user]
-                timers[item] = [tracker_id, current_time]
-                user_db[user] = timers
-            return render_template('tracker.html', user = user, keylist = timers)
-        elif key != 'None':
-            print(f'close entry, {item}, {key}')
-            current_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-            year = datetime.now().year
-            month = datetime.now().strftime("%m")
-            with shelve.open(f'tracker{year}{month}') as tracker_db:
-                instance = tracker_db[key]
-                instance['time_end'] = current_time
-                tracker_db[key] = instance
-            with shelve.open('user') as user_db:
-                timers = user_db[user]
-                timers[item] = [None, None]
-                user_db[user] = timers
-            return render_template('tracker.html', user = user, keylist = timers)
+        user = session['user']
+        Tracker().update_tracker_session(item, rate, user, key)
+        timers = Tracker().get_active_trackers(user)
+        return render_template('tracker.html', user = user, keylist = timers)
     if 'user_id' in request.form:
         user = request.form.get('user_id')
-        with shelve.open('user') as user_db:
-            if user in user_db:
-                timers = user_db[user]
-            else:
-                user_db[user] = {'Aircon':[None, None],
-                                'Shower':[None, None],
-                                'Lights':[None, None]}
-                timers = user_db[user]
+        session['user'] = user
+        timers = Tracker().get_active_trackers(user)
+        return render_template('tracker.html', user = user, keylist = timers)
+    else:
+        user = session['user']
+        timers = Tracker().get_active_trackers(user)
         return render_template('tracker.html', user = user, keylist = timers)
 
 @app.route('/report', methods=['GET', 'POST'])
 def generate_report():
     if request.method == 'POST':
-        user = request.form.get('user')
-        x_axis, y_axis = Tracker.generate_datapoints(Tracker.generate_report(user))
-        items = Tracker.generate_report(user)
+        user = session['user']
+        x_axis, y_axis = Report().generate_datapoints(Report().generate_report(user))
+        items = Report().generate_report(user)
         return render_template('report.html', list=items, x = x_axis, y = y_axis)
 
 
