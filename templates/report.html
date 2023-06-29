@@ -6,16 +6,22 @@
 </head>
 <body>
     <h1>Negco Web App</h1>
-    {% for record in list %}
-        <h2>{{record['item']}}</h2>
+    {% for date in list %}
+    <h2>{{ date }}</h2>
+      <span for="duration-{{ loop.index }}"> Total Duration: {{ list[date]['total']['duration'] }}</span>
+      <span for="duration-{{ loop.index }}"> Total Usage: {{ list[date]['total']['usage'] }}</span>
+      <br>
+      <h1>Break Down</h1>
+      <br>
+      {% for item in list[date] %}
+        <h2>{{ item }}</h2>
         <div>
-            <label for="date-{{ loop.index }}">Date: </label>
-            <input id="date-{{ loop.index }}" type="text" value="{{record['date']}}">
-            <label for="duration-{{ loop.index }}">Duration: </label>
-            <input id="'duration-{{ loop.index }}" type="text" value="{{record['duration']}}" readonly>
-            <label for="usage-{{ loop.index }}">Usage: </label>
-            <input id="usage-{{ loop.index }}" type="text" value="{{record['usage']}}" readonly>
+          <span for="duration-{{ loop.index }}"> Total Duration: {{ list[date][item]['duration'] }}</span>
+          <span for="duration-{{ loop.index }}"> Total Usage: {{ list[date][item]['usage'] }}</span>
         </div>
+        <br>
+      {% endfor %}  
+      <h3>----------------------------------------------------------------------</h3>
     {% endfor %}
     <div id='return'>
       <form name="tracker" action="/track" method="POST">

@@ -1,7 +1,7 @@
 from datetime import datetime
 import calendar
 import shelve
-from .tracker import Tracker
+from .tracker import TrackerFunctions, Tracker, SessionInfo, SessionTracker
 
 class Report:
     def __init__(self):
@@ -27,23 +27,21 @@ class Report:
         total = int(float(rate)*hours)
         return total
     
-    def generate_report(self, user):
-        items = []
-        year = datetime.now().year
-        month = datetime.now().strftime("%m")
-        with shelve.open(f'tracker{year}{month}') as db:
-            for i in db:
-                if db[i]['user'] == user:
-                    usetime = self.calculate_time_difference(db[i]['time_start'], db[i]['time_end'])
-                    usage = self.calculate_usage(db[i]['rate'], usetime)
-                    date = db[i]['time_start'][0:10]
-                    dict = {
-                        'item':db[i]['item'],
-                        'date':date,
-                        'duration':usetime,
-                        'usage':usage
-                    }
-                    items.append(dict)
+    def generate_report(self, user_id):
+        trackers = Tracker.filter_by(user_id=user_id)
+        # with shelve.open(f'tracker{year}{month}') as db:
+        #     for i in db:
+        #         if db[i]['user'] == user:
+        #             usetime = self.calculate_time_difference(db[i]['time_start'], db[i]['time_end'])
+        #             usage = self.calculate_usage(db[i]['rate'], usetime)
+        #             date = db[i]['time_start'][0:10]
+        #             dict = {
+        #                 'item':db[i]['item'],
+        #                 'date':date,
+        #                 'duration':usetime,
+        #                 'usage':usage
+        #             }
+        #             items.append(dict)
         return items
     
     def generate_datapoints(self, list):
@@ -68,3 +66,5 @@ class Report:
             date = int(f'{i:02d}')
             x_axis.append(int(date))
         return x_axis, y_axis
+    
+        
