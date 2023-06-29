@@ -23,6 +23,7 @@ def create_app(config_class=Config):
         from app.password_recovery import bp as password_recovery_bp
         from app.error import bp as error_bp
         from app.signup import bp as signup_bp
+        from app.api import bp as api_bp
 
         app.register_blueprint(main_bp)
         app.register_blueprint(login_bp)
@@ -31,6 +32,7 @@ def create_app(config_class=Config):
         app.register_blueprint(signup_bp)
         app.register_blueprint(password_recovery_bp)
         app.register_blueprint(error_bp)
+        app.register_blueprint(api_bp)
 
         login_bp.xcaptcha = xcaptcha
 

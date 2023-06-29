@@ -6,6 +6,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
+    profile_picture = db.Column(db.String(200), unique=True)
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(50))
     role = db.Column(db.String(20))
@@ -64,6 +65,5 @@ class LockedUser(db.Model):
     locked_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_locked(self):
-        # You can customize the locking conditions here (e.g., time-based lock)
         lock_duration = timedelta(hours=1)
         return self.locked_at + lock_duration > datetime.utcnow()

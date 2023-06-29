@@ -4,6 +4,8 @@ from werkzeug.utils import secure_filename
 from ..models import User
 from config import Config
 from app.user import bp
+from PIL import Image
+import secrets
 
 from ..extensions import db
 
@@ -16,15 +18,8 @@ def settings():
 
         if request.method == "POST":
             if request.files.get("profile_picture"):
-                profile_picture = request.files["profile_picture"]
-                if profile_picture.filename != "":
-                    filename = secure_filename(profile_picture.filename)
-                    profile_picture.save(
-                        profile_picture.save(
-                            os.path.join(Config.UPLOAD_FOLDER, filename)
-                        )
-                    )
-                    user.profile_picture = filename
+                profile_picture = save_picture(request.files["profile_picture"])
+                user.profile_picture = profile_picture
 
             if request.form.get("first_name"):
                 user.first_name = request.form.get("first_name")
@@ -72,3 +67,17 @@ def dashboard():
         return render_template("user/dashboard.html", username=username)
     else:
         return redirect(url_for("login.login"))
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(Config.UPLOAD_FOLDER, picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_path

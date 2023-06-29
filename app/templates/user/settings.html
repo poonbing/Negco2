@@ -15,7 +15,7 @@
           };
           reader.readAsDataURL(input.files[0]);
         } else {
-          previewImage.src = ''; // Clear the preview if no file is selected
+          previewImage.src = '';
         }
       }
     </script>
@@ -28,7 +28,7 @@
       <h1 class="text-3xl font-bold mt-4">Settings</h1>
       <br />
 
-      <form method="POST" action="{{ url_for('user.settings') }}">
+      <form method="POST" action="{{ url_for('user.settings') }}" enctype="multipart/form-data">
         <div class="grid gap-6 mb-6 md:grid-cols-2">
           <div class="mb-6">
             <label for="profile_picture" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Picture</label>
@@ -38,8 +38,7 @@
                 Browse
               </label>
             </div>
-            <img id="profile_picture_preview" class="mt-2" style="max-width: 200px; max-height: 200px;" />
-          </div>
+            <img id="profile_picture_preview" class="mt-2" style="width: 200px; height: 200px;" src="{{ user.profile_picture }}" />          </div>
           
           
           

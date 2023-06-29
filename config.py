@@ -1,3 +1,6 @@
+import os
+
+
 class Config:
     # Flask configuration
     DEBUG = True  # Set to False in production
@@ -20,19 +23,10 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USERNAME = "chuayoushen5@gmail.com"
-    MAIL_PASSWORD = "wulzalsahzqkouwf"
-    MAIL_DEFAULT_SENDER = ("NEGCO2", "your-email@gmail.com")
+    MAIL_PASSWORD = "bqpccxputtnresrf"
+    MAIL_DEFAULT_SENDER = ("NEGCO2", "chuayoushen@gmail.com")
 
-    # Static configuration
-    STATIC_URL_PATH = "/static"
-    STATIC_FOLDER = "static"
-
-    # File upload configuration
-    UPLOAD_FOLDER = "/static/img"  # Update with your desired upload folder path
-    ALLOWED_EXTENSIONS = {
-        "jpg",
-        "jpeg",
-        "png",
-        "gif",
-    }  # Set the allowed file extensions
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Set the maximum file size (in bytes)
+    # Path Configuration
+    APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "app"))
+    STATIC_FOLDER = os.path.join(APP_ROOT, "static")
+    UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
