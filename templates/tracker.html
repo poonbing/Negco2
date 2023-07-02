@@ -66,11 +66,10 @@
             <input type="text" id="name" name="name" value="{{ key.name }}" style="display: none;">
             <span id="timer-{{ key.name }}"> 0h 0m 0s</span>
             <br>
-            <label for="rate">Rate: {{ key.rate }} Watts/Second</label>
+            <label for="rate">Rate: {{ key.rate }} Watts/Hour</label>
             <input type="text" id="item" name="item" value="{{ key.item }}" style="display: none;">
             <input type="text" id="rate" name="rate" value="{{ key.rate }}" style="display: none;">
             <input type="text" id="key" name="key" value="{{ key.session_id }}" style="display: none;">
-            <input type="text" id="time" name="time" value="{{ key.start_time }}" style="display: none;">
             <br>
             <button id="start_tracker" name="start_tracker" type="submit">Start</button>
             <form action="/track" name="delete" id="delete" method="POST">
@@ -79,7 +78,7 @@
             </form>
         </form>
         <script>
-            var startTime = "{{ key.start_time }}";
+            var startTime = "{{ key.session_start }}";
             var elementId = "timer-{{ key.name }}";
             startTimer(startTime, elementId);
         </script>

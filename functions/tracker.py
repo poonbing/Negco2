@@ -1,13 +1,13 @@
 from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, func, ForeignKey, create_engine
+from sqlalchemy import desc, func, ForeignKey, create_engine, ARRAY
 from sqlalchemy.orm import sessionmaker, relationship
 import uuid
 from collections import defaultdict
 import calendar
 
-app = Flask(__name__)
+app = Flask('__main__')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/tracker'
 engine = create_engine("mysql+pymysql://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/tracker", echo=True)
 Session = sessionmaker(bind=engine)
@@ -18,11 +18,12 @@ class Tracker(db.Model):
     __tablename__ = 'tracker'
     #sql model
     id = db.Column(db.String(36), primary_key = True, unique = True)
-    user_id = db.Column(db.String(36), db.ForeignKey('user.id'))
-    user = db.relationship('User', backref = db.backref('tracker', lazy = True))
+    user_id = db.Column(db.String(36), nullable = False, unique = True)
+    # user_id = db.Column(db.String(36), db.ForeignKey('user.id'))
+    # user = db.relationship('User', backref = db.backref('tracker', lazy = True))
     name = db.Column(db.String(20), nullable = False)
     type = db.Column(db.String(20), nullable = False)
-    rate = db.Column(db.Integer(20), nullable = False)
+    rate = db.Column(db.FLOAT(7,4), nullable = False)
     start_time = db.Column(db.DateTime, nullable = False)
     end_time = db.Column(db.DateTime)
 
@@ -225,3 +226,4 @@ class TrackerFunctions:
             y_axis.append(total)
             x_axis.append(i)
         return x_axis, y_axis
+    
