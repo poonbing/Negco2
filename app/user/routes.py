@@ -6,67 +6,69 @@ from config import Config
 from app.user import bp
 from PIL import Image
 import secrets
+from ..forms import SettingsForm
+from flask_login import login_required, current_user  # Import current_user
 
-from ..extensions import db
+from ..extensions import db, login_manager
 
 
 @bp.route("/settings", methods=["GET", "POST"])
+@login_required
 def settings():
-    if "username" in session:
-        username = session["username"]
-        user = User.query.filter_by(username=username).first()
+    user = current_user
 
-        if request.method == "POST":
-            if request.files.get("profile_picture"):
-                profile_picture = save_picture(request.files["profile_picture"])
-                user.profile_picture = profile_picture
+    form = SettingsForm()
+    if request.method == "POST":
+        print("reached here")
+        if form.profile_picture.data:
+            profile_picture = save_picture(form.profile_picture.data)
+            user.profile_picture = profile_picture
 
-            if request.form.get("first_name"):
-                user.first_name = request.form.get("first_name")
-            if request.form.get("last_name"):
-                user.last_name = request.form.get("last_name")
-            if request.form.get("phone"):
-                user.phone = request.form.get("phone")
-            if request.form.get("gender"):
-                user.gender = request.form.get("gender")
-            if request.form.get("email"):
-                user.email = request.form.get("email")
-            if request.form.get("password"):
-                new_password = request.form.get("password")
-                confirm_password = request.form.get("confirm_password")
-                if new_password == confirm_password:
-                    user.password = new_password
-                else:
-                    error_message = "Password and confirm password do not match."
-                    return render_template(
-                        "user/settings.html",
-                        username=username,
-                        user=user,
-                        error_message=error_message,
-                    )
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.phone = form.phone.data
+        user.gender = form.gender.data
+        user.email = form.email.data
 
-            db.session.commit()
-
-            success_message = "User information updated successfully!"
+        new_password = form.password.data
+        confirm_password = form.confirm_password.data
+        if new_password and new_password == confirm_password:
+            user.password = new_password
+        elif new_password and new_password != confirm_password:
+            error_message = "Password and confirm password do not match."
             return render_template(
                 "user/settings.html",
-                username=username,
+                username=user.username,
                 user=user,
-                success_message=success_message,
+                form=form,
+                error_message=error_message,
             )
-        else:
-            return render_template("user/settings.html", user=user)
-    else:
-        return redirect(url_for("login.login"))
+
+        db.session.commit()
+
+        success_message = "User information updated successfully!"
+        return render_template(
+            "user/settings.html",
+            username=user.username,
+            user=user,
+            form=form,
+            success_message=success_message,
+        )
+
+    return render_template(
+        "user/settings.html",
+        username=user.username,
+        user=user,
+        form=form,
+    )
 
 
 @bp.route("/dashboard")
+@login_required
 def dashboard():
-    if "username" in session:
-        username = session["username"]
-        return render_template("user/dashboard.html", username=username)
-    else:
-        return redirect(url_for("login.login"))
+    user = current_user
+
+    return render_template("user/dashboard.html", username=user.username)
 
 
 def save_picture(form_picture):

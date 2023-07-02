@@ -1,8 +1,9 @@
 from .extensions import db
 from datetime import datetime, timedelta
+from flask_login import UserMixin
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -33,6 +34,9 @@ class User(db.Model):
         self.age = age
         self.phone = phone
 
+    def check_password(self, password):
+        return self.password == password
+
     def increment_login_attempts(self):
         self.login_attempts += 1
         db.session.commit()
@@ -55,6 +59,15 @@ class User(db.Model):
 
     def is_account_locked(self):
         return self.locked is not None and self.locked.is_locked()
+
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return False
 
 
 class LockedUser(db.Model):
