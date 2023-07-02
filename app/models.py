@@ -1,6 +1,9 @@
 # Python Modules
 from datetime import datetime, timedelta
 from flask_login import UserMixin
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+
 
 # Local Modules
 from .extensions import db
@@ -83,3 +86,84 @@ class LockedUser(db.Model):
     def is_locked(self):
         lock_duration = timedelta(hours=1)
         return self.locked_at + lock_duration > datetime.utcnow()
+
+class Tracker(db.Model):
+    __tablename__ = 'tracker'
+    #sql model
+    id = db.Column(db.String(36), primary_key = True, unique = True)
+    user_id = db.Column(db.String(36), nullable = False)
+    name = db.Column(db.String(45), nullable = False)
+    item = db.Column(db.String(45), nullable = False)
+    rate = db.Column(db.INTEGER, nullable = False)
+    start_time = db.Column(db.String(20), nullable = False)
+    end_time = db.Column(db.String(20))
+
+    def __init__(self, id, user_id, name, item, rate, start_time, end_time):
+        self.id = id
+        self.user_id = user_id
+        self.name = name
+        self.item = item
+        self.rate = rate
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'item': self.item,
+            'rate': self.rate,
+            'start_time': self.start_time,
+            'end_time': self.end_time
+        }
+    
+class SessionTracker(db.Model):
+    __tablename__ = 'session_tracker'
+    #sql model
+    user_id = db.Column(db.String(36), primary_key = True, unique = True)
+    active_sessions = relationship('SessionInfo', backref='session_tracker')
+
+    def __init__(self, user_id, session_info=None):
+        self.user_id = user_id
+        self.session_info = session_info or []
+
+    def add_session_info(self, data):
+        self.session_info.append(data)
+    
+    def to_dict(self):
+        return {
+            'user_id':self.user_id,
+            'active_session':self.active_sessions
+        }
+
+class SessionInfo(db.Model):
+    __tablename__ = 'session_info'
+
+    id = db.Column(db.String(36), primary_key = True, unique = True)
+    active_sessions = db.Column(db.String(45), ForeignKey('session_tracker.user_id'))
+    name = db.Column(db.String(45), nullable = False)
+    item = db.Column(db.String(45), nullable = False)
+    session_id = db.Column(db.String(36), nullable = False)
+    session_start = db.Column(db.String(20))
+    rate = db.Column(db.INTEGER, nullable = False)
+
+    def __init__(self, id, user_id, name, item, session_id, session_start, rate):
+        self.id = id
+        self.user_id = user_id
+        self.name = name
+        self.item = item
+        self.session_id = session_id
+        self.session_start = session_start
+        self.rate = rate
+
+    def to_dict(self):
+        return{
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'item': self.item,
+            'session_id': self.session_id,
+            'session_start':self.session_start,
+            'rate':self.rate
+        }
