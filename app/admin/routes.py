@@ -1,8 +1,11 @@
+# Python Modules
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from functools import wraps
+
+# Local Modules
 from app.admin import bp
 from ..models import User, LockedUser
-from functools import wraps
 
 
 def admin_required(view_func):

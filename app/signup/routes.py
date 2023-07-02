@@ -1,4 +1,7 @@
+# Python Modules
 from flask import render_template, request, redirect, url_for
+
+# Local Modules
 from app.signup import bp
 from ..models import User
 from ..extensions import db

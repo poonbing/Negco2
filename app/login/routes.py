@@ -1,5 +1,8 @@
+# Python Modules
 from flask import render_template, request, redirect, session, url_for
 from flask_login import login_user, logout_user, login_required, current_user
+
+# Local Modules
 from app.login import bp
 from ..models import User
 from ..extensions import login_manager

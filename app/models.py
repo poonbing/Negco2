@@ -1,6 +1,9 @@
-from .extensions import db
+# Python Modules
 from datetime import datetime, timedelta
 from flask_login import UserMixin
+
+# Local Modules
+from .extensions import db
 
 
 class User(db.Model, UserMixin):

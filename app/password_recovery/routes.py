@@ -1,8 +1,12 @@
+# Python Modules
 from flask import redirect, url_for, render_template, request
-from app.password_recovery import bp
 from flask_mail import Message
-from ..models import User
 from random import randint
+
+
+# Local Modules
+from app.password_recovery import bp
+from ..models import User
 from ..extensions import db, mail
 
 access_codes = {}

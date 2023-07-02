@@ -1,15 +1,17 @@
-import os
+# Python Modules
 from flask import render_template, request, session, redirect, url_for
+from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from ..models import User
-from config import Config
-from app.user import bp
 from PIL import Image
 import secrets
-from ..forms import SettingsForm
-from flask_login import login_required, current_user
+import os
 
+# Local Modules
 from ..extensions import db, login_manager
+from ..forms import SettingsForm
+from ..models import User
+from app.user import bp
+from config import Config
 
 
 @bp.route("/settings", methods=["GET", "POST"])
