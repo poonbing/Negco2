@@ -7,7 +7,7 @@ from app.user import bp
 from PIL import Image
 import secrets
 from ..forms import SettingsForm
-from flask_login import login_required, current_user  # Import current_user
+from flask_login import login_required, current_user
 
 from ..extensions import db, login_manager
 
@@ -18,8 +18,7 @@ def settings():
     user = current_user
 
     form = SettingsForm()
-    if request.method == "POST":
-        print("reached here")
+    if form.validate_on_submit():
         if form.profile_picture.data:
             profile_picture = save_picture(form.profile_picture.data)
             user.profile_picture = profile_picture
@@ -82,4 +81,4 @@ def save_picture(form_picture):
     i.thumbnail(output_size)
     i.save(picture_path)
 
-    return picture_path
+    return picture_fn
