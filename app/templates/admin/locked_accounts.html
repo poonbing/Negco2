@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Locked Accounts</title>
+  </head>
+  <body>
+    <h1>Locked Accounts</h1>
+
+    <form method="POST" action="{{ url_for('admin.locked_accounts') }}">
+      <table>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+        {% for account in locked_accounts %}
+        <tr>
+          <td>{{ account.username }}</td>
+          <td>{{ account.email }}</td>
+          <td>
+            <input
+              type="checkbox"
+              name="unlock_account"
+              value="{{ account.id }}"
+            />
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+
+      <button type="submit">Unlock Selected Accounts</button>
+    </form>
+  </body>
+</html>
