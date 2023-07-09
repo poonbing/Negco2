@@ -9,33 +9,13 @@ from datetime import datetime
 import uuid
 from app.tracker import bp
 from ..extensions import db
-from ..models import Tracker, SessionInfo, SessionTracker
+from ..models import Tracker, SessionInfo
 
 class TrackerFunctions:
     def __init__(self):
         pass
 
     # session operators
-    def get_session_tracker(self, user_id):
-        sessions = SessionTracker.query.get(user_id)
-        return sessions.to_dict()
-
-    def get_all_session_of_tracker(self, user_id):
-        trackers = SessionInfo.query.filter_by(active_sessions=user_id).all()
-        if trackers is None:
-            return []
-        return trackers
-
-    def check_for_session_tracker(self, user_id):
-        session_tracker = SessionTracker.query.filter_by(user_id=user_id).first()
-        return session_tracker is not None
-
-    def create_session_tracker(self, user_id):
-        new_session = SessionTracker(user_id)
-        db.session.add(new_session)
-        db.session.commit()
-        return new_session
-
     def get_session_information(self, user_id, name):
         session_info = SessionInfo.query.filter(and_(SessionInfo.active_sessions == user_id, SessionInfo.name == name)).first()
         return session_info
@@ -49,27 +29,23 @@ class TrackerFunctions:
     def create_session_information(self, user_id, name, item, rate):
         id = str(uuid.uuid4())
         session_info = SessionInfo(id, user_id, name, item, 'None', 'None', rate)
-        session_tracker = SessionTracker.query.get(user_id)
-        session_tracker.active_sessions.append(session_info)
         db.session.add(session_info)
         db.session.commit()
         return id
     
     def start_session(self, user_id, name, session_id, start_time):
-        session_tracker = SessionTracker.query.get(user_id)
-        if session_tracker is None:
-            return False
         session_info = SessionInfo.query.filter(and_(SessionInfo.active_sessions == user_id, SessionInfo.name == name)).first()
+        if session_info is None:
+            return False
         session_info.session_id = session_id
         session_info.session_start = start_time
         db.session.commit()
         return 'Success'
 
     def end_session(self, user_id, name):
-        session_tracker = SessionTracker.query.get(user_id)
-        if session_tracker is None:
-            return False
         session_info = SessionInfo.query.filter(and_(SessionInfo.active_sessions == user_id, SessionInfo.name == name)).first()
+        if session_info is None:
+            return False
         session_info.session_id = 'None'
         session_info.session_start = 'None'
         db.session.commit()
@@ -82,9 +58,6 @@ class TrackerFunctions:
         db.session.commit()
 
     def update_session_information(self, user_id, old_name, name, item, rate):
-        sessiontracker = SessionTracker.query.get(user_id)
-        if sessiontracker is None:
-            return 'Failed'
         session_info = SessionInfo.query.filter(and_(SessionInfo.active_sessions == user_id, SessionInfo.name == old_name)).first()
         if session_info is None:
             return 'Failed'
