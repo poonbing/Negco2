@@ -149,7 +149,7 @@ def track():
             tracker.create_session_information(user, 'LED Lights', 'LED Light', 10)
         timers = tracker.get_all_session_of_tracker(user)
         print(timers, user)
-        return render_template('tracker.html', keylist=timers)
+        return render_template('tracker/tracker.html', keylist=timers)
     if 'start_tracker' in request.form: #updated
         user = session['user']
         name = request.form.get('name')
@@ -163,7 +163,7 @@ def track():
             tracker.end_session(user, name)
             tracker.end_tracker(key)
         timers = tracker.get_all_session_of_tracker(user)
-        return render_template('tracker.html', keylist=timers)
+        return render_template('tracker/tracker.html', keylist=timers)
     if 'item_form' in request.form: #updated
         index = request.form.get('item_index')
         item = request.form.get('new_item')
@@ -175,12 +175,12 @@ def track():
         elif method == 'create':
             tracker.create_session_information(user, name, item, rate)
         timers = tracker.get_all_session_of_tracker(user)
-        return render_template('tracker.html', keylist=timers)
+        return render_template('tracker/tracker.html', keylist=timers)
     if 'delete' in request.form: #updated
         index = request.form.get('index')
         tracker.delete_session_information(user, index)
         timers = tracker.get_all_session_of_tracker(user)
-        return render_template('tracker.html', keylist=timers)
+        return render_template('tracker/tracker.html', keylist=timers)
     else: #updated
         timers = tracker.get_all_session_of_tracker(user)
-        return render_template('tracker.html', keylist=timers)
+        return render_template('tracker/tracker.html', keylist=timers)
