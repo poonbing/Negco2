@@ -56,7 +56,7 @@
               id="login-form"
               class="space-y-4 md:space-y-6"
               method="POST"
-              action="{{ url_for('login.login') }}"
+              action="{{ url_for('auth.login') }}"
               onsubmit="signInHandler()"
             >
               <div>
@@ -108,7 +108,7 @@
                   </div>
                 </div>
                 <a
-                  href="{{ url_for('password_recovery.forgot_password') }}"
+                  href="{{ url_for('recovery.forgot_password') }}"
                   class="text-sm font-medium text-teal-600 hover:underline dark:text-teal-500"
                   >Forgot password?</a
                 >
@@ -124,7 +124,7 @@
               <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet?
                 <a
-                  href="{{ url_for('signup.signup') }}"
+                  href="{{ url_for('auth.signup') }}"
                   class="font-medium text-teal-600 hover:underline dark:text-teal-500"
                   >Sign up</a
                 >

@@ -41,39 +41,37 @@
             <h1
               class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
             >
-              Password Recovery
+              Enter Access Code
             </h1>
             <p class="dark:text-white text-gray-900">
-              Please enter your email address to initiate the account recovery
-              process:
+              Please enter the access code:
             </p>
             {% if error %}
             <p class="text-red-500">{{ error }}</p>
             {% endif %}
             <form
-              class="space-y-4 md:space-y-6"
+              action="{{ url_for('recovery.enter_access_code', email=email) }}"
               method="POST"
-              action="{{ url_for('password_recovery.forgot_password') }}"
             >
               <div>
                 <label
-                  for="email"
+                  for="access_code"
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >Your email</label
+                  >Access code</label
                 >
                 <input
                   type="text"
-                  name="email"
-                  id="email"
+                  name="access_code"
+                  id="access_code"
                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Username"
+                  placeholder="Access Code"
                   required
                 />
               </div>
               <button
                 type="submit"
                 value="Login"
-                class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                class="w-full mt-4 text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
               >
                 Submit
               </button>

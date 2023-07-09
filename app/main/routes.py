@@ -6,5 +6,5 @@ from ..models import User
 @bp.route("/")
 def home():
     if "username" in session:
-        return redirect(url_for("user.dashboard"))
-    return redirect(url_for("login.login"))
+        return redirect(url_for("management.dashboard"))
+    return redirect(url_for("auth.login"))

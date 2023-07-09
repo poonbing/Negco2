@@ -2,27 +2,47 @@
 from datetime import datetime, timedelta
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
-
+from secrets import token_hex
 
 # Local Modules
 from .extensions import db
 
 
+class Session(db.Model):
+    __tablename__ = "sessions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    session_token = db.Column(db.String(100), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(255))
+
+    def __init__(self, user_id, ip_address, user_agent):
+        self.session_token = token_hex(32)
+        self.user_id = user_id
+        self.ip_address = ip_address
+        self.user_agent = user_agent
+
+    def update_last_activity(self):
+        self.last_activity = datetime.utcnow()
+        db.session.commit()
+
+
 class User(db.Model, UserMixin):
     __tablename__ = "users"
 
-    id = db.Column(db.INTEGER, nullable = False, primary_key=True)
+    id = db.Column(db.INTEGER, nullable=False, primary_key=True)
     profile_picture = db.Column(db.String(200), unique=True)
-    username = db.Column(db.String(50), nullable = False, unique=True)
-    password = db.Column(db.String(50), nullable = False)
-    role = db.Column(db.String(20), nullable = False)
-    email = db.Column(db.String(100), nullable = False, unique=True)
-    gender = db.Column(db.String(10), nullable = False)
-    first_name = db.Column(db.String(50), nullable = False)
-    last_name = db.Column(db.String(50), nullable = False)
-    age = db.Column(db.INTEGER, nullable = False)
-    phone = db.Column(db.String(15), nullable = False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    gender = db.Column(db.String(10), nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    age = db.Column(db.INTEGER, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
     login_attempts = db.Column(db.INTEGER, default=0)
 
     locked = db.relationship("LockedUser", backref="user", uselist=False)
@@ -75,27 +95,46 @@ class User(db.Model, UserMixin):
     def is_anonymous(self):
         return False
 
+    def is_admin(self):
+        return self.role == "admin"
+
+    def create_session(self, session_token):
+        session = Session(session_token=session_token, user_id=self.id)
+        db.session.add(session)
+        db.session.commit()
+
+    def get_session(self, session_token):
+        return self.sessions.filter_by(session_token=session_token).first()
+
+    def update_session_last_activity(self, session_token):
+        session = self.get_session(session_token)
+        if session:
+            session.update_last_activity()
+
 
 class LockedUser(db.Model):
     __tablename__ = "locked_users"
 
-    id = db.Column(db.INTEGER, nullable = False, primary_key=True)
-    user_id = db.Column(db.INTEGER, db.ForeignKey("users.id"), nullable = False, unique=True)
+    id = db.Column(db.INTEGER, nullable=False, primary_key=True)
+    user_id = db.Column(
+        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
     locked_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_locked(self):
         lock_duration = timedelta(hours=1)
         return self.locked_at + lock_duration > datetime.utcnow()
 
+
 class Tracker(db.Model):
-    __tablename__ = 'tracker'
-    #sql model
-    id = db.Column(db.String(36), primary_key = True, unique = True)
-    user = db.Column(db.INTEGER, nullable = False)
-    name = db.Column(db.String(45), nullable = False)
-    item = db.Column(db.String(45), nullable = False)
-    rate = db.Column(db.INTEGER, nullable = False)
-    start_time = db.Column(db.String(20), nullable = False)
+    __tablename__ = "tracker"
+    # sql model
+    id = db.Column(db.String(36), primary_key=True, unique=True)
+    user = db.Column(db.INTEGER, nullable=False)
+    name = db.Column(db.String(45), nullable=False)
+    item = db.Column(db.String(45), nullable=False)
+    rate = db.Column(db.INTEGER, nullable=False)
+    start_time = db.Column(db.String(20), nullable=False)
     end_time = db.Column(db.String(20))
 
     def __init__(self, id, user, name, item, rate, start_time, end_time):
@@ -109,25 +148,28 @@ class Tracker(db.Model):
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'user_id': self.user,
-            'name': self.name,
-            'item': self.item,
-            'rate': self.rate,
-            'start_time': self.start_time,
-            'end_time': self.end_time
+            "id": self.id,
+            "user_id": self.user,
+            "name": self.name,
+            "item": self.item,
+            "rate": self.rate,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
         }
 
-class SessionInfo(db.Model):
-    __tablename__ = 'session_info'
 
-    id = db.Column(db.String(36), primary_key = True, nullable = False, unique = True)
-    active_sessions = db.Column(db.String(45), ForeignKey('session_tracker.user_id'), nullable = False)
-    name = db.Column(db.String(45), nullable = False)
-    item = db.Column(db.String(45), nullable = False)
+class SessionInfo(db.Model):
+    __tablename__ = "session_info"
+
+    id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
+    active_sessions = db.Column(
+        db.String(45), ForeignKey("session_tracker.user_id"), nullable=False
+    )
+    name = db.Column(db.String(45), nullable=False)
+    item = db.Column(db.String(45), nullable=False)
     session_id = db.Column(db.String(36))
     session_start = db.Column(db.String(20))
-    rate = db.Column(db.INTEGER, nullable = False)
+    rate = db.Column(db.INTEGER, nullable=False)
 
     def __init__(self, id, user_id, name, item, session_id, session_start, rate):
         self.id = id
@@ -139,12 +181,12 @@ class SessionInfo(db.Model):
         self.rate = rate
 
     def to_dict(self):
-        return{
-            'id': self.id,
-            'user_id': self.user_id,
-            'name': self.name,
-            'item': self.item,
-            'session_id': self.session_id,
-            'session_start':self.session_start,
-            'rate':self.rate
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "item": self.item,
+            "session_id": self.session_id,
+            "session_start": self.session_start,
+            "rate": self.rate,
         }

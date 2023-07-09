@@ -8,7 +8,7 @@
     {% if error %}
     <p class="error">{{ error }}</p>
     {% endif %}
-    <form method="POST" action="{{ url_for('signup.signup') }}">
+    <form method="POST" action="{{ url_for('auth.signup') }}">
       <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required />

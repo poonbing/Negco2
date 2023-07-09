@@ -1,5 +1,6 @@
 import os
 
+
 class Config:
     # Flask configuration
     DEBUG = True  # Set to False in production
@@ -14,7 +15,7 @@ class Config:
 
     # Database configuration
     SQLALCHEMY_DATABASE_URI = (
-        'mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2'
+        "postgresql://postgres:1817postgres%40pg@localhost:5432/users"
     )
 
     # Flask-Mail configuration

@@ -17,25 +17,22 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
 
     from app.main import bp as main_bp
-    from app.login import bp as login_bp
-    from app.user import bp as user_bp
-    from app.admin import bp as admin_bp
-    from app.password_recovery import bp as password_recovery_bp
+    from app.auth import bp as auth_bp
+    from app.management import bp as management_bp
+    from app.recovery import bp as recovery_bp
     from app.error import bp as error_bp
-    from app.signup import bp as signup_bp
     from app.api import bp as api_bp
-    from app.tracker import bp as tracker_bp
+
+    # from app.tracker import bp as tracker_bp
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(login_bp)
-    app.register_blueprint(user_bp)
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(signup_bp)
-    app.register_blueprint(password_recovery_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(management_bp)
+    app.register_blueprint(recovery_bp)
     app.register_blueprint(error_bp)
     app.register_blueprint(api_bp)
-    app.register_blueprint(tracker_bp)
+    # app.register_blueprint(tracker_bp)
 
-    login_bp.xcaptcha = xcaptcha
+    auth_bp.xcaptcha = xcaptcha
 
     return app
