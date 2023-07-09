@@ -163,7 +163,7 @@ class SessionInfo(db.Model):
 
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
     active_sessions = db.Column(
-        db.String(45), ForeignKey("session_tracker.user_id"), nullable=False
+        db.String(45), ForeignKey("users.user_id"), nullable=False
     )
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)

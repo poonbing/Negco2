@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Tracker Web App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function startTimer(startTime, elementId) {
             if (startTime !== 'None') {
@@ -53,39 +54,44 @@
     </script>
 </head>
 <body>
+    
     <h1>Tracker Web App</h1>
+    <div class="grid grid-cols-2 gap-4">
     {% for key in keylist %}
-    ----------------------------------------------------------------------
-    <div id="'trackercard">
-        <h2 id="key">{{ key.name }}</h2>
-        <div>
-            {{ key.item }} 
-            <button onclick=" toggleform('{{ key.name }}', '{{ key.name }}', '{{ key.item }}', '{{ key.rate }}', 'update' )"> Edit </button>
-        </div>
-        <form name="tracker" action="/track" method="POST">
-            <input type="text" id="name" name="name" value="{{ key.name }}" style="display: none;">
-            <span id="timer-{{ key.name }}"> 0h 0m 0s</span>
-            <br>
-            <label for="rate">Rate: {{ key.rate }} Watts/Hour</label>
-            <input type="text" id="item" name="item" value="{{ key.item }}" style="display: none;">
-            <input type="text" id="rate" name="rate" value="{{ key.rate }}" style="display: none;">
-            <input type="text" id="key" name="key" value="{{ key.session_id }}" style="display: none;">
-            <br>
-            <button id="start_tracker" name="start_tracker" type="submit">Start</button>
-            <form action="/track" name="delete" id="delete" method="POST">
-                <input type="text" id="index" name="index" style="display: none;" value="{{ key.name }}">
-                <button name="delete" id="delete"> Delete </button>
+        <div id="'trackercard" class="m-5 bg-emerald-100 rounded-lg">
+            <div class="m-3 flex justify-between">
+                <div>
+                    <div class="text-xl"><h2 id="key">{{ key.name }}</h2></div>
+                    <div class="ml-3 text-xs">{{ key.item }} </div>
+                </div>
+                <div>
+                    <button onclick=" toggleform('{{ key.name }}', '{{ key.name }}', '{{ key.item }}', '{{ key.rate }}', 'update' )"> Edit </button>
+                    <form action="/track" name="delete" id="delete" method="POST">
+                        <input type="text" id="index" name="index" style="display: none;" value="{{ key.name }}">
+                        <button name="delete" id="delete"> Delete </button>
+                    </form>
+                </div>
+            </div>
+            <span id="timer-{{ key.name }}" class="ml-5"> 0h 0m 0s</span>
+            <form name="tracker" action="/track" method="POST" class="ml-10">
+                <input type="text" id="name" name="name" value="{{ key.name }}" style="display: none;">
+                
+                <br>
+                <label for="rate">Rate: {{ key.rate }} Watts/Hour</label>
+                <input type="text" id="item" name="item" value="{{ key.item }}" style="display: none;">
+                <input type="text" id="rate" name="rate" value="{{ key.rate }}" style="display: none;">
+                <input type="text" id="key" name="key" value="{{ key.session_id }}" style="display: none;">
+                <br>
+                <button id="start_tracker" name="start_tracker" type="submit" class="-ml-7 mb-3">Start</button>
             </form>
-        </form>
-        <script>
-            var startTime = "{{ key.session_start }}";
-            var elementId = "timer-{{ key.name }}";
-            startTimer(startTime, elementId);
-        </script>
-    </div>
-    <br>
+            <script>
+                var startTime = "{{ key.session_start }}";
+                var elementId = "timer-{{ key.name }}";
+                startTimer(startTime, elementId);
+            </script>
+        </div>
     {% endfor %}
-    ----------------------------------------------------------------------
+    </div>
     <br><br>
     <button onclick="opendisplay('item_form', 'flex')"> Create New Item </button>
     <form name="report" action="/report" method="POST">
