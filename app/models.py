@@ -1,7 +1,6 @@
 # Python Modules
 from datetime import datetime, timedelta
 from flask_login import UserMixin
-from sqlalchemy import ForeignKey
 from secrets import token_hex
 
 # Local Modules
@@ -130,16 +129,16 @@ class Tracker(db.Model):
     __tablename__ = "tracker"
     # sql model
     id = db.Column(db.String(36), primary_key=True, unique=True)
-    user = db.Column(db.INTEGER, nullable=False)
+    user_id = db.Column(db.INTEGER, nullable=False, unique=True)
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
     rate = db.Column(db.INTEGER, nullable=False)
     start_time = db.Column(db.String(20), nullable=False)
     end_time = db.Column(db.String(20))
 
-    def __init__(self, id, user, name, item, rate, start_time, end_time):
+    def __init__(self, id, user_id, name, item, rate, start_time, end_time):
         self.id = id
-        self.user = user
+        self.user_id = user_id
         self.name = name
         self.item = item
         self.rate = rate
@@ -149,7 +148,7 @@ class Tracker(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user,
+            "user_id": self.user_id,
             "name": self.name,
             "item": self.item,
             "rate": self.rate,
@@ -163,7 +162,7 @@ class SessionInfo(db.Model):
 
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
     active_sessions = db.Column(
-        db.String(45), ForeignKey("session_tracker.user_id"), nullable=False
+        db.String(45), db.ForeignKey("users.id"), nullable=False
     )
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
@@ -190,3 +189,54 @@ class SessionInfo(db.Model):
             "session_start": self.session_start,
             "rate": self.rate,
         }
+
+
+class Articles(db.Model):
+    __tablename__ = "articles"
+
+    id = db.Column(db.String(36), primary_key=True, unique=True)
+    title = db.Column(db.String(20), nullable=False, unique=True)
+    description = db.Column(db.String(200), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.today)
+    writer = db.Column(db.String(20), nullable=False)
+    image = db.Column(db.String(50), unique=True, nullable=False)
+    paragraph = db.Column(db.String(20000), nullable=False)
+
+    def time_ago(self):
+        time_difference = datetime.now() - self.date_added
+        if time_difference.days > 0:
+            return f"{time_difference.days} days ago"
+        elif time_difference.seconds >= 3600:
+            hours = time_difference.seconds // 3600
+            return f"{hours} hours ago"
+        elif time_difference.seconds >= 60:
+            minutes = time_difference.seconds // 60
+            return f"{minutes} minutes ago"
+        else:
+            return "Just now"
+
+
+class Products(db.Model):
+    __tablename__ = "products"
+
+    id = db.Column(db.String(36), primary_key=True, unique=True)
+    brand = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    description = db.Column(db.String(800), nullable=False)
+    category = db.Column(db.String(20), nullable=False)
+    price = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
+    offer = db.Column(db.Integer)
+    image = db.Column(db.String(50), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.today)
+    offered_price = db.Column(db.Numeric(precision=10, scale=2))
+
+
+class CartItem(db.Model):
+    __tablename__ = "cart_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.String(36), db.ForeignKey("products.id"), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(precision=10, scale=2))
+
+    product = db.relationship("Products", backref="cart_items")

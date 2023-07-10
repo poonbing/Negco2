@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <title>Login</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body class="h-full bg-cover bg-center">
+    {% include 'navbar.html' %} {% block content %} {% endblock %} {% include
+    'footer.html' %}
+  </body>
+</html>

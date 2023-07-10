@@ -18,7 +18,7 @@ def generate_access_code():
 
 def send_recovery_email(email, access_code):
     msg = Message("Password Recovery", recipients=[email])
-    msg.html = render_template("recovery/email_template.html", access_code=access_code)
+    msg.html = render_template("recovery/emailTemplate.html", access_code=access_code)
     mail.send(msg)
 
 
@@ -35,9 +35,9 @@ def forgot_password():
             return redirect(url_for("recovery.enter_access_code", email=email))
         else:
             error = "Invalid email address."
-            return render_template("recovery/forgot_password.html", error=error)
+            return render_template("recovery/forgotPassword.html", error=error)
 
-    return render_template("recovery/forgot_password.html")
+    return render_template("recovery/forgotPassword.html")
 
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
@@ -54,9 +54,9 @@ def enter_access_code():
             return redirect(url_for("recovery.reset_password", email=email))
         else:
             error = "Invalid access code."
-            return render_template("recovery/enter_access_code.html", error=error)
+            return render_template("recovery/accessCode.html", error=error)
 
-    return render_template("recovery/enter_access_code.html", email=email)
+    return render_template("recovery/accessCode.html", email=email)
 
 
 @bp.route("/success", methods=["GET", "POST"])
@@ -80,4 +80,4 @@ def reset_password():
         db.session.commit()
         return redirect(url_for("recovery.success"))
 
-    return render_template("recovery/reset_password.html", email=email)
+    return render_template("recovery/resetPassword.html", email=email)

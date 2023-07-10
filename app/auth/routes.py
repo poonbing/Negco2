@@ -1,12 +1,37 @@
 # Python Modules
-from flask import render_template, request, redirect, session, url_for
+from flask import render_template, request, redirect, session, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 
 # Local Modules
 from app.auth import bp
 from ..models import User, Session
-from ..extensions import login_manager, db
+from ..extensions import login_manager, db, oauth
+
+
+google = oauth.register(
+    name="google",
+    authorize_url="https://accounts.google.com/o/oauth2/auth",
+    access_token_url="https://accounts.google.com/o/oauth2/token",
+    api_base_url="https://www.googleapis.com/oauth2/v1/",
+    client_kwargs={"scope": "openid profile email"},
+)
+
+microsoft = oauth.register(
+    name="microsoft",
+    authorize_url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    access_token_url="https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    api_base_url="https://graph.microsoft.com/v1.0/",
+    client_kwargs={"scope": "User.Read"},
+)
+
+github = oauth.register(
+    name="github",
+    authorize_url="https://github.com/login/oauth/authorize",
+    access_token_url="https://github.com/login/oauth/access_token",
+    api_base_url="https://api.github.com/",
+    client_kwargs={"scope": "user:email"},
+)
 
 
 @login_manager.user_loader
@@ -17,6 +42,7 @@ def user_loader(user_id):
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     xcaptcha = bp.xcaptcha
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -36,7 +62,6 @@ def login():
                 time_of_login = datetime.now()
                 user_agent = request.user_agent.string
 
-                # Create a new session and save it to the database
                 session = Session(
                     user_id=user.id, ip_address=ip_address, user_agent=user_agent
                 )
@@ -55,7 +80,9 @@ def login():
         error = "Invalid username or password."
         return render_template("auth/login.html", error=error)
 
-    return render_template("auth/login.html")
+    return render_template(
+        "auth/login.html", google=google, microsoft=microsoft, github=github
+    )
 
 
 @bp.route("/logout")
@@ -104,3 +131,27 @@ def signup():
         return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html")
+
+
+@bp.route("/login/google/authorized")
+def google_authorized():
+    token = google.authorize_access_token()
+    if token is None:
+        flash("Failed to authenticate with Google.")
+        return redirect(url_for("auth.login"))
+
+
+@bp.route("/login/microsoft/authorized")
+def microsoft_authorized():
+    token = microsoft.authorize_access_token()
+    if token is None:
+        flash("Failed to authenticate with Microsoft.")
+        return redirect(url_for("auth.login"))
+
+
+@bp.route("/login/github/authorized")
+def github_authorized():
+    token = github.authorize_access_token()
+    if token is None:
+        flash("Failed to authenticate with GitHub.")
+        return redirect(url_for("auth.login"))
