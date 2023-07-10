@@ -161,13 +161,7 @@ class SessionInfo(db.Model):
     __tablename__ = "session_info"
 
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
-    active_sessions = db.Column(
-<<<<<<< HEAD
-        db.String(45), db.ForeignKey("users.id"), nullable=False
-=======
-        db.String(45), ForeignKey("users.user_id"), nullable=False
->>>>>>> 0bdfadedad2b329a01fd265c91b7c16071b02140
-    )
+    active_sessions = db.Column(db.INTEGER, nullable=False)
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
     session_id = db.Column(db.String(36))
