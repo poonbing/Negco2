@@ -128,7 +128,7 @@ class LockedUser(db.Model):
 class Tracker(db.Model):
     __tablename__ = "tracker"
     # sql model
-    id = db.Column(db.String(36), primary_key=True, unique=True)
+    id = db.Column(db.String(36), primary_key=True)
     user_id = db.Column(db.INTEGER, nullable=False, unique=True)
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)

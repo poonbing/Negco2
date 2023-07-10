@@ -39,8 +39,7 @@ def create_app(config_class=Config):
     from app.recovery import bp as recovery_bp
     from app.error import bp as error_bp
     from app.api import bp as api_bp
-
-    # from app.tracker import bp as tracker_bp
+    from app.tracker import bp as tracker_bp
 
     from app.articles import bp as articles_bp
     from app.products import bp as products_bp
@@ -51,7 +50,7 @@ def create_app(config_class=Config):
     app.register_blueprint(recovery_bp)
     app.register_blueprint(error_bp)
     app.register_blueprint(api_bp)
-    # app.register_blueprint(tracker_bp)
+    app.register_blueprint(tracker_bp)
 
     with app.app_context():
         db.create_all()

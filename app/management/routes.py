@@ -49,7 +49,7 @@ def locked_accounts():
     locked_accounts = User.query.join(LockedUser).all()
 
     return render_template(
-        "management/locked_accounts.html", locked_accounts=locked_accounts
+        "management/lockedAccounts.html", locked_accounts=locked_accounts
     )
 
 
