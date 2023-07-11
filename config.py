@@ -2,9 +2,13 @@ import os
 
 
 class Config:
-    # Flask configuration
-    DEBUG = True  # Set to False in production
-    SECRET_KEY = "your_secret_key"
+    # Security configuration
+    DEBUG = True
+    SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
+    SECURITY_PASSWORD_SALT = "146585145368522386173505678016728509634"
+
+    # RBAC configuration
+    RBAC_USE_WHITE = True
 
     # xCaptcha configuration
     XCAPTCHA_SITE_KEY = "906a1dab-2e2c-4c80-880a-9fb359a89b73"
@@ -14,9 +18,7 @@ class Config:
     XCAPTCHA_DIV_CLASS = "h-captcha"
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = (
-        'mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2'
-    )
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2"
 
     # Flask-Mail configuration
     MAIL_SERVER = "smtp.gmail.com"

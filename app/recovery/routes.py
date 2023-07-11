@@ -51,7 +51,7 @@ def enter_access_code():
         correct_code = access_codes[email]
         if entered_code == correct_code:
             del access_codes[email]
-            return redirect(url_for("recovery.reset_password", email=email))
+            return redirect(url_for("recovery.success", email=email))
         else:
             error = "Invalid access code."
             return render_template("recovery/accessCode.html", error=error)

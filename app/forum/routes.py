@@ -15,8 +15,8 @@ def allowed_file(filename):
 
 @bp.route("/forum")
 def home():
-    topics = Topic.query().all()
-    return render_template("forum/Topics.html", topic=topics)
+    topics = Topic.query.all()
+    return render_template("forum/Home.html", topic=topics)
 
 
 @bp.route("/topics/<int:topic_id>/posts", methods=["GET", "POST"])
@@ -25,7 +25,7 @@ def topic_posts(topic_id):
 
     page = request.args.get("page", 1, type=int)
     post_list = Post.query.filter_by(topic_id=topic_id).paginate(per_page=4, page=page)
-    topic = Topic.query().get(topic_id)
+    topic = Topic.query.get(topic_id)
     print("Topic:", topic)
 
     form = Post_Submission()
@@ -42,7 +42,7 @@ def topic_posts(topic_id):
 
     if topic:
         return render_template(
-            "form/ViewThreads.html",
+            "forum/Posts.html",
             topic=topic,
             post_list=post_list,
             form=form,
@@ -72,10 +72,10 @@ def post(id):
         except Exception as e:
             print(f"An error occurred while committing the comment: {e}")
 
-    post = Post.query().get(id)
+    post = Post.query.get(id)
     if post:
         return render_template(
-            "forum/ViewComments.html", post=post, form=form, comment_list=comment_list
+            "forum/Comments.html", post=post, form=form, comment_list=comment_list
         )
     else:
         return render_template("error/404.html")

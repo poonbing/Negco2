@@ -165,10 +165,11 @@ content %}
   </ul>
   {% else %}
   <p>No sessions found.</p>
-  {% endif %} {% if success_message %}
-  <div class="bg-green-200 text-green-800 p-4 mt-4">{{ success_message }}</div>
-  {% endif %} {% if error_message %}
-  <div class="bg-red-200 text-red-800 p-4 mt-4">{{ error_message }}</div>
-  {% endif %}
+  {% endif %} {% with messages = get_flashed_messages() %} {% for message in
+  messages %} {% if message.category == "success" %}
+  <div class="bg-green-200 text-green-800 p-4 mt-4">{{ message }}</div>
+  {% elif message.category == "error" %}
+  <div class="bg-red-200 text-red-800 p-4 mt-4">{{ message }}</div>
+  {% endif %} {% endfor %} {% endwith %}
 </div>
 {% endblock %}

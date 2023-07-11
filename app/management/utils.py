@@ -1,0 +1,34 @@
+# Python Modules
+from flask import redirect, url_for
+from flask_login import current_user
+from functools import wraps
+from PIL import Image
+import secrets
+import os
+
+# Loc
+from config import Config
+
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != "admin":
+            return redirect(url_for("management.dashboard"))
+        return view_func(*args, **kwargs)
+
+    return decorated_view
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(Config.UPLOAD_FOLDER, picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn

@@ -1,28 +1,15 @@
 # Python Modules
-from flask import redirect, render_template, request, url_for, abort
+from flask import redirect, render_template, request, url_for, abort, flash
 from flask_login import current_user, login_required
-from functools import wraps
-from PIL import Image
-import secrets
-import os
+
 
 # Local Modules
 from app.management import bp
+from .utils import admin_required, save_picture
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
 from ..models import User
-from config import Config
-
-
-def admin_required(view_func):
-    @wraps(view_func)
-    def decorated_view(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != "admin":
-            return redirect(url_for("management.dashboard"))
-        return view_func(*args, **kwargs)
-
-    return decorated_view
 
 
 @bp.route("/show_users", methods=["GET"])
@@ -77,24 +64,22 @@ def settings():
         if new_password and new_password == confirm_password:
             user.password = new_password
         elif new_password and new_password != confirm_password:
-            error_message = "Password and confirm password do not match."
+            flash("Password and confirm password do not match.", "error")
             return render_template(
                 "management/settings.html",
                 user=user,
                 sessions=sessions,
                 form=form,
-                error_message=error_message,
             )
 
         db.session.commit()
 
-        success_message = "User information updated successfully!"
+        flash("User information updated successfully!", "success")
         return render_template(
             "management/settings.html",
             user=user,
             sessions=sessions,
             form=form,
-            success_message=success_message,
         )
 
     return render_template(
@@ -131,24 +116,22 @@ def admin_settings(no):
         if new_password and new_password == confirm_password:
             user.password = new_password
         elif new_password and new_password != confirm_password:
-            error_message = "Password and confirm password do not match."
+            flash("Password and confirm password do not match.", "error")
             return render_template(
                 "management/settings.html",
                 user=user,
                 sessions=sessions,
                 form=form,
-                error_message=error_message,
             )
 
         db.session.commit()
 
-        success_message = "User information updated successfully!"
+        flash("User information updated successfully!", "success")
         return render_template(
             "management/settings.html",
             user=user,
             sessions=sessions,
             form=form,
-            success_message=success_message,
         )
 
     return render_template(
@@ -165,17 +148,3 @@ def dashboard():
     user = current_user
 
     return render_template("management/dashboard.html", username=user.username)
-
-
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(Config.UPLOAD_FOLDER, picture_fn)
-
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn

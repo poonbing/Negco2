@@ -28,9 +28,14 @@ content %}
         >
           Sign in to your account
         </h1>
-        {% if error %}
-        <p class="text-red-500">{{ error }}</p>
-        {% endif %}
+
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <p class="text-red-500">{{ message }}</p>
+          {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
         <form
           id="login-form"
           class="space-y-4 md:space-y-6"
@@ -107,35 +112,6 @@ content %}
             >
           </p>
         </form>
-        <div id="external-providers">
-          <button
-            type="submit"
-            name="login_type"
-            value="google"
-            onclick="window.location.href='{{ google.authorize_redirect(url_for('auth.google_authorized', _external=True)) }}'"
-            class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-          >
-            Log in with Google
-          </button>
-          <button
-            type="submit"
-            name="login_type"
-            value="microsoft"
-            onclick="window.location.href='{{ microsoft.authorize_redirect(url_for('auth.microsoft_authorized', _external=True)) }}'"
-            class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-          >
-            Log in with Microsoft
-          </button>
-          <button
-            type="submit"
-            name="login_type"
-            value="github"
-            onclick="window.location.href='{{ github.authorize_redirect(url_for('auth.github_authorized', _external=True)) }}'"
-            class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-          >
-            Log in with GitHub
-          </button>
-        </div>
       </div>
     </div>
   </div>

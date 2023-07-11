@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://cdn.quilljs.com/1.3.7/quill.snow.css"
+      rel="stylesheet"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap"
       rel="stylesheet"
     />
@@ -19,6 +23,70 @@
       nomodule
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
+    <style>
+      .forum-card {
+        background-color: #192d3e;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .forum-card a {
+        color: #fff;
+        transition: color 0.2s ease-in-out;
+      }
+
+      .forum-card a:hover {
+        color: #68c1ef;
+      }
+
+      .forum-card h2 {
+        color: #fff;
+      }
+
+      .forum-card p {
+        color: #c5d1d9;
+      }
+    </style>
+    <style>
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .post {
+        padding: 20px;
+        background-color: #f7f7f7;
+        margin-bottom: 20px;
+        border-radius: 6px;
+      }
+
+      .post-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .post-content {
+        margin-bottom: 20px;
+      }
+
+      .comment {
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+
+      .comment-content {
+        margin-bottom: 10px;
+      }
+
+      .comment-details {
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
   </head>
   <body class="pt-20 font-serif">
     {% include 'navbar.html' %} {% block content %} {% endblock %} {% include

@@ -40,9 +40,9 @@ def create_app(config_class=Config):
     from app.error import bp as error_bp
     from app.api import bp as api_bp
     from app.tracker import bp as tracker_bp
-
     from app.articles import bp as articles_bp
     from app.products import bp as products_bp
+    from app.forum import bp as forum_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -51,12 +51,9 @@ def create_app(config_class=Config):
     app.register_blueprint(error_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(tracker_bp)
-
-    with app.app_context():
-        db.create_all()
-
     app.register_blueprint(articles_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(forum_bp)
 
     auth_bp.xcaptcha = xcaptcha
 
