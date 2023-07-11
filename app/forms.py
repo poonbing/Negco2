@@ -52,3 +52,14 @@ class createProduct(FlaskForm):
     offer = IntegerField("Offer(%)", validators=[DataRequired()])
     image = FileField("Image:", validators=[DataRequired()])
     submit = SubmitField("Submit")
+
+
+class Comment_Submission(FlaskForm):
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Create Post")
+
+
+class Post_Submission(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Create Post")

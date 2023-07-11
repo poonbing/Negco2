@@ -238,3 +238,30 @@ class CartItem(db.Model):
     price = db.Column(db.Numeric(precision=10, scale=2))
 
     product = db.relationship("Products", backref="cart_items")
+
+
+class Comment(db.Model):
+    __tablename__ = "content"
+
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
+    post_id = db.Column(db.INTEGER, db.ForeignKey("posts.id"), nullable=False)
+    content = db.Column(db.String(255), nullable=False)
+    post = db.relationship("Post", back_populates="comments")
+
+
+class Post(db.Model):
+    __tablename__ = "posts"
+
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
+    title = db.Column(db.String(255), nullable=False)
+    topic_id = db.Column(db.INTEGER, db.ForeignKey("topics.id"), nullable=False)
+    topic = db.relationship("Topic", back_populates="posts")
+    content = db.Column(db.Text(length=1000000), nullable=False)
+    comments = db.relationship("Comment", back_populates="post")
+
+
+class Topic(db.Model):
+    __tablename__ = "topics"
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False)
+    posts = db.relationship("Post", back_populates="topic")
