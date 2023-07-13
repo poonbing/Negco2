@@ -2,10 +2,9 @@
 from flask import redirect, render_template, request, url_for, abort, flash
 from flask_login import current_user, login_required
 
-
 # Local Modules
 from app.management import bp
-from .utils import admin_required, save_picture
+from .utils import admin_required, save_picture, update_password, update_info
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
@@ -44,43 +43,18 @@ def locked_accounts():
 @login_required
 def settings():
     user = current_user
-
-    sessions = Session.query.filter_by(user_id=user.id).all()
     form = SettingsForm()
+    sessions = Session.query.filter_by(user_id=user.id).all()
 
     if form.validate_on_submit():
-        if form.profile_picture.data:
-            profile_picture = save_picture(form.profile_picture.data)
-            user.profile_picture = profile_picture
+        update_info(user, form)
+        password_updated = update_password(user, form)
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
-
-        new_password = form.password.data
-        confirm_password = form.confirm_password.data
-        if new_password and new_password == confirm_password:
-            user.password = new_password
-        elif new_password and new_password != confirm_password:
+        if password_updated:
+            db.session.commit()
+            flash("User information updated successfully!", "success")
+        else:
             flash("Password and confirm password do not match.", "error")
-            return render_template(
-                "management/settings.html",
-                user=user,
-                sessions=sessions,
-                form=form,
-            )
-
-        db.session.commit()
-
-        flash("User information updated successfully!", "success")
-        return render_template(
-            "management/settings.html",
-            user=user,
-            sessions=sessions,
-            form=form,
-        )
 
     return render_template(
         "management/settings.html",
@@ -97,42 +71,18 @@ def admin_settings(no):
         abort(403)
 
     user = User.query.get(no)
-    sessions = Session.query.filter_by(user_id=user.id).all()
     form = SettingsForm()
+    sessions = Session.query.filter_by(user_id=user.id).all()
 
     if form.validate_on_submit():
-        if form.profile_picture.data:
-            profile_picture = save_picture(form.profile_picture.data)
-            user.profile_picture = profile_picture
+        update_info(user, form)
+        password_updated = update_password(user, form)
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
-
-        new_password = form.password.data
-        confirm_password = form.confirm_password.data
-        if new_password and new_password == confirm_password:
-            user.password = new_password
-        elif new_password and new_password != confirm_password:
+        if password_updated:
+            db.session.commit()
+            flash("User information updated successfully!", "success")
+        else:
             flash("Password and confirm password do not match.", "error")
-            return render_template(
-                "management/settings.html",
-                user=user,
-                sessions=sessions,
-                form=form,
-            )
-
-        db.session.commit()
-
-        flash("User information updated successfully!", "success")
-        return render_template(
-            "management/settings.html",
-            user=user,
-            sessions=sessions,
-            form=form,
-        )
 
     return render_template(
         "management/settings.html",

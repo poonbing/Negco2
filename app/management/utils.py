@@ -32,3 +32,26 @@ def save_picture(form_picture):
     i.save(picture_path)
 
     return picture_fn
+
+
+def update_info(user, form):
+    if form.profile_picture.data:
+        profile_picture = save_picture(form.profile_picture.data)
+        user.profile_picture = profile_picture
+
+    user.first_name = form.first_name.data
+    user.last_name = form.last_name.data
+    user.phone = form.phone.data
+    user.gender = form.gender.data
+    user.email = form.email.data
+
+
+def update_password(user, form):
+    new_password = form.password.data
+    confirm_password = form.confirm_password.data
+
+    if new_password and new_password == confirm_password:
+        user.password = new_password
+        return True
+    else:
+        return False

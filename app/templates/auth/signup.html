@@ -1,53 +1,46 @@
 {% extends "full_layout.html" %} {% block title %}Sign Up{% endblock %} {% block
 content %}
 <h1>Sign Up</h1>
-{% if error %}
-<p class="error">{{ error }}</p>
-{% endif %}
+{% with messages = get_flashed_messages() %} {% for message in messages %}
+<p class="error">{{ message }}</p>
+{% endfor %} {% endwith %}
 <form method="POST" action="{{ url_for('auth.signup') }}">
+  {{ form.csrf_token }}
+
   <div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required />
+    {{ form.username.label }} {{ form.username(class_="form-control",
+    required=true) }}
   </div>
   <div>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required />
+    {{ form.password.label }} {{ form.password(class_="form-control",
+    required=true) }}
   </div>
   <div>
-    <label for="confirm_password">Confirm Password:</label>
-    <input
-      type="password"
-      id="confirm_password"
-      name="confirm_password"
-      required
-    />
+    {{ form.confirm_password.label }} {{
+    form.confirm_password(class_="form-control", required=true) }}
   </div>
   <div>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required />
+    {{ form.email.label }} {{ form.email(class_="form-control", required=true)
+    }}
   </div>
   <div>
-    <label for="gender">Gender:</label>
-    <select id="gender" name="gender" required>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
+    {{ form.gender.label }} {{ form.gender(class_="form-control", required=true)
+    }}
   </div>
   <div>
-    <label for="first_name">First Name:</label>
-    <input type="text" id="first_name" name="first_name" required />
+    {{ form.first_name.label }} {{ form.first_name(class_="form-control",
+    required=true) }}
   </div>
   <div>
-    <label for="last_name">Last Name:</label>
-    <input type="text" id="last_name" name="last_name" required />
+    {{ form.last_name.label }} {{ form.last_name(class_="form-control",
+    required=true) }}
   </div>
   <div>
-    <label for="age">Age:</label>
-    <input type="number" id="age" name="age" required />
+    {{ form.age.label }} {{ form.age(class_="form-control", required=true) }}
   </div>
   <div>
-    <label for="phone">Phone:</label>
-    <input type="tel" id="phone" name="phone" required />
+    {{ form.phone.label }} {{ form.phone(class_="form-control", required=true)
+    }}
   </div>
   <button type="submit">Sign Up</button>
 </form>

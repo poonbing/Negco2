@@ -1,5 +1,5 @@
 # Python Modules
-from flask import redirect, url_for, render_template, request
+from flask import redirect, url_for, render_template, request, flash
 from flask_mail import Message
 from random import randint
 
@@ -26,7 +26,9 @@ def send_recovery_email(email, access_code):
 def forgot_password():
     if request.method == "POST":
         email = request.form.get("email")
-        if email == "chuayoushen5@outlook.com":
+        user = User.query.filter_by(email=email).first()
+
+        if user:
             access_code = generate_access_code()
             access_codes[email] = access_code
 
@@ -34,8 +36,7 @@ def forgot_password():
 
             return redirect(url_for("recovery.enter_access_code", email=email))
         else:
-            error = "Invalid email address."
-            return render_template("recovery/forgotPassword.html", error=error)
+            flash("Invalid email address.", "error")
 
     return render_template("recovery/forgotPassword.html")
 
@@ -53,8 +54,7 @@ def enter_access_code():
             del access_codes[email]
             return redirect(url_for("recovery.success", email=email))
         else:
-            error = "Invalid access code."
-            return render_template("recovery/accessCode.html", error=error)
+            flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email)
 

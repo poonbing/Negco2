@@ -9,6 +9,7 @@ from wtforms import (
     SelectField,
     DecimalField,
     PasswordField,
+    BooleanField,
 )
 
 
@@ -66,17 +67,21 @@ class Post_Submission(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired()])
-    password = StringField("Password", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
+    remember = BooleanField("Remember me")
 
 
 class SignUpForm(FlaskForm):
-    profile_picture = FileField("Profile Picture")
+    username = StringField("Username", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    gender = SelectField(
+        "Gender",
+        choices=[("Male"), ("Female")],
+        validators=[InputRequired()],
+    )
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
-    phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
-    gender = StringField("Gender")
-    email = StringField("Email", validators=[Email()])
-    password = PasswordField("Password")
-    confirm_password = PasswordField(
-        "Confirm Password", validators=[EqualTo("password")]
-    )
+    age = IntegerField("Age", validators=[InputRequired()])
+    phone = StringField("Phone", validators=[InputRequired()])

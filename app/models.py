@@ -17,9 +17,10 @@ class Session(db.Model):
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.String(255))
 
-    def __init__(self, user_id, ip_address, user_agent):
+    def __init__(self, user_id, last_activity, ip_address, user_agent):
         self.session_token = token_hex(32)
         self.user_id = user_id
+        self.last_activity = last_activity
         self.ip_address = ip_address
         self.user_agent = user_agent
 
@@ -47,8 +48,19 @@ class User(db.Model, UserMixin):
     locked = db.relationship("LockedUser", backref="user", uselist=False)
 
     def __init__(
-        self, username, password, role, email, gender, first_name, last_name, age, phone
+        self,
+        user_id,
+        username,
+        password,
+        role,
+        email,
+        gender,
+        first_name,
+        last_name,
+        age,
+        phone,
     ):
+        self.id = user_id
         self.username = username
         self.password = password
         self.role = role
@@ -64,6 +76,8 @@ class User(db.Model, UserMixin):
 
     def increment_login_attempts(self):
         self.login_attempts += 1
+        if self.login_attempts >= 3:
+            self.lock_account()
         db.session.commit()
 
     def reset_login_attempts(self):
@@ -114,7 +128,7 @@ class User(db.Model, UserMixin):
 class LockedUser(db.Model):
     __tablename__ = "locked_users"
 
-    id = db.Column(db.INTEGER, nullable=False, primary_key=True)
+    id = db.Column(db.INTEGER, nullable=False, primary_key=True, autoincrement=True)
     user_id = db.Column(
         db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
     )
