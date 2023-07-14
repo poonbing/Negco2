@@ -1,5 +1,7 @@
 # Python Modules
 from flask import render_template, request, url_for, session, redirect, flash
+from flask_login import login_user, logout_user, login_required
+from ..management.utils import admin_required
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 from uuid import uuid4
@@ -74,6 +76,8 @@ def publishProduct():
 
 
 @bp.route("/viewProduct")
+@login_required
+@admin_required
 def viewProduct():
     page = request.args.get("page", 1, type=int)
     products = Products.query.order_by(Products.date_added.desc()).paginate(

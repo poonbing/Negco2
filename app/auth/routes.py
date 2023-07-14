@@ -29,7 +29,7 @@ def login():
             or_(User.username == username, User.email == username)
         ).first()
 
-        if user.is_account_locked():
+        if user and user.is_account_locked():
             flash("Account locked. Contact the admin for assistance.", "error")
         elif not xcaptcha.verify():
             flash("xCaptcha verification failed. Please try again.", "error")

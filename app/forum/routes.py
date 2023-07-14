@@ -38,7 +38,7 @@ def topic_posts(topic_id):
             db.session.commit()
         except Exception as e:
             print(f"An error occurred while committing the post: {e}")
-        return redirect(url_for("topic_posts", topic_id=topic_id))
+        return redirect(url_for("forum.topic_posts", topic_id=topic_id))
 
     if topic:
         return render_template(
@@ -68,7 +68,7 @@ def post(id):
         try:
             db.session.commit()
             print("Comment committed successfully")
-            return redirect(url_for("post", id=id))
+            return redirect(url_for("forum.post", id=id))
         except Exception as e:
             print(f"An error occurred while committing the comment: {e}")
 
