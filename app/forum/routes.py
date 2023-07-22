@@ -1,8 +1,10 @@
 # Python Modules
 from flask import render_template, redirect, url_for, request
+from flask_login import current_user, login_required
 
 # Local Modules
 from app.forum import bp
+from .utils import remove_html_tags
 from ..models import Comment, Post, Topic
 from ..forms import Comment_Submission, Post_Submission
 from ..extensions import db
@@ -20,6 +22,7 @@ def home():
 
 
 @bp.route("/topics/<int:topic_id>/posts", methods=["GET", "POST"])
+@login_required
 def topic_posts(topic_id):
     print("Topic ID:", topic_id)
 
@@ -30,13 +33,15 @@ def topic_posts(topic_id):
 
     form = Post_Submission()
     if form.validate_on_submit():
+        user = current_user
         new_post = Post(
-            title=form.title.data, content=form.content.data, topic_id=topic_id
+            poster=user.id,
+            title=form.title.data,
+            content=remove_html_tags(form.content.data),
+            topic_id=topic_id,
         )
         db.session.add(new_post)
-        print('test')
         try:
-            print('mmmmm')
             db.session.commit()
         except Exception as e:
             print(f"An error occurred while committing the post: {e}")
@@ -55,14 +60,17 @@ def topic_posts(topic_id):
 
 
 @bp.route("/post/<int:id>/", methods=["GET", "POST"])
+@login_required
 def post(id):
     db.session.rollback()
     comment_list = Comment.query.filter_by(post_id=id).all()
     print("testlist")
     form = Comment_Submission()
-    if request.method == "POST":
-        print(form.content.data)
-        new_comment = Comment(post_id=id, content=form.content.data)
+    if form.validate_on_submit():
+        user = current_user
+        new_comment = Comment(
+            commenter=user.id, post_id=id, content=remove_html_tags(form.content.data)
+        )
         print("Success")
         print(new_comment)
         db.session.add(new_comment)

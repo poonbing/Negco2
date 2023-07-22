@@ -20,7 +20,7 @@
         <div class="comment">
           <div class="comment-content">{{ comment.content | safe }}</div>
           <div class="comment-details">
-            <span>Posted by User123</span>
+            <span>Posted by {{current_user.username}}</span>
           </div>
         </div>
         {% endfor %}

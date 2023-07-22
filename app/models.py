@@ -287,6 +287,9 @@ class Comment(db.Model):
     id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
     post_id = db.Column(db.INTEGER, db.ForeignKey("posts.id"), nullable=False)
     content = db.Column(db.String(255), nullable=False)
+    commenter = db.Column(
+        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
     post = db.relationship("Post", back_populates="comments")
 
 
@@ -296,9 +299,13 @@ class Post(db.Model):
     id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
     title = db.Column(db.String(255), nullable=False)
     topic_id = db.Column(db.INTEGER, db.ForeignKey("topics.id"), nullable=False)
+    poster = db.Column(
+        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
     topic = db.relationship("Topic", back_populates="posts")
     content = db.Column(db.Text(length=1000000), nullable=False)
     comments = db.relationship("Comment", back_populates="post")
+    image = db.Column(db.LargeBinary(length=(2**32) - 1), nullable=True)
 
 
 class Topic(db.Model):

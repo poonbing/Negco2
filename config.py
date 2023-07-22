@@ -36,14 +36,25 @@ class Config:
     TALISMAN_CONTENT_SECURITY_POLICY = {
         "default-src": [
             "'self'",
-            "cdnjs.cloudflare.com",
+            "https://cdn.tailwindcss.com",
+            "https://fonts.googleapis.com",
+            "https://fonts.gstatic.com",
+            "https://cdn.quilljs.com",
+            "https://unpkg.com",
+            "https://cdnjs.cloudflare.com",
         ],
-        "script-src": [
+        "style-src": [
             "'self'",
-            "cdnjs.cloudflare.com",
+            "https://cdn.tailwindcss.com",
+            "https://fonts.googleapis.com",
+            "https://cdn.quilljs.com",
+            "https://unpkg.com",
+            "https://cdnjs.cloudflare.com",
         ],
-        "img-src": [
+        "font-src": [
             "'self'",
-            "data:",
+            "https://fonts.googleapis.com",
+            "https://fonts.gstatic.com",
         ],
+        "script-src": ["'self'", "https://cdn.tailwindcss.com", "https://unpkg.com"],
     }
