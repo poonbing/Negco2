@@ -20,7 +20,7 @@
       <a
         href="{{url_for('products.view_cart')}}"
         class="text-white rounded-full mr-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 duration-500"
-        >{{total_quantity}}<ion-icon name="cart-outline"></ion-icon
+        >{{cart_total_quantity}}<ion-icon name="cart-outline"></ion-icon
       ></a>
 
       {% if current_user.role %}

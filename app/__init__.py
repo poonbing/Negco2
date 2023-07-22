@@ -1,7 +1,7 @@
 # Python Modules
 from flask import Flask, session
 from flask_xcaptcha import XCaptcha
-
+from .models import CartItem
 # Local Modules
 from config import Config
 from .extensions import db, mail, login_manager, oauth
@@ -17,21 +17,26 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     oauth.init_app(app)
 
-    def get_total_quantity():
-        if "cart" not in session:
-            return 0
+    # def get_total_quantity():
+    #     if "cart" not in session:
+    #         return 0
 
-        total_quantity = 0
-        cart_items = session["cart"]
-        for item in cart_items:
-            total_quantity += item["quantity"]
+    #     total_quantity = 0
+    #     cart_items = session["cart"]
+    #     for item in cart_items:
+    #         total_quantity += item["quantity"]
 
-        return total_quantity
+    #     return total_quantity
 
+    # @app.context_processor
+    # def inject_total_quantity():
+    #     total_quantity = get_total_quantity()
+    #     return dict(total_quantity=total_quantity)
     @app.context_processor
-    def inject_total_quantity():
-        total_quantity = get_total_quantity()
-        return dict(total_quantity=total_quantity)
+    def cart_total_quantity():
+        cart_items = CartItem.query.all()
+        total_quantity = sum(item.quantity for item in cart_items)
+        return dict(cart_total_quantity=total_quantity)
 
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp

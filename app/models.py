@@ -232,7 +232,7 @@ class Products(db.Model):
 class CartItem(db.Model):
     __tablename__ = "cart_items"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, unique=True)
     product_id = db.Column(db.String(36), db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(precision=10, scale=2))
