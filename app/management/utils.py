@@ -10,14 +10,21 @@ import os
 from config import Config
 
 
-def admin_required(view_func):
-    @wraps(view_func)
-    def decorated_view(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != "admin":
-            return redirect(url_for("management.dashboard"))
-        return view_func(*args, **kwargs)
+def role_required(required_role):
+    def decorator(func):
+        @wraps(func)
+        def decorated_view(*args, **kwargs):
+            if not current_user.is_authenticated or not current_user.has_role(
+                required_role
+            ):
+                return redirect(url_for("management.dashboard"))
+            return func(*args, **kwargs)
 
-    return decorated_view
+        return decorated_view
+
+    return decorator
+
+    return decorator
 
 
 # def save_picture(form_picture):

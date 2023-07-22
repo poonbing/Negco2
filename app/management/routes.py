@@ -7,7 +7,7 @@ from io import BytesIO
 
 # Local Modules
 from app.management import bp
-from .utils import admin_required, update_password
+from .utils import role_required, update_password
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
@@ -22,7 +22,7 @@ def profile_picture():
 
 @bp.route("/show_users", methods=["GET"])
 @login_required
-@admin_required
+@role_required("admin")
 def show_users():
     all_users = User.query.all()
     return render_template("management/users.html", users=all_users)
@@ -30,7 +30,7 @@ def show_users():
 
 @bp.route("/locked-accounts", methods=["GET", "POST"])
 @login_required
-@admin_required
+@role_required("admin")
 def locked_accounts():
     if request.method == "POST":
         locked_account_ids = request.form.getlist("unlock_account")
