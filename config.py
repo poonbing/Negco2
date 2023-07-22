@@ -7,9 +7,6 @@ class Config:
     SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
     SECURITY_PASSWORD_SALT = "146585145368522386173505678016728509634"
 
-    # RBAC configuration
-    RBAC_USE_WHITE = True
-
     # xCaptcha configuration
     XCAPTCHA_SITE_KEY = "906a1dab-2e2c-4c80-880a-9fb359a89b73"
     XCAPTCHA_SECRET_KEY = "0xF9Eb4ffE0304E994f169619C85a0cbe3ca803D9B"
@@ -32,3 +29,21 @@ class Config:
     APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "app"))
     STATIC_FOLDER = os.path.join(APP_ROOT, "static")
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
+
+    # Talisman Configuration
+    TALISMAN_FORCE_HTTPS = True
+    TALISMAN_SESSION_COOKIE_SECURE = True
+    TALISMAN_CONTENT_SECURITY_POLICY = {
+        "default-src": [
+            "'self'",
+            "cdnjs.cloudflare.com",
+        ],
+        "script-src": [
+            "'self'",
+            "cdnjs.cloudflare.com",
+        ],
+        "img-src": [
+            "'self'",
+            "data:",
+        ],
+    }

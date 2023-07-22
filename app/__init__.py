@@ -4,13 +4,14 @@ from flask_xcaptcha import XCaptcha
 
 # Local Modules
 from config import Config
-from .extensions import db, mail, login_manager, oauth
+from .extensions import db, mail, login_manager, oauth, talisman
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    talisman.init_app(app)
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
     mail.init_app(app)

@@ -9,6 +9,61 @@ from secrets import token_hex
 from .extensions import db
 
 
+# Mixins
+
+
+class AuthenticationMixin:
+    def check_password(self, password):
+        return self.password == password
+
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+
+class AccountManagementMixin:
+    def increment_login_attempts(self):
+        self.login_attempts += 1
+        if self.login_attempts >= 3:
+            self.lock_account()
+        db.session.commit()
+
+    def reset_login_attempts(self):
+        self.login_attempts = 0
+        db.session.commit()
+
+    def lock_account(self):
+        if not self.locked:
+            locked_user = LockedUser(user_id=self.id)
+            db.session.add(locked_user)
+            db.session.commit()
+
+    def unlock_account(self):
+        if self.locked:
+            self.reset_login_attempts()
+            db.session.delete(self.locked)
+            db.session.commit()
+
+    def is_account_locked(self):
+        return self.locked is not None and self.locked.is_locked()
+
+
+class RolesAndPermissionsMixin:
+    def is_admin(self):
+        return self.role == "admin"
+
+    def has_role(self, required_role):
+        return self.role == required_role
+
+
+# Relations
+
+
 class Session(db.Model):
     __tablename__ = "sessions"
 
@@ -31,7 +86,13 @@ class Session(db.Model):
         db.session.commit()
 
 
-class User(db.Model, UserMixin):
+class User(
+    db.Model,
+    UserMixin,
+    AuthenticationMixin,
+    AccountManagementMixin,
+    RolesAndPermissionsMixin,
+):
     __tablename__ = "users"
 
     id = db.Column(db.INTEGER, nullable=False, primary_key=True)
@@ -78,62 +139,6 @@ class User(db.Model, UserMixin):
         self.last_name = last_name
         self.age = age
         self.phone = phone
-
-    def check_password(self, password):
-        return self.password == password
-
-    def increment_login_attempts(self):
-        self.login_attempts += 1
-        if self.login_attempts >= 3:
-            self.lock_account()
-        db.session.commit()
-
-    def reset_login_attempts(self):
-        self.login_attempts = 0
-        db.session.commit()
-
-    def lock_account(self):
-        if not self.locked:
-            locked_user = LockedUser(user_id=self.id)
-            db.session.add(locked_user)
-            db.session.commit()
-
-    def unlock_account(self):
-        if self.locked:
-            self.reset_login_attempts()
-            db.session.delete(self.locked)
-            db.session.commit()
-
-    def is_account_locked(self):
-        return self.locked is not None and self.locked.is_locked()
-
-    def is_active(self):
-        return True
-
-    def is_authenticated(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def is_admin(self):
-        return self.role == "admin"
-
-    def has_role(self, required_role):
-        return self.role == required_role
-
-    def create_session(self, session_token):
-        session = Session(session_token=session_token, user_id=self.id)
-        db.session.add(session)
-        db.session.commit()
-
-    def get_session(self, session_token):
-        return self.sessions.filter_by(session_token=session_token).first()
-
-    def update_session_last_activity(self, session_token):
-        session = self.get_session(session_token)
-        if session:
-            session.update_last_activity()
 
 
 class OAuthUser(OAuthConsumerMixin, db.Model):
@@ -269,7 +274,9 @@ class CartItem(db.Model):
     product_id = db.Column(db.String(36), db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(precision=10, scale=2))
-
+    user_id = db.Column(
+        db.INTEGER, db.ForeignKey("users.id"), unique=True, nullable=False
+    )
     product = db.relationship("Products", backref="cart_items")
 
 
