@@ -1,14 +1,23 @@
 # Python Modules
-from flask import redirect, render_template, request, url_for, abort, flash
+from flask import redirect, render_template, request, url_for, abort, flash, send_file
+from flask_dance.contrib.google import google
+from flask_dance.contrib.github import github
 from flask_login import current_user, login_required
+from io import BytesIO
 
 # Local Modules
 from app.management import bp
-from .utils import admin_required, save_picture, update_password, update_info
+from .utils import admin_required, update_password
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
 from ..models import User
+
+
+@bp.route("/profile_picture")
+def profile_picture():
+    user = current_user
+    return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
 
 
 @bp.route("/show_users", methods=["GET"])
@@ -47,7 +56,15 @@ def settings():
     sessions = Session.query.filter_by(user_id=user.id).all()
 
     if form.validate_on_submit():
-        update_info(user, form)
+        if form.profile_picture.data:
+            user.profile_picture = form.profile_picture.data
+
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.phone = form.phone.data
+            user.gender = form.gender.data
+            user.email = form.email.data
+
         password_updated = update_password(user, form)
 
         if password_updated:
@@ -75,14 +92,16 @@ def admin_settings(no):
     sessions = Session.query.filter_by(user_id=user.id).all()
 
     if form.validate_on_submit():
-        update_info(user, form)
-        password_updated = update_password(user, form)
+        if form.profile_picture.data:
+            user.profile_picture = form.profile_picture.data.read()
 
-        if password_updated:
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.phone = form.phone.data
+            user.gender = form.gender.data
+            user.email = form.email.data
+
             db.session.commit()
-            flash("User information updated successfully!", "success")
-        else:
-            flash("Password and confirm password do not match.", "error")
 
     return render_template(
         "management/settings.html",
@@ -98,3 +117,20 @@ def dashboard():
     user = current_user
 
     return render_template("management/dashboard.html", username=user.username)
+
+
+@bp.route("/profile")
+def profile():
+    if google.authorized:
+        account_info = get_account_info(google, "/oauth2/v2/userinfo")
+    elif github.authorized:
+        account_info = get_account_info(github, "/user")
+    else:
+        return redirect(url_for("auth.login"))
+
+
+def get_account_info(provider, endpoint):
+    info = provider.get(endpoint)
+    if info.ok:
+        account_info = info.json()
+        return account_info

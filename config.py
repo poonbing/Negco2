@@ -32,11 +32,3 @@ class Config:
     APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "app"))
     STATIC_FOLDER = os.path.join(APP_ROOT, "static")
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
-
-    # SSO provider configuration
-    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-    MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID")
-    MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET")
-    GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID")
-    GITHUB_CLIENT_SECRET = os.environ.get("GITHUB_CLIENT_SECRET")

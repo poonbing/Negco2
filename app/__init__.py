@@ -17,6 +17,9 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     oauth.init_app(app)
 
+    with app.app_context():
+        db.create_all()
+
     def get_total_quantity():
         if "cart" not in session:
             return 0
@@ -35,6 +38,8 @@ def create_app(config_class=Config):
 
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp
+    from app.auth import google_blueprint
+    from app.auth import github_blueprint
     from app.management import bp as management_bp
     from app.recovery import bp as recovery_bp
     from app.error import bp as error_bp
@@ -54,6 +59,8 @@ def create_app(config_class=Config):
     app.register_blueprint(articles_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(forum_bp)
+    app.register_blueprint(google_blueprint, url_prefix="/login")
+    app.register_blueprint(github_blueprint, url_prefix="/login")
 
     auth_bp.xcaptcha = xcaptcha
 

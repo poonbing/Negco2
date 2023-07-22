@@ -20,30 +20,22 @@ def admin_required(view_func):
     return decorated_view
 
 
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(Config.UPLOAD_FOLDER, picture_fn)
+# def save_picture(form_picture):
+#     random_hex = secrets.token_hex(8)
+#     _, f_ext = os.path.splitext(form_picture.filename)
+#     picture_fn = random_hex + f_ext
+#     picture_path = os.path.join(Config.UPLOAD_FOLDER, picture_fn)
 
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
+#     output_size = (125, 125)
+#     i = Image.open(form_picture)
+#     i.thumbnail(output_size)
+#     i.save(picture_path)
 
-    return picture_fn
+#     return picture_fn
 
 
 def update_info(user, form):
-    if form.profile_picture.data:
-        profile_picture = save_picture(form.profile_picture.data)
-        user.profile_picture = profile_picture
-
-    user.first_name = form.first_name.data
-    user.last_name = form.last_name.data
-    user.phone = form.phone.data
-    user.gender = form.gender.data
-    user.email = form.email.data
+    pass
 
 
 def update_password(user, form):

@@ -1,8 +1,11 @@
 # Python Modules
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
+from flask_dance.contrib.github import github
+from flask_dance.contrib.google import google
 from sqlalchemy import or_
 from datetime import datetime
+
 
 # Local Modules
 from app.auth import bp
@@ -31,8 +34,8 @@ def login():
 
         if user and user.is_account_locked():
             flash("Account locked. Contact the admin for assistance.", "error")
-        elif not xcaptcha.verify():
-            flash("xCaptcha verification failed. Please try again.", "error")
+        # elif not xcaptcha.verify():
+        #     flash("xCaptcha verification failed. Please try again.", "error")
         else:
             if user and user.check_password(password):
                 session_attributes = {
@@ -53,6 +56,20 @@ def login():
                 flash("Invalid username or password.", "error")
 
     return render_template("auth/login.html", form=form)
+
+
+@bp.route("/login/google")
+def login_google():
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+    return redirect(url_for("management.profile"))
+
+
+@bp.route("/login/github")
+def login_github():
+    if not github.authorized:
+        return redirect(url_for("github.login"))
+    return redirect(url_for("management.profile"))
 
 
 @bp.route("/logout")

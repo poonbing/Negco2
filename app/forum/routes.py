@@ -34,7 +34,9 @@ def topic_posts(topic_id):
             title=form.title.data, content=form.content.data, topic_id=topic_id
         )
         db.session.add(new_post)
+        print('test')
         try:
+            print('mmmmm')
             db.session.commit()
         except Exception as e:
             print(f"An error occurred while committing the post: {e}")
