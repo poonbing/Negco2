@@ -5,13 +5,14 @@ from flask_xcaptcha import XCaptcha
 # Local Modules
 from config import Config
 from .extensions import db, mail, login_manager, oauth, talisman
+from .models import CartItem
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    talisman.init_app(app)
+    # talisman.init_app(app)
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
     mail.init_app(app)
@@ -21,21 +22,26 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
-    def get_total_quantity():
-        if "cart" not in session:
-            return 0
+        # def get_total_quantity():
+    #     if "cart" not in session:
+    #         return 0
 
-        total_quantity = 0
-        cart_items = session["cart"]
-        for item in cart_items:
-            total_quantity += item["quantity"]
+    #     total_quantity = 0
+    #     cart_items = session["cart"]
+    #     for item in cart_items:
+    #         total_quantity += item["quantity"]
 
-        return total_quantity
+    #     return total_quantity
 
+    # @app.context_processor
+    # def inject_total_quantity():
+    #     total_quantity = get_total_quantity()
+    #     return dict(total_quantity=total_quantity)
     @app.context_processor
-    def inject_total_quantity():
-        total_quantity = get_total_quantity()
-        return dict(total_quantity=total_quantity)
+    def cart_total_quantity():
+        cart_items = CartItem.query.all()
+        total_quantity = sum(item.quantity for item in cart_items)
+        return dict(cart_total_quantity=total_quantity)
 
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp
