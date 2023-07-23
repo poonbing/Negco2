@@ -1,0 +1,50 @@
+{% extends "layout.html" %} {% block title %} Home {% endblock %} {% block
+content %}
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">NegCO Forum</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="forum-card bg-gray-600 rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Rules and Regulations</h2>
+        <p class="mb-4">Rules and Regulations of the Forum.</p>
+        <a
+          href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+          class="text-blue-500 hover:underline"
+          >View All</a
+        >
+      </div>
+      <div class="forum-card bg-gray-600 rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-4">General Discussions</h2>
+        <p class="mb-4">
+          Discuss Anything related to Environmental Sustainability
+        </p>
+        <a
+          href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+          class="text-blue-500 hover:underline"
+          >View All</a
+        >
+      </div>
+      <div class="forum-card bg-gray-600 rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Bug Reports</h2>
+        <p class="mb-4">
+          Report any bugs or issues you encounter while on the website.
+        </p>
+        <a
+          href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+          class="text-blue-500 hover:underline"
+          >View All</a
+        >
+      </div>
+      <div class="forum-card bg-gray-600 rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Suggestions & Feedback</h2>
+        <p class="mb-4">
+          Share your ideas and provide feedback to help improve NegCO.
+        </p>
+        <a href="#" class="text-blue-500 hover:underline">View All</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
