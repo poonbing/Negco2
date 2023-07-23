@@ -1,0 +1,150 @@
+
+{% extends 'layout.html' %} {% block title %}Report{% endblock %} {% block
+content %}
+
+
+<html>
+<head>
+    <title>Tracker Web App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function startTimer(startTime, elementId) {
+            if (startTime !== 'None') {
+                var startDate = new Date(startTime);
+                var element = document.getElementById(elementId);
+                document.getElementById('start_tracker').innerHTML = 'Stop'
+                var interval = setInterval(function() {
+                    var currentDate = new Date();
+                    var elapsedTime = currentDate - startDate; 
+                    
+                    var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+                    var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                    
+                    var elapsedTimeString = hours + 'h ' + minutes + 'm ' + seconds + 's';
+
+                    element.innerHTML = elapsedTimeString;
+                }, 1000);
+            }
+        }
+
+        function toggleform(index, name, item, rate, method){
+            var form = document.getElementById('item_form');
+            var new_name = document.getElementById('new_name');
+            var new_item = document.getElementById('new_item');
+            var new_rate = document.getElementById('new_rate');
+            var item_index = document.getElementById('item_index');
+            var form_action = document.getElementById('form_action');
+            var form_label = document.getElementById('form_action_header');
+
+            form_action.value = method
+            form_label.innerHTML = method
+            new_name.value = name
+            new_item.value = item
+            new_rate.value = rate
+            item_index.value = index
+            form.style.display = "flex"
+        }
+
+        function closedisplay(item){
+            var item = document.getElementById(item)
+            item.style.display = 'none'
+        }
+
+        function opendisplay(item, type){
+            var item = document.getElementById(item)
+            item.style.display = type
+        }
+    </script>
+</head>
+<body>
+    
+    <h1>Tracker Web App</h1>
+    <div class="grid grid-cols-2 gap-4">
+    {% for key in keylist %}
+        <div id="'trackercard" class="m-5 bg-emerald-100 rounded-lg">
+            <div class="m-3 flex justify-between">
+                <div>
+                    <div class="text-xl"><h2 id="key">{{ key.name }}</h2></div>
+                    <div class="ml-3 text-xs">{{ key.item }} </div>
+                </div>
+                <div>
+                    <button onclick=" toggleform('{{ key.name }}', '{{ key.name }}', '{{ key.item }}', '{{ key.rate }}', 'update' )"> Edit </button>
+                    <form action="/track" name="delete" id="delete" method="POST">
+                        <input type="text" id="index" name="index" style="display: none;" value="{{ key.name }}">
+                        <button name="delete" id="delete"> Delete </button>
+                    </form>
+                </div>
+            </div>
+            <span id="timer-{{ key.name }}" class="ml-5"> 0h 0m 0s</span>
+            <form name="tracker" action="/track" method="POST" class="ml-10">
+                <input type="text" id="name" name="name" value="{{ key.name }}" style="display: none;">
+                
+                <br>
+                <label for="rate">Rate: {{ key.rate }} Watts/Hour</label>
+                <input type="text" id="item" name="item" value="{{ key.item }}" style="display: none;">
+                <input type="text" id="rate" name="rate" value="{{ key.rate }}" style="display: none;">
+                <input type="text" id="key" name="key" value="{{ key.session_id }}" style="display: none;">
+                <br>
+                <button id="start_tracker" name="start_tracker" type="submit" class="-ml-7 mb-3">Start</button>
+            </form>
+            <script>
+                var startTime = "{{ key.session_start }}";
+                var elementId = "timer-{{ key.name }}";
+                startTimer(startTime, elementId);
+            </script>
+        </div>
+    {% endfor %}
+    </div>
+    <br><br>
+    <button onclick="opendisplay('item_form', 'flex')"> Create New Item </button>
+    <form name="report" action="/report" method="POST">
+        <button type="submit">Report</button>
+    </form>
+  </form>
+  <script>
+    var startTime = "{{ key.session_start }}";
+    var elementId = "timer-{{ key.name }}";
+    startTimer(startTime, elementId);
+  </script>
+</div>
+<br />
+{% endfor %}
+<br /><br />
+<button onclick="opendisplay('item_form', 'flex')">Create New Item</button>
+<form name="report" action="/report" method="POST">
+  <button type="submit">Report</button>
+</form>
+<form
+  id="item_form"
+  name="item_form"
+  action="/track"
+  method="POST"
+  style="display: none"
+>
+  <h2 id="form_action_header">Create Item</h2>
+  <br />
+  <input
+    type="text"
+    id="form_action"
+    name="form_action"
+    value="create"
+    style="display: none"
+  />
+  <label for="new_name">Name: </label>
+  <input type="text" id="new_name" name="new_name" />
+  <label for="new_name">Item: </label>
+  <input type="text" id="new_item" name="new_item" />
+  <label for="new_name">Rate: </label>
+  <input type="text" id="new_rate" name="new_rate" />
+  <input
+    type="text"
+    id="item_index"
+    name="item_index"
+    style="display: none"
+    value="-1"
+  />
+  <button name="item_form" type="submit">Save Changes</button>
+  <button name="close_form" onclick="closedisplay('item_form')">Close</button>
+</form>
+{% endblock %}

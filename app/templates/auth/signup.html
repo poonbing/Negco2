@@ -1,0 +1,129 @@
+{% extends "full_layout.html" %} {% block title %}Sign Up{% endblock %} {% block
+content %}
+
+<section class="bg-white dark:bg-gray-900">
+  <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
+    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+      Sign Up
+    </h2>
+
+    {% with messages = get_flashed_messages() %} {% for message in messages %}
+    <p class="error">{{ message }}</p>
+    {% endfor %} {% endwith %}
+    <form method="POST" action="{{ url_for('auth.signup') }}">
+      {{ form.csrf_token }}
+      <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+        <div class="sm:col-span-2">
+          <label
+            for="email"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >{{form.email.label}}</label
+          >
+          {{form.email(class="bg-gray-50 border border-gray-300 text-gray-900
+          text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
+          block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
+          dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+          dark:focus:border-primary-500")}}
+        </div>
+        <div class="sm:col-span-2">
+          <label
+            for="username"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >{{form.username.label}}</label
+          >
+          {{form.username(class="block p-2.5 w-full text-sm text-gray-900
+          bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+          focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+          dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+          dark:focus:border-primary-500")}}
+        </div>
+        <div class="sm:col-span-2">
+          <label
+            for="password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >{{form.password.label}}</label
+          >
+          {{form.password(class="block p-2.5 w-full text-sm text-gray-900
+          bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+          focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+          dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+          dark:focus:border-primary-500")}}
+        </div>
+        <div class="sm:col-span-2">
+          <label
+            for="confirm_password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >{{form.confirm_password.label}}</label
+          >
+          {{form.confirm_password(class="block p-2.5 w-full text-sm
+          text-gray-900 bg-gray-50 rounded-lg border border-gray-300
+          focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700
+          dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+          dark:focus:ring-primary-500 dark:focus:border-primary-500")}}
+        </div>
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          for="gender"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.gender.label}}</label
+        >
+        {{form.gender(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+        rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          for="first_name"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.first_name.label}}</label
+        >
+        {{form.first_name(class="block p-2.5 w-full text-sm text-gray-900
+        bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          for="last_name"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.last_name.label}}</label
+        >
+        {{form.last_name(class="block p-2.5 w-full text-sm text-gray-900
+        bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          for="age"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.age.label}}</label
+        >
+        {{form.age(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+        rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          for="phone"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.phone.label}}</label
+        >
+        {{form.phone(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+        rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

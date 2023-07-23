@@ -1,0 +1,40 @@
+{% extends 'layout.html' %} {% block title %}Report{% endblock %} {% block
+content %}
+<h1>Tracker Report</h1>
+
+{% for date in list %}
+<h2>{{ date }}</h2>
+<span for="duration-{{ loop.index }}">
+  Total Duration: {{ total['duration'] }}</span
+>
+<br />
+<span for="duration-{{ loop.index }}"> Total Usage: {{ total['usage'] }}</span>
+<br />
+<h1>Break Down</h1>
+<br />
+{% for item in list[date] %}
+<h3>----------------------------------------------------------------------</h3>
+<br />
+<h2>{{ item }}</h2>
+<div>
+  <span for="duration-{{ loop.index }}">
+    Total Duration: {{ list[date][item]['duration'] }}</span
+  >
+  <br />
+  <span for="duration-{{ loop.index }}">
+    Total Usage: {{ list[date][item]['usage'] }}</span
+  >
+</div>
+<br />
+{% endfor %}
+<h3>----------------------------------------------------------------------</h3>
+{% endfor %}
+<div id="return">
+  <form name="tracker" action="/track" method="POST">
+    <button type="submit">Tracker</button>
+  </form>
+</div>
+<div id="x-axis" style="display: none">{{ x }}</div>
+<div id="y-axis" style="display: none">{{ y }}</div>
+<canvas id="myChart"></canvas>
+{% endblock %}
