@@ -227,12 +227,24 @@ class Products(db.Model):
     image = db.Column(db.String(50), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.today)
     offered_price = db.Column(db.Numeric(precision=10, scale=2))
+    rating_score = db.Column(db.Integer)
+    rating_count = db.Column(db.Integer)
+
+    def rating_result(self):
+        if self.rating_count == None:
+            rating_result = 0
+            return rating_result
+        else:
+            rating_result = self.rating_score / self.rating_count
+
+        return round(rating_result, 1)
+
 
 
 class CartItem(db.Model):
     __tablename__ = "cart_items"
 
-    id = db.Column(db.Integer, primary_key=True, unique=True)
+    id = db.Column(db.String(36), primary_key=True, unique=True)
     product_id = db.Column(db.String(36), db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(precision=10, scale=2))

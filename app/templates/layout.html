@@ -20,9 +20,15 @@
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
   </head>
-  <body class="pt-20 font-serif">
-    {% include 'navbar.html' %} {% block content %} {% endblock %} {% include
-    'footer.html' %}
+  <body class="mt-20 font-serif flex flex-col min-h-screen">
+    {% include 'navbar.html' %} 
+      <div class="flex-1">
+        {% block content %} 
+        {% endblock %}
+      </div>
+
+    {% include 'footer.html' %}
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
   </body>
 </html>

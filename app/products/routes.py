@@ -138,39 +138,21 @@ def deleteProduct(id):
 
 @bp.route("/productPage/<string:id>", methods=["GET", "POST"])
 def productPage(id):
-    # cart_items = []
-    # if 'add_to_cart' in request.form:
-    #     if "cart" not in session:
-    #         session["cart"] = []
-    #         # Check if the product already exists in the cart
-    #     for item in session["cart"]:
-    #         product_id = item["product_id"]
-    #         quantity = item["quantity"]
-    #         if item["product_id"] == id:
-    #             item["quantity"] += 1
-    #             flash("Product quantity updated in cart!")
-    #             return redirect(request.referrer)
-            
-    #         product = Products.query.get(product_id)
-    #         cart_item = CartItem(
-    #         product_id=product.id, quantity=quantity, price=product.price
-    #         )
-    #         db.session.add(cart_item)
-    #         db.session.commit()
-
-    #         cart_items.append(cart_item)
-
-    #     # If the product doesn't exist in the cart, add it with a quantity of 1
-    #     product = {"product_id": id, "quantity": 1}
-    #     session["cart"].append(product)
-
-    #     flash("Product added to cart successfully!")
-
-
     product_to_view = Products.query.get_or_404(id)
+    if request.method == 'POST':
+        rating = int(request.form['rating'])
+        if not product_to_view.rating_score:
+            product_to_view.rating_score = rating
+            product_to_view.rating_count = 1
+            db.session.commit()
+            flash('Thank you for leaving a rating on the product!')
+        else:
+            product_to_view.rating_score += rating
+            product_to_view.rating_count += 1
+            db.session.commit()
+            flash('Thank you for your rating on the product!')
+    
     more_product = Products.query.order_by(func.random()).limit(4)
-  
-
 
     return render_template(
         "products/productPage.html",
