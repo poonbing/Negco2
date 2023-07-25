@@ -1,7 +1,8 @@
 # Python Modules
 from flask import render_template, request, url_for, session, redirect, flash
+from flask_login import current_user
 from werkzeug.utils import secure_filename
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from uuid import uuid4
 import os
 
@@ -138,6 +139,34 @@ def deleteProduct(id):
 
 @bp.route("/productPage/<string:id>", methods=["GET", "POST"])
 def productPage(id):
+    # cart_items = []
+    # if 'add_to_cart' in request.form:
+    #     if "cart" not in session:
+    #         session["cart"] = []
+    #         # Check if the product already exists in the cart
+    #     for item in session["cart"]:
+    #         product_id = item["product_id"]
+    #         quantity = item["quantity"]
+    #         if item["product_id"] == id:
+    #             item["quantity"] += 1
+    #             flash("Product quantity updated in cart!")
+    #             return redirect(request.referrer)
+
+    #         product = Products.query.get(product_id)
+    #         cart_item = CartItem(
+    #         product_id=product.id, quantity=quantity, price=product.price
+    #         )
+    #         db.session.add(cart_item)
+    #         db.session.commit()
+
+    #         cart_items.append(cart_item)
+
+    #     # If the product doesn't exist in the cart, add it with a quantity of 1
+    #     product = {"product_id": id, "quantity": 1}
+    #     session["cart"].append(product)
+
+    #     flash("Product added to cart successfully!")
+
     product_to_view = Products.query.get_or_404(id)
     if request.method == 'POST':
         rating = int(request.form['rating'])
@@ -182,17 +211,14 @@ def filterProducts(category):
 @bp.route("/add_to_cart/<string:product_id>")
 def add_to_cart(product_id):
     product = Products.query.get_or_404(product_id)
-    cart_item = CartItem.query.filter_by(product_id=product_id).first()
+    cart_item = CartItem.query.filter_by(product_id=product_id, user_id=current_user.id).first()
 
     if cart_item:
         cart_item.quantity += 1
         flash("Product quantity updated in cart!")
     else:
         cart_item = CartItem(
-            id = str(uuid4())[:8],
-            product_id=product_id,
-            quantity=1,
-            price=product.price
+            id=str(uuid4())[:8], product_id=product_id, quantity=1, price=product.price, user_id=current_user.id
         )
         db.session.add(cart_item)
         flash("Product added to cart successfully!")
@@ -203,7 +229,9 @@ def add_to_cart(product_id):
 
 @bp.route("/view_cart")
 def view_cart():
-    cart_items = CartItem.query.all()
+    user = current_user
+    cart_items = CartItem.query.filter_by(user_id=user.id).all()
+
     total_quantity = sum(item.quantity for item in cart_items)
     total_price = sum(item.price * item.quantity for item in cart_items)
 
@@ -218,7 +246,8 @@ def view_cart():
 @bp.route("/update_quantity/<string:product_id>", methods=["POST"])
 def update_quantity(product_id):
     quantity = int(request.form.get("quantity"))
-    cart_item = CartItem.query.filter_by(product_id=product_id).first()
+    cart_item = CartItem.query.filter_by(product_id=product_id, user_id=current_user.id).first()
+
 
     if cart_item:
         cart_item.quantity = quantity
@@ -230,7 +259,7 @@ def update_quantity(product_id):
 
 @bp.route("/remove_from_cart/<string:product_id>")
 def remove_from_cart(product_id):
-    cart_item = CartItem.query.filter_by(product_id=product_id).first()
+    cart_item = CartItem.query.filter_by(product_id=product_id, user_id=current_user.id).first()
 
     if cart_item:
         db.session.delete(cart_item)

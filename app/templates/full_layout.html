@@ -6,6 +6,7 @@
       href="{{ url_for('static', filename='css/main.css') }}"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Newsreader:wght@300&display=swap"
@@ -22,7 +23,8 @@
   </head>
 
   <body class="h-full bg-cover bg-center">
-    {% include 'navbar.html' %} {% block content %} {% endblock %} {% include
-    'footer.html' %}
+    {% block content %} {% endblock %}
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   </body>
 </html>

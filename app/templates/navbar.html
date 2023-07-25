@@ -18,12 +18,17 @@
     </a>
     <div class="flex md:order-2">
       <a
-        href="{{url_for('products.view_cart')}}"
+        href="
+        {% if current_user.is_authenticated %} 
+          {{url_for('products.view_cart')}}
+        {% else %}
+          {{url_for('auth.login')}}
+        {% endif %}"
         class="text-white rounded-full mr-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 duration-500"
         >{{cart_total_quantity}}<ion-icon name="cart-outline"></ion-icon
       ></a>
 
-      {% if current_user.role %}
+      {% if current_user.is_authenticated %}
       <button
         type="button"
         class="flex mr-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
@@ -33,11 +38,8 @@
         data-dropdown-placement="bottom"
       >
         <span class="sr-only">Open user menu</span>
-        <img
-          class="w-8 h-8 rounded-full"
-          src="/docs/images/people/profile-picture-3.jpg"
-          alt="user photo"
-        />
+        <img class="w-10 h-10 rounded-full" src="{{ url_for('management.profile_picture') }}" alt="Profile Picture">
+
       </button>
       <!-- Dropdown menu -->
       <div
@@ -46,10 +48,10 @@
       >
         <div class="px-4 py-3">
           <span class="block text-sm text-gray-900 dark:text-white"
-            >Bonnie Green</span
+            >{{current_user.username}}</span
           >
           <span class="block text-sm text-gray-500 truncate dark:text-gray-400"
-            >name@flowbite.com</span
+            >{{current_user.email}}</span
           >
         </div>
         <ul class="py-2" aria-labelledby="user-menu-button">
@@ -142,7 +144,7 @@
         </li>
         <li>
           <a
-            href="#"
+            href="/forum"
             class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-teal-700 md:p-0 md:dark:hover:text-red-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 duration-500"
             >Blog</a
           >

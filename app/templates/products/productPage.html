@@ -167,9 +167,14 @@ get_flashed_messages() %}
             >SGD {{product_to_view.price}}</span
           >
           {% endif %}
-
+          
           <form
-            action="{{url_for('products.add_to_cart', product_id=product_to_view.id)}}"
+
+            action="{% if current_user.is_authenticated %} 
+                      {{url_for('products.add_to_cart', product_id=product_to_view.id)}}
+                    {% else %}
+                      {{url_for('auth.login')}}
+                    {% endif %}"
             method="GET"
           >
             <button
