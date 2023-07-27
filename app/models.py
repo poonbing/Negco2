@@ -241,7 +241,7 @@ class Report(db.Model):
     year = db.Column(db.String(4), nullable=False)
     total_usage = db.Column(db.INTEGER)
     energy_goals = db.Column(db.INTEGER)
-    datapoint = db.Column(db.String(300))
+    datapoint = db.Column(db.JSON)
 
     def __init__(self, id, related_user, item_name, month, year, total_usage, energy_goals, datapoint):
         self.id = id

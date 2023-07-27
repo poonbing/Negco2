@@ -74,7 +74,7 @@ class TrackerFunctions:
 
     def delete_session_information(self, user_id, name):
         session_info = SessionInfo.query.filter(
-            and_(SessionInfo.active_sessions == user_id, SessionInfo.name == name)
+            and_(SessionInfo.active_sessions==user_id, SessionInfo.name==name)
         ).first()
         if session_info is None:
             return "Failed"
@@ -83,9 +83,10 @@ class TrackerFunctions:
 
     def update_session_information(self, user_id, old_name, name, item, rate):
         session_info = SessionInfo.query.filter(
-            and_(SessionInfo.active_sessions == user_id, SessionInfo.name == old_name)
+            and_(SessionInfo.active_sessions==user_id, SessionInfo.name==old_name)
         ).first()
         if session_info is None:
+            print("Failed")
             return "Failed"
         session_info.name = name
         session_info.item = item
@@ -125,9 +126,9 @@ class TrackerFunctions:
         return id, current_time
 
     def end_tracker(self, id, user_id):
+        tracker = Tracker.query.get(id)
         report = self.check_report(user_id, tracker.name)
         total_report = self.check_report(user_id, 'total')
-        tracker = Tracker.query.get(id)
         current_date = int(datetime.now().day)
         start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
         current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -136,26 +137,28 @@ class TrackerFunctions:
         total_usage = int(tracker.rate)*int(round((current_time - start_time).total_seconds()/60))
         if report != "Failed":
             report.total_usage += total_usage
-            list = ast.literal_eval(report.datapoint)
+            list = report.datapoint
             if len(list) < current_date:
                 list.append(total_usage)
             elif len(list) >= current_date:
-                list[current_date] += total_usage
+                list[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
             report.datapoint = list
             total_report.total_usage += total_usage
-            list2 = ast.literal_eval(total_report.datapoint)
+            list2 = total_report.datapoint
             if len(list2) < current_date:
                 list2.append(total_usage)
             elif len(list2) >= current_date:
-                list2[current_date] += total_usage
+                list2[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
             total_report.datapoint = list2
         else:
             current_month = datetime.now().strftime('%m')
             current_year = datetime.now().year
             list = []
+            print(current_date)
             for i in range(current_date):
-                list.append(0)
-            list[current_date] += total_usage
+                list.append('0')
+            print(list)
+            list[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
             new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=tracker.name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
             db.session.add(new_report)
             total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)

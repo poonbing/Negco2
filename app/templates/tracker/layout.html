@@ -54,28 +54,6 @@
         item.style.display = type;
       }
     </script>
-    <script>
-      var ctx = document.getElementById("myChart").getContext("2d");
-      var dates = JSON.parse(document.getElementById("y-axis").innerHTML);
-      var dataset = JSON.parse(document.getElementById("x-axis").innerHTML);
-      var data = {
-        labels: dataset,
-        datasets: [
-          {
-            label: "Example Dataset",
-            data: dates,
-            borderColor: "black",
-            fill: false,
-          },
-        ],
-      };
-
-      var myChart = new Chart(ctx, {
-        type: "line",
-        data: data,
-        options: {},
-      });
-    </script>
   </head>
   <body>
     {% include 'navbar.html' %} {% block content %} {% endblock %} {% include

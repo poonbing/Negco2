@@ -85,3 +85,15 @@ class SignUpForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired()])
     age = IntegerField("Age", validators=[InputRequired()])
     phone = StringField("Phone", validators=[InputRequired()])
+
+class TrackerInteract(FlaskForm):
+    name = StringField("Name: ", validators=[InputRequired()])
+    item = StringField("Item: ", validators=[InputRequired()])
+    rate = StringField("Rate: ", validators=[InputRequired(), Length(min=1, max=5)])
+    action = StringField("action", validators=[InputRequired()])
+    old_name = StringField("old name", validators=[InputRequired()])
+    old_item = StringField("old item", validators=[InputRequired()])
+
+class TrackerDelete(FlaskForm):
+    name = StringField("name", validators=[InputRequired()])
+
