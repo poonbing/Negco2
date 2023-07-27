@@ -52,16 +52,11 @@ def enter_access_code():
         correct_code = access_codes[email]
         if entered_code == correct_code:
             del access_codes[email]
-            return redirect(url_for("recovery.success", email=email))
+            return redirect(url_for("recovery.reset_password", email=email))
         else:
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email)
-
-
-@bp.route("/success", methods=["GET", "POST"])
-def success():
-    return render_template("recovery/success.html")
 
 
 @bp.route("/reset_password", methods=["GET", "POST"])
@@ -78,6 +73,6 @@ def reset_password():
         new_password = request.form.get("password")
         user.password = new_password
         db.session.commit()
-        return redirect(url_for("recovery.success"))
+        return redirect(url_for("auth.login"))
 
     return render_template("recovery/resetPassword.html", email=email)

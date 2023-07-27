@@ -6,7 +6,7 @@ content %}
 
   <form
     method="POST"
-    action="{% if current_user.role == 'admin' %}{{ url_for('management.admin_settings', no=user.id) }}{% else %}{{ url_for('management.settings') }}{% endif %}"
+    action="{{ url_for('management.settings') }}"
     enctype="multipart/form-data"
   >
     {{ form.csrf_token }}

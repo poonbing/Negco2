@@ -1,52 +1,66 @@
 # Python Modules
-from flask import Flask, session
+from flask import Flask
 from flask_xcaptcha import XCaptcha
+
 
 # Local Modules
 from config import Config
-from .extensions import db, mail, login_manager, oauth, talisman
+from .extensions import db, mail, login_manager, oauth, csrf, jwt
 from .models import CartItem
+import logging
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # talisman.init_app(app)
-    xcaptcha = XCaptcha(app=app)
-    db.init_app(app)
-    mail.init_app(app)
-    login_manager.init_app(app)
-    oauth.init_app(app)
+    @app.after_request
+    def add_security_headers(response):
+        response.headers[
+            "Strict-Transport-Security"
+        ] = "max-age=31536000; includeSubDomains"
+        # response.headers[
+        #     "Content-Security-Policy"
+        # ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://assets.hcaptcha.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src https://assets.hcaptcha.com; frame-src https://assets.hcaptcha.com; script-src https://hcaptcha.com https://assets.hcaptcha.com;"
 
-    with app.app_context():
-        db.create_all()
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
 
-        # def get_total_quantity():
-    #     if "cart" not in session:
-    #         return 0
+        return response
 
-    #     total_quantity = 0
-    #     cart_items = session["cart"]
-    #     for item in cart_items:
-    #         total_quantity += item["quantity"]
-
-    #     return total_quantity
-
-    # @app.context_processor
-    # def inject_total_quantity():
-    #     total_quantity = get_total_quantity()
-    #     return dict(total_quantity=total_quantity)
     @app.context_processor
     def cart_total_quantity():
         cart_items = CartItem.query.all()
         total_quantity = sum(item.quantity for item in cart_items)
         return dict(cart_total_quantity=total_quantity)
 
+    xcaptcha = XCaptcha(app=app)
+    db.init_app(app)
+    mail.init_app(app)
+    login_manager.init_app(app)
+    jwt.init_app(app)
+    oauth.init_app(app)
+
+    oauth.register(
+        name="google",
+        client_id=Config.GOOGLE_CLIENT_ID,
+        client_secret=Config.GOOGLE_CLIENT_SECRET,
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
+    )
+
+    oauth.register(
+        name="azure",
+        client_id=Config.AZURE_CLIENT_ID,
+        client_secret=Config.AZURE_CLIENT_SECRET,
+        api_base_url="https://graph.microsoft.com/",
+        server_metadata_url="https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
+    )
+
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp
-    from app.auth import google_blueprint
-    from app.auth import github_blueprint
+
     from app.management import bp as management_bp
     from app.recovery import bp as recovery_bp
     from app.error import bp as error_bp
@@ -66,9 +80,13 @@ def create_app(config_class=Config):
     app.register_blueprint(articles_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(forum_bp)
-    app.register_blueprint(google_blueprint, url_prefix="/login")
-    app.register_blueprint(github_blueprint, url_prefix="/login")
 
     auth_bp.xcaptcha = xcaptcha
+
+    file_handler = logging.FileHandler(Config.LOG_FILE)
+    file_handler.setLevel(Config.LOG_LEVEL)
+    file_handler.setFormatter(Config.LOG_FORMAT)
+
+    app.logger.addHandler(file_handler)
 
     return app

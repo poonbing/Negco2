@@ -1,11 +1,16 @@
 import os
+import logging
 
 
 class Config:
     # Security configuration
     DEBUG = True
     SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
-    SECURITY_PASSWORD_SALT = "146585145368522386173505678016728509634"
+    SECURITY_PASSWORD_SALT = b"$2b$12$qdiRLBGdVc2t0LrfuINFqO"
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    PERMANENT_SESSION_LIFETIME = 600
 
     # xCaptcha configuration
     XCAPTCHA_SITE_KEY = "906a1dab-2e2c-4c80-880a-9fb359a89b73"
@@ -30,31 +35,15 @@ class Config:
     STATIC_FOLDER = os.path.join(APP_ROOT, "static")
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
 
-    # Talisman Configuration
-    TALISMAN_FORCE_HTTPS = True
-    TALISMAN_SESSION_COOKIE_SECURE = True
-    TALISMAN_CONTENT_SECURITY_POLICY = {
-        "default-src": [
-            "'self'",
-            "https://cdn.tailwindcss.com",
-            "https://fonts.googleapis.com",
-            "https://fonts.gstatic.com",
-            "https://cdn.quilljs.com",
-            "https://unpkg.com",
-            "https://cdnjs.cloudflare.com",
-        ],
-        "style-src": [
-            "'self'",
-            "https://cdn.tailwindcss.com",
-            "https://fonts.googleapis.com",
-            "https://cdn.quilljs.com",
-            "https://unpkg.com",
-            "https://cdnjs.cloudflare.com",
-        ],
-        "font-src": [
-            "'self'",
-            "https://fonts.googleapis.com",
-            "https://fonts.gstatic.com",
-        ],
-        "script-src": ["'self'", "https://cdn.tailwindcss.com", "https://unpkg.com"],
-    }
+    # Oauth Configuration
+    GOOGLE_CLIENT_ID = (
+        "43510388979-2l3aedm3mce7trakvl09n9rcblcm1lco.apps.googleusercontent.com"
+    )
+    GOOGLE_CLIENT_SECRET = "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"
+    AZURE_CLIENT_ID = "2853d287-14c5-45dd-97f7-89d9bd06f37c"
+    AZURE_CLIENT_SECRET = "8304bf93-0a20-459d-89a9-0fff0b169e0f"
+
+    # Logging Configuration
+    LOG_FILE = "record.log"
+    LOG_LEVEL = logging.DEBUG
+    LOG_FORMAT = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")

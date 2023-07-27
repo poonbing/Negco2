@@ -205,7 +205,11 @@ def add_to_cart(product_id):
         flash("Product quantity updated in cart!")
     else:
         cart_item = CartItem(
-            id=str(uuid4())[:8], product_id=product_id, quantity=1, price=product.price
+            id=str(uuid4())[:8],
+            product_id=product_id,
+            quantity=1,
+            price=product.price,
+            user_id=current_user.id,
         )
         db.session.add(cart_item)
         flash("Product added to cart successfully!")
