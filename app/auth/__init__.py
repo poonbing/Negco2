@@ -18,22 +18,22 @@ google_blueprint = make_google_blueprint(
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
     ],
-    storage=SQLAlchemyStorage(
-        OAuth,
-        db.session,
-        user=current_user,
-    ),
+    # storage=SQLAlchemyStorage(
+    #     OAuth,
+    #     db.session,
+    #     user=current_user,
+    # ),
 )
 
 github_blueprint = make_github_blueprint(
     client_id="e9d685f8558a7a584761",
     client_secret="048a2b47fc787386a4037d4690d69bcd387ba351",
     scope="user:email",
-    storage=SQLAlchemyStorage(
-        OAuth,
-        db.session,
-        user=current_user,
-    ),
+    # storage=SQLAlchemyStorage(
+    #     OAuth,
+    #     db.session,
+    #     user=current_user,
+    # ),
 )
 
 from app.auth import routes

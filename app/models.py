@@ -69,7 +69,7 @@ class Session(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     session_token = db.Column(db.String(100), unique=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"))
     last_activity = db.Column(db.DateTime, default=datetime.utcnow)
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.String(255))
@@ -95,7 +95,7 @@ class User(
 ):
     __tablename__ = "users"
 
-    id = db.Column(db.INTEGER, nullable=False, primary_key=True)
+    id = db.Column(db.String(36), nullable=False, primary_key=True)
     profile_picture = db.Column(db.LargeBinary(length=(2**32) - 1))
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
@@ -141,12 +141,12 @@ class User(
         self.phone = phone
 
 
-class OAuthUser(OAuthConsumerMixin, db.Model):
-    __tablename__ = "oauth_users"
+# class OAuthUser(OAuthConsumerMixin, db.Model):
+#     __tablename__ = "oauth_users"
 
-    provider_user_id = db.Column(db.String(256), unique=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    user = db.relationship(User)
+#     provider_user_id = db.Column(db.String(256), unique=True)
+#     user_id = db.Column(db.String(36), db.ForeignKey(User.id))
+#     user = db.relationship(User)
 
 
 class LockedUser(db.Model):
@@ -154,7 +154,7 @@ class LockedUser(db.Model):
 
     id = db.Column(db.INTEGER, nullable=False, primary_key=True, autoincrement=True)
     user_id = db.Column(
-        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
     locked_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -167,7 +167,9 @@ class Tracker(db.Model):
     __tablename__ = "tracker"
     # sql model
     id = db.Column(db.String(36), primary_key=True)
-    user_id = db.Column(db.INTEGER, nullable=False, unique=True)
+    user_id = db.Column(
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
+    )
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
     rate = db.Column(db.INTEGER, nullable=False)
@@ -199,16 +201,18 @@ class SessionInfo(db.Model):
     __tablename__ = "session_info"
 
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
-    active_sessions = db.Column(db.INTEGER, nullable=False)
+    active_sessions = db.Column(
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
+    )
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
     session_id = db.Column(db.String(36))
     session_start = db.Column(db.String(20))
     rate = db.Column(db.INTEGER, nullable=False)
 
-    def __init__(self, id, user_id, name, item, session_id, session_start, rate):
+    def __init__(self, id, active_sessions, name, item, session_id, session_start, rate):
         self.id = id
-        self.user_id = user_id
+        self.active_sessions = active_sessions
         self.name = name
         self.item = item
         self.session_id = session_id
@@ -224,6 +228,41 @@ class SessionInfo(db.Model):
             "session_id": self.session_id,
             "session_start": self.session_start,
             "rate": self.rate,
+        }
+
+
+class Report(db.Model):
+    __tablename__ = "report"
+
+    id = id = db.Column(db.String(36), primary_key=True, unique=True)
+    related_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    item_name = db.Column(db.String(45), nullable=False)
+    month = db.Column(db.String(2), nullable=False)
+    year = db.Column(db.String(4), nullable=False)
+    total_usage = db.Column(db.INTEGER)
+    energy_goals = db.Column(db.INTEGER)
+    datapoint = db.Column(db.String(300))
+
+    def __init__(self, id, related_user, item_name, month, year, total_usage, energy_goals, datapoint):
+        self.id = id
+        self.related_user = related_user
+        self.item_name = item_name
+        self.month = month
+        self.year = year
+        self.total_usage = total_usage
+        self.energy_goals = energy_goals
+        self.datapoint = datapoint
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "related_user": self.related_user,
+            "item_name": self.item_name,
+            "month": self.month,
+            "year": self.year,
+            "total_usage": self.total_usage,
+            "energy_goals": self.energy_goals,
+            "datapoint": self.datapoint
         }
 
 
@@ -249,7 +288,7 @@ class Articles(db.Model):
             minutes = time_difference.seconds // 60
             return f"{minutes} minutes ago"
         else:
-            return "Just now"
+            return "Just now", 
 
 
 class Products(db.Model):
@@ -276,7 +315,7 @@ class CartItem(db.Model):
     price = db.Column(db.Numeric(precision=10, scale=2))
 
     user_id = db.Column(
-        db.INTEGER, db.ForeignKey("users.id"), unique=True, nullable=False
+        db.String(36), db.ForeignKey("users.id"), unique=True, nullable=False
     )
     product = db.relationship("Products", backref="cart_items")
 
@@ -288,7 +327,7 @@ class Comment(db.Model):
     post_id = db.Column(db.INTEGER, db.ForeignKey("posts.id"), nullable=False)
     content = db.Column(db.String(255), nullable=False)
     commenter = db.Column(
-        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
     post = db.relationship("Post", back_populates="comments")
 
@@ -300,7 +339,7 @@ class Post(db.Model):
     title = db.Column(db.String(255), nullable=False)
     topic_id = db.Column(db.INTEGER, db.ForeignKey("topics.id"), nullable=False)
     poster = db.Column(
-        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
     topic = db.relationship("Topic", back_populates="posts")
     content = db.Column(db.Text(length=1000000), nullable=False)

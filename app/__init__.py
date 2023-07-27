@@ -55,6 +55,7 @@ def create_app(config_class=Config):
     from app.articles import bp as articles_bp
     from app.products import bp as products_bp
     from app.forum import bp as forum_bp
+    from app.report import bp as report_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -66,6 +67,7 @@ def create_app(config_class=Config):
     app.register_blueprint(articles_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(forum_bp)
+    app.register_blueprint(report_bp)
     app.register_blueprint(google_blueprint, url_prefix="/login")
     app.register_blueprint(github_blueprint, url_prefix="/login")
 
