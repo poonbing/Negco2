@@ -1,9 +1,9 @@
 # Python Modules
-from flask import redirect, url_for, render_template, request, flash
+from flask import redirect, url_for, render_template, request, flash, current_app
 from flask_mail import Message
 from random import randint
-
-
+from flask_login import current_user, login_required
+from app import limiter
 # Local Modules
 from app.recovery import bp
 from ..models import User
@@ -24,6 +24,7 @@ def send_recovery_email(email, access_code):
 
 @bp.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
+    current_app.logger.info('Processing request to recover password from %s for %s', request.remote_addr, request.path)
     if request.method == "POST":
         email = request.form.get("email")
         user = User.query.filter_by(email=email).first()
@@ -43,6 +44,7 @@ def forgot_password():
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
 def enter_access_code():
+    current_app.logger.info('Receive and confirm access code for password recovery from %s for %s', request.remote_addr, request.path)
     email = request.args.get("email")
     if not email or email not in access_codes:
         return redirect(url_for("recovery.forgot_password"))
@@ -54,6 +56,7 @@ def enter_access_code():
             del access_codes[email]
             return redirect(url_for("recovery.success", email=email))
         else:
+            current_app.logger.info('Returning invalid access code from %s for %s', request.remote_addr, request.path)
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email)
@@ -61,11 +64,13 @@ def enter_access_code():
 
 @bp.route("/success", methods=["GET", "POST"])
 def success():
+    current_app.logger.info('Return approval of password recovery from %s for %s', request.remote_addr, request.path)
     return render_template("recovery/success.html")
 
 
 @bp.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
+    current_app.logger.info('Initiate reset of password from %s for %s', request.remote_addr, request.path)
     email = request.args.get("email")
     if not email:
         return redirect(url_for("recovery.forgot_password"))

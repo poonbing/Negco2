@@ -1,11 +1,11 @@
 # Python Modules
-from flask import render_template, request, url_for, session, redirect, flash
+from flask import render_template, request, url_for, session, redirect, flash, current_app
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 from uuid import uuid4
 import os
-
+from app import limiter
 # Local Modules
 from app.products import bp
 from config import Config
@@ -50,6 +50,7 @@ def publishProduct():
             )
             db.session.add(product)
             db.session.commit()
+            current_app.logger.info('Added product ( %s ) with offered price ( %s) from %s for %s', name, round(offered_price, 2), request.remote_addr, request.path)
             flash("Product added successfully!")
             return redirect(url_for("products.viewProduct"))
 
@@ -68,6 +69,7 @@ def publishProduct():
             )
             db.session.add(product)
             db.session.commit()
+            current_app.logger.info('Added product ( %s ) from %s for %s', name, request.remote_addr, request.path)
             flash("Product added successfully!")
             return redirect(url_for("products.viewProduct"))
 
@@ -75,7 +77,9 @@ def publishProduct():
 
 
 @bp.route("/viewProduct")
+@limiter.limit('2/second')
 def viewProduct():
+    current_app.logger.info('Processing request to view products from %s for %s', request.remote_addr, request.path)
     page = request.args.get("page", 1, type=int)
     products = Products.query.order_by(Products.date_added.desc()).paginate(
         per_page=4, page=page
@@ -105,10 +109,12 @@ def updateProduct(id):
             product_to_update.offered_price = None
         try:
             db.session.commit()
+            current_app.logger.info('Product ( %s ) updated from %s for %s', form.data.name, request.remote_addr, request.path)
             flash("Product updated successfully!")
             return redirect(url_for("products.viewProduct"))
 
         except:
+            current_app.logger.info('Product update rejected from %s for %s', request.remote_addr, request.path)
             return "Opps! Looks like something went wrong."
     else:
         form.name.data = product_to_update.name
@@ -128,16 +134,19 @@ def deleteProduct(id):
     try:
         db.session.delete(product_to_delete)
         db.session.commit()
+        current_app.logger.info('Product ( %s ) deleted from %s for %s', product_to_delete.name, request.remote_addr, request.path)
         flash("Product deleted succesfully!")
         return redirect(url_for("products.viewProduct"))
 
     except:
+        current_app.logger.info('Product delete failed from %s for %s', request.remote_addr, request.path)
         return render_template(
             "products/viewProduct.html", product_to_delete=product_to_delete
         )
 
 
 @bp.route("/productPage/<string:id>", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def productPage(id):
     # cart_items = []
     # if 'add_to_cart' in request.form:
@@ -169,7 +178,7 @@ def productPage(id):
 
     product_to_view = Products.query.get_or_404(id)
     more_product = Products.query.order_by(func.random()).limit(4)
-
+    current_app.logger.info('Processing request to view product page %s from %s for %s', product_to_view.name, request.remote_addr, request.path)
     return render_template(
         "products/productPage.html",
         product_to_view=product_to_view,
@@ -178,24 +187,29 @@ def productPage(id):
 
 
 @bp.route("/allProducts", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def allProducts():
     page = request.args.get("page", 1, type=int)
     products = Products.query.paginate(per_page=4, page=page)
+    current_app.logger.info('Processing request to view all products from %s for %s', request.remote_addr, request.path)
     return render_template("products/allProducts.html", products=products)
 
 
 @bp.route("/filterProducts/<string:category>", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def filterProducts(category):
     page = request.args.get("page", 1, type=int)
     products = Products.query.filter_by(category=category).paginate(
         per_page=4, page=page
     )
+    current_app.logger.info('Filtering products from %s for %s', request.remote_addr, request.path)
     return render_template(
         "products/filteredProducts.html", products=products, category=category
     )
 
 
 @bp.route("/add_to_cart/<string:product_id>")
+@limiter.limit('2/second')
 def add_to_cart(product_id):
     product = Products.query.get_or_404(product_id)
     cart_item = CartItem.query.filter_by(product_id=product_id).first()
@@ -211,17 +225,19 @@ def add_to_cart(product_id):
         flash("Product added to cart successfully!")
 
     db.session.commit()
+    current_app.logger.info('Added Product ( %s ) to cart from %s for %s', product.name,  request.remote_addr, request.path)
     return redirect(request.referrer)
 
 
 @bp.route("/view_cart")
+@limiter.limit('2/second')
 def view_cart():
     user = current_user
     cart_items = CartItem.query.filter_by(user_id=user.id).all()
 
     total_quantity = sum(item.quantity for item in cart_items)
     total_price = sum(item.price * item.quantity for item in cart_items)
-
+    current_app.logger.info('Processing request to view cart from %s for %s', request.remote_addr, request.path)
     return render_template(
         "products/viewCart.html",
         cart_items=cart_items,
@@ -231,6 +247,7 @@ def view_cart():
 
 
 @bp.route("/update_quantity/<string:product_id>", methods=["POST"])
+@limiter.limit('2/second')
 def update_quantity(product_id):
     quantity = int(request.form.get("quantity"))
     cart_item = CartItem.query.filter_by(product_id=product_id).first()
@@ -238,23 +255,27 @@ def update_quantity(product_id):
     if cart_item:
         cart_item.quantity = quantity
         db.session.commit()
-
+    current_app.logger.info('Updated product ( %s ) quanity ( %s ) from %s for %s', cart_item.name, cart_item.quantity,  request.remote_addr, request.path)
     flash("Product quantity updated in cart!")
     return redirect(url_for("products.view_cart"))
 
 
 @bp.route("/remove_from_cart/<string:product_id>")
+@limiter.limit('2/second')
 def remove_from_cart(product_id):
     cart_item = CartItem.query.filter_by(product_id=product_id).first()
 
     if cart_item:
         db.session.delete(cart_item)
         db.session.commit()
+        current_app.logger.info('Cart item ( %s ) removed from %s for %s', cart_item.name, request.remote_addr, request.path)
         flash("Product removed from cart successfully!")
 
     return redirect(url_for("products.view_cart"))
 
 
 @bp.route("/checkoutPage", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def checkout():
+    current_app.logger.info('Checkout proceeded from %s for %s', request.remote_addr, request.path)
     return render_template("products/checkout.html")

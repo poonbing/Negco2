@@ -5,7 +5,6 @@ from flask_login import LoginManager
 from flask_talisman import Talisman
 from authlib.integrations.flask_client import OAuth
 
-
 talisman = Talisman()
 db = SQLAlchemy()
 migrate = Migrate(db, render_as_batch=True)

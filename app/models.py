@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
-
+import logging
 # Local Modules
 from .extensions import db
 
@@ -352,3 +352,9 @@ class Topic(db.Model):
     id = db.Column(db.INTEGER, primary_key=True, nullable=False, unique=True)
     name = db.Column(db.String(255), nullable=False)
     posts = db.relationship("Post", back_populates="topic")
+
+class Log(db.Model):
+    __tablename__ = 'logs'
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False, autoincrement=True)
+    timestamp = db.Column(db.DateTime, default = db.func.current_timestamp())
+    log_text = db.Column(db.String, nullable=False)

@@ -11,9 +11,10 @@ from app.articles import bp
 from ..models import Articles
 from ..forms import createArticle
 from ..extensions import db
-
+from ..__init__ import limiter
 
 @bp.route("/allArticles")
+@limiter.limit('2/second')
 def allArticles():
     page = request.args.get("page", 1, type=int)
     articles = Articles.query.order_by(Articles.date_added.desc()).paginate(
@@ -24,6 +25,7 @@ def allArticles():
 
 # retrieve individual article
 @bp.route("/articlePage/<string:id>", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def articlePage(id):
     article_to_view = Articles.query.get_or_404(id)
     more_article = Articles.query.order_by(func.random()).limit(3)
@@ -36,6 +38,7 @@ def articlePage(id):
 
 # create article db
 @bp.route("/publishArticle", methods=["POST", "GET"])
+@limiter.limit('2/second')
 def publishArticle():
     form = createArticle()
     if request.method == "POST":
@@ -72,6 +75,7 @@ def publishArticle():
 
 # retrieve article db
 @bp.route("/viewArticle")
+@limiter.limit('2/second')
 def viewArticle():
     page = request.args.get("page", 1, type=int)
     articles = Articles.query.order_by(Articles.date_added.desc()).paginate(
@@ -81,6 +85,7 @@ def viewArticle():
 
 
 @bp.route("/updateArticle/<string:id>", methods=["GET", "POST"])
+@limiter.limit('2/second')
 def updateArticle(id):
     form = createArticle()
     article_to_update = Articles.query.get_or_404(id)
@@ -117,6 +122,7 @@ def updateArticle(id):
 
 # delete article db
 @bp.route("/deleteArticle/<string:id>")
+@limiter.limit('2/second')
 def deleteArticle(id):
     article_to_delete = Articles.query.get_or_404(id)
     try:

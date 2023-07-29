@@ -1,17 +1,21 @@
 # Python Modules
 from flask import Flask, session
 from flask_xcaptcha import XCaptcha
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import logging
 # Local Modules
 from config import Config
 from .extensions import db, mail, login_manager, oauth, talisman
-from .models import CartItem
+from .models import CartItem, Log
 
+                  #storage_uri="mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2")
+limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-
+    limiter.init_app(app)
     # talisman.init_app(app)
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
@@ -42,6 +46,16 @@ def create_app(config_class=Config):
         cart_items = CartItem.query.all()
         total_quantity = sum(item.quantity for item in cart_items)
         return dict(cart_total_quantity=total_quantity)
+
+    class SQLAlchemyHandler(logging.Handler):
+        def emit(self, record):
+            log_entry = Log(log_text=self.format(record))
+            db.session.add(log_entry)
+            db.session.commit()
+
+    handler = SQLAlchemyHandler()
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
 
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp

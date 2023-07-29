@@ -93,7 +93,3 @@ class TrackerInteract(FlaskForm):
     action = StringField("action", validators=[InputRequired()])
     old_name = StringField("old name", validators=[InputRequired()])
     old_item = StringField("old item", validators=[InputRequired()])
-
-class TrackerDelete(FlaskForm):
-    name = StringField("name", validators=[InputRequired()])
-
