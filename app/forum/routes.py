@@ -1,6 +1,8 @@
 # Python Modules
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+import os
 
 # Local Modules
 from app.forum import bp
@@ -24,6 +26,7 @@ def home():
 @bp.route("/topics/<int:topic_id>/posts", methods=["GET", "POST"])
 @login_required
 def topic_posts(topic_id):
+    db.session.rollback()
     print("Topic ID:", topic_id)
 
     page = request.args.get("page", 1, type=int)
@@ -66,11 +69,26 @@ def post(id):
     comment_list = Comment.query.filter_by(post_id=id).all()
     print("testlist")
     form = Comment_Submission()
+    print("test2")
+
     if form.validate_on_submit():
+        print("Form image data:", form.image.data)
+        print("test3")
         user = current_user
-        new_comment = Comment(
-            commenter=user.id, post_id=id, content=remove_html_tags(form.content.data)
-        )
+        print("test4")
+        new_comment = Comment(commenter=user.id, post_id=id, content=remove_html_tags(form.content.data))
+        if form.image.data:
+            print("Image data:", form.image.data.filename)
+            # Save the image as a file on the server
+            filename = secure_filename(form.image.data.filename)
+            UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'images')
+            current_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+            image=os.path.join('images', filename)
+            print(image)
+            form.image.data.save(image)
+
+            # Set the image_path attribute in the Comment model
+            new_comment.image = image
         print("Success")
         print(new_comment)
         db.session.add(new_comment)
@@ -81,7 +99,7 @@ def post(id):
             return redirect(url_for("forum.post", id=id))
         except Exception as e:
             print(f"An error occurred while committing the comment: {e}")
-
+    db.session.rollback()
     post = Post.query.get(id)
     if post:
         return render_template(

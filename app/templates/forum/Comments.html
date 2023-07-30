@@ -6,6 +6,7 @@
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   </head>
   <body>
     {% block navbar %} {% include 'forum/CommentCreation.html' %} {% endblock %}
@@ -19,6 +20,9 @@
         {% for comment in comment_list %}
         <div class="comment">
           <div class="comment-content">{{ comment.content | safe }}</div>
+            {% if comment.image %}
+            <img src="{{ url_for('static', filename=comment.image) }}" alt="Uploaded Image">
+            {% endif %}
           <div class="comment-details">
             <span>Posted by {{current_user.username}}</span>
           </div>
@@ -27,4 +31,5 @@
       </div>
     </div>
   </body>
+
 </html>

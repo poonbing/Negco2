@@ -50,7 +50,7 @@
       >
         Close
       </button>
-      <form method="POST" class="mt-4">
+      <form method="POST" class="mt-4" action="""" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="mb-4">
           <label for="content" class="block text-gray-700 font-bold mb-2"
@@ -58,6 +58,9 @@
           >
           <div id="editor" class="w-full h-64"></div>
           {{ form.content(id="content", class="hidden", required="required") }}
+        </div>
+        <div class="flex items-center">
+          <input type="file" id="file-input" name="image" accept="image/*" onchange="handleFile(this.files[0])" />
         </div>
         {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
       </form>
@@ -86,6 +89,22 @@
         const content = quillEditor.root.innerHTML;
         document.getElementById("content").value = content;
       });
+
+      function handleFile(file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const imageData = event.target.result;
+          document.getElementById("content").value = imageData;
+          quillEditor.clipboard.dangerouslyPasteHTML(`<img src="${imageData}" alt="Uploaded Image">`);
+        };
+        reader.readAsDataURL(file);
+      }
+
+
+      document.getElementById("create-post-section").addEventListener("dragover", handleDragOver);
+      document.getElementById("create-post-section").addEventListener("dragleave", handleDragLeave);
+      document.getElementById("create-post-section").addEventListener("drop", handleDrop);
+
     </script>
   </body>
 </html>

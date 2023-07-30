@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed,FileRequired
 from wtforms.validators import InputRequired, Email, Length, EqualTo
 from wtforms import (
     StringField,
@@ -56,6 +57,7 @@ class createProduct(FlaskForm):
 
 class Comment_Submission(FlaskForm):
     content = TextAreaField("Content", validators=[InputRequired()])
+    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField("Create Post")
 
 
