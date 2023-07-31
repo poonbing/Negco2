@@ -81,14 +81,15 @@ def post(id):
             print("Image data:", form.image.data.filename)
             # Save the image as a file on the server
             filename = secure_filename(form.image.data.filename)
+            print(filename)
             UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'images')
             current_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-            image=os.path.join('images', filename)
+            image=os.path.join(UPLOAD_FOLDER, filename)
             print(image)
-            form.image.data.save(image)
+            form.image.data.save(filename)
 
             # Set the image_path attribute in the Comment model
-            new_comment.image = image
+            new_comment.image = filename
         print("Success")
         print(new_comment)
         db.session.add(new_comment)

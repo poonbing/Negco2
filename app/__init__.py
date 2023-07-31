@@ -11,7 +11,7 @@ from .models import CartItem
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    app.config['STATIC_FOLDER'] = 'images'
+    app.config['STATIC_FOLDER'] = '/app/static/images'
     app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'gif'}
     # talisman.init_app(app)
     xcaptcha = XCaptcha(app=app)

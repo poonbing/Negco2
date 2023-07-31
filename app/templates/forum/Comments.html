@@ -21,7 +21,7 @@
         <div class="comment">
           <div class="comment-content">{{ comment.content | safe }}</div>
             {% if comment.image %}
-            <img src="{{ url_for('static', filename=comment.image) }}" alt="Uploaded Image">
+            <img src="{{ url_for('static', filename='images/' + comment.image) }}" alt="Uploaded Image">
             {% endif %}
           <div class="comment-details">
             <span>Posted by {{current_user.username}}</span>
