@@ -271,4 +271,16 @@ def remove_from_cart(product_id):
 
 @bp.route("/checkoutPage", methods=["GET", "POST"])
 def checkout():
-    return render_template("products/checkout.html")
+    user = current_user
+    cart_items = CartItem.query.filter_by(user_id=user.id).all()
+
+    total_quantity = sum(item.quantity for item in cart_items)
+    total_price = sum(item.price * item.quantity for item in cart_items)
+
+    return render_template(
+        "products/checkout.html",
+        cart_items=cart_items,
+        total_quantity=total_quantity,
+        total_price=total_price,
+    )
+    

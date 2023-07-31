@@ -221,14 +221,14 @@ content %}
       <div class="items-center justify-between">
         {% if product.offered_price %}
         <span class="text-xl text-gray-500 dark:text-white line-through"
-          >SGD{{product.price}}</span
+          >SGD {{"%.2f"|format(product.price)}}</span
         >
         <span class="text-xl text-gray-500 dark:text-white"
-          >SGD {{product.offered_price}}</span
+          >SGD {{"%.2f"|format(product.offered_price)}}</span
         >
         {% else %}
         <span class="text-xl text-gray-500 dark:text-white"
-          >SGD {{product.price}}</span
+          >SGD {{"%.2f"|format(product.price)}}</span
         >
         {% endif %}
       </div>

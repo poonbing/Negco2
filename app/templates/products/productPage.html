@@ -157,14 +157,14 @@ get_flashed_messages() %}
           {% if product_to_view.offered_price %}
           <span
             class="title-font font-medium text-2xl text-gray-500 mr-2 line-through"
-            >SGD {{product_to_view.price}}</span
+            >SGD {{"%.2f"|format(product_to_view.price)}}</span
           >
           <span class="title-font font-medium text-2xl text-gray-500 mr-2"
-            >SGD {{product_to_view.offered_price}}</span
+            >SGD {{"%.2f"|format(product_to_view.offered_price)}}</span
           >
           {% else %}
           <span class="title-font font-medium text-2xl text-gray-500 mr-2"
-            >SGD {{product_to_view.price}}</span
+            >SGD {{"%.2f"|format(product_to_view.price)}}</span
           >
           {% endif %}
           
