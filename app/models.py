@@ -337,6 +337,7 @@ class Checkout(db.Model, FlaskSerializeMixin):
     )
     product_list = db.Column(db.String(255), db.ForeignKey("products.id"), nullable=False)
     product_price = db.Column(db.String(255))
+    product_quantity = db.Column(db.String(255))
     total_cost = db.Column(db.Numeric(precision=10, scale=2))
     payment_date = db.Column(db.DateTime, default=datetime.today)
 

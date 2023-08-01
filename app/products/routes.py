@@ -403,15 +403,12 @@ def processPayment():
             #add to checkout database
             product_id = (item.product.id for item in checkout_items)
             product_price = (item.price for item in checkout_items)
-            # for item in checkout_items:
-            #     if item.offered_price:
-            #         product_price.append(item.offered_price)
-            #     else:
-            #         product_price.append(item.price)
+            product_quantity = (item.quantity for item in checkout_items)
             
             
             checkout = Checkout(id=str(uuid4())[:8], user_id=user.id, product_list=str(list(product_id)), 
-                                product_price=str(list(product_price)), 
+                                product_price=str(list(product_price)),
+                                product_quantity=str(list(product_quantity)), 
                                 total_cost=total_price)
             db.session.add(checkout)
             db.session.commit()
