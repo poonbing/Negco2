@@ -1,5 +1,6 @@
+import re
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo
+from wtforms.validators import InputRequired, Email, Length, EqualTo, ValidationError
 from wtforms import (
     StringField,
     SubmitField,
@@ -13,12 +14,35 @@ from wtforms import (
 )
 
 
+def password_check(form, field):
+    password = field.data
+
+    length_error = len(password) < 8
+    digit_error = re.search(r"\d", password is None)
+    uppercase_error = re.search(r"[A-Z]", password) is None
+    lowercase_error = re.search(r"[a-z]", password) is None
+    symbol_error = re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password) is None
+
+    if (
+        length_error
+        or digit_error
+        or uppercase_error
+        or lowercase_error
+        or symbol_error
+    ):
+        raise ValidationError(
+            "Password must be at least 8 characters long and contain at least one digit, one uppercase letter, one lowercase letter, and one symbol."
+        )
+
+
 class SettingsForm(FlaskForm):
     profile_picture = FileField("Profile Picture")
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
     phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
-    gender = StringField("Gender")
+    gender = SelectField(
+        "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
+    )
     email = StringField("Email", validators=[Email()])
     password = PasswordField("Password")
     confirm_password = PasswordField(

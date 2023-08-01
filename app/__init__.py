@@ -37,6 +37,7 @@ def create_app(config_class=Config):
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
     mail.init_app(app)
+    # csrf.init_app(app)
     login_manager.init_app(app)
     jwt.init_app(app)
     oauth.init_app(app)
@@ -75,11 +76,11 @@ def create_app(config_class=Config):
     app.register_blueprint(management_bp)
     app.register_blueprint(recovery_bp)
     app.register_blueprint(error_bp)
-    app.register_blueprint(api_bp)
     app.register_blueprint(tracker_bp)
     app.register_blueprint(articles_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(forum_bp)
+    app.register_blueprint(api_bp, url_prefix="/api/v1")
 
     auth_bp.xcaptcha = xcaptcha
 

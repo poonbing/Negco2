@@ -30,6 +30,11 @@ def user_loader(user_id):
     return user
 
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect(url_for("auth.login"))
+
+
 @bp.route("/login_with_google")
 def login_with_google():
     redirect_uri = url_for("auth.auth", provider="google", _external=True)
@@ -141,7 +146,6 @@ def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        print("Reached Here")
         username = form.username.data
         password = form.password.data
         confirm_password = form.confirm_password.data

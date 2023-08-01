@@ -6,6 +6,7 @@ from flask_talisman import Talisman
 from authlib.integrations.flask_client import OAuth
 from flask_jwt_extended import JWTManager
 from flask_wtf.csrf import CSRFProtect
+from flask_cors import CORS
 
 
 db = SQLAlchemy()
