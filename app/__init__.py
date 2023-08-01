@@ -7,10 +7,15 @@ from .models import CartItem
 from config import Config
 from .extensions import db, mail, login_manager, oauth, talisman
 from .models import CartItem
+from flask_wtf.csrf import CSRFProtect
+import secrets
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
+    key = secrets.token_urlsafe(16)
+    csrf = CSRFProtect()
+    app.config['SECRET_KEY'] = key
     app.config.from_object(config_class)
 
     # talisman.init_app(app)
@@ -19,7 +24,7 @@ def create_app(config_class=Config):
     mail.init_app(app)
     login_manager.init_app(app)
     oauth.init_app(app)
-
+    csrf.init_app(app)
     with app.app_context():
         db.create_all()
 

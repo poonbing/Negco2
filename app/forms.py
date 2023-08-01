@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo
+from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired
 from wtforms import (
     StringField,
     SubmitField,
@@ -10,7 +10,10 @@ from wtforms import (
     DecimalField,
     PasswordField,
     BooleanField,
+    DateField
 )
+import datetime
+from wtforms_components import DateTimeField, DateRange
 
 
 class SettingsForm(FlaskForm):
@@ -85,3 +88,15 @@ class SignUpForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired()])
     age = IntegerField("Age", validators=[InputRequired()])
     phone = StringField("Phone", validators=[InputRequired()])
+
+
+class PaymentForm(FlaskForm):
+
+    #Field types followed by label and data validators
+    credit_card_number = StringField('Card Details', [DataRequired(), Length(min=13, max=16, message="Invalid Credit Card Number")], render_kw={"placeholder": "xxxx-xxxx-xxxx-xxxx"})
+    card_holder = StringField('Credit Card Holder', [DataRequired(), Length(min=5, max=49, message="Invalid Length")], render_kw={"placeholder": "Name on the Card"})
+    expiration_date = DateField('Expiry Date (YYYY-MM-DD)', [DataRequired(), DateRange(min=datetime.datetime.today().date(), max=datetime.date(2030, 12, 31))], format='%Y-%m-%d')
+    security_code = StringField('CVC', [DataRequired(), Length(min=3, max=3, message="Length should be 3 digits")], render_kw={"placeholder": "CVC"})
+    amount = DecimalField('Subtotal')
+    submit = SubmitField('Place Order')
+    

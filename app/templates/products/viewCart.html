@@ -80,6 +80,7 @@ get_flashed_messages() %}
               method="POST"
               class="flex items-center px-2 py-1 space-x-1"
             >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <span class="mr-1">Quantity:</span>
               <input
                 type="number"
@@ -98,6 +99,7 @@ get_flashed_messages() %}
               action="{{ url_for('products.remove_from_cart', product_id=item.product.id) }}"
               class="flex items-center px-2 py-1 pl-0 space-x-1"
             >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -142,7 +144,7 @@ get_flashed_messages() %}
       >Back to Shop</a
     >
     <a
-      href="/checkoutPage"
+      href="/paymentPage"
       class="px-6 py-2 border rounded-md dark:border-violet-400 text-white bg-teal-600 hover:bg-teal-700 duration-500"
       >Continue to Checkout</a
     >

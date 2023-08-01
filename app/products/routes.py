@@ -1,16 +1,23 @@
 # Python Modules
-from flask import render_template, request, url_for, session, redirect, flash
+from flask import render_template, request, url_for, session, redirect, flash, escape, Response, jsonify
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import func, and_
 from uuid import uuid4
 import os
+# checkout module
+import datetime
+import re
+from decimal import Decimal
+from decimal import getcontext
+
+
 
 # Local Modules
 from app.products import bp
 from config import Config
-from ..models import Products, CartItem
-from ..forms import createProduct
+from ..models import Products, CartItem, Checkout
+from ..forms import createProduct, PaymentForm
 from ..extensions import db
 
 
@@ -139,34 +146,6 @@ def deleteProduct(id):
 
 @bp.route("/productPage/<string:id>", methods=["GET", "POST"])
 def productPage(id):
-    # cart_items = []
-    # if 'add_to_cart' in request.form:
-    #     if "cart" not in session:
-    #         session["cart"] = []
-    #         # Check if the product already exists in the cart
-    #     for item in session["cart"]:
-    #         product_id = item["product_id"]
-    #         quantity = item["quantity"]
-    #         if item["product_id"] == id:
-    #             item["quantity"] += 1
-    #             flash("Product quantity updated in cart!")
-    #             return redirect(request.referrer)
-
-    #         product = Products.query.get(product_id)
-    #         cart_item = CartItem(
-    #         product_id=product.id, quantity=quantity, price=product.price
-    #         )
-    #         db.session.add(cart_item)
-    #         db.session.commit()
-
-    #         cart_items.append(cart_item)
-
-    #     # If the product doesn't exist in the cart, add it with a quantity of 1
-    #     product = {"product_id": id, "quantity": 1}
-    #     session["cart"].append(product)
-
-    #     flash("Product added to cart successfully!")
-
     product_to_view = Products.query.get_or_404(id)
     if request.method == 'POST':
         rating = int(request.form['rating'])
@@ -217,9 +196,14 @@ def add_to_cart(product_id):
         cart_item.quantity += 1
         flash("Product quantity updated in cart!")
     else:
-        cart_item = CartItem(
-            id=str(uuid4())[:8], product_id=product_id, quantity=1, price=product.price, user_id=current_user.id
-        )
+        if product.offered_price:
+            cart_item = CartItem(
+                id=str(uuid4())[:8], product_id=product_id, quantity=1, price=product.offered_price, user_id=current_user.id
+            )
+        else:
+            cart_item = CartItem(
+                id=str(uuid4())[:8], product_id=product_id, quantity=1, price=product.price, user_id=current_user.id
+            )
         db.session.add(cart_item)
         flash("Product added to cart successfully!")
 
@@ -243,8 +227,9 @@ def view_cart():
     )
 
 
-@bp.route("/update_quantity/<string:product_id>", methods=["POST"])
+@bp.route("/update_quantity/<string:product_id>", methods=["GET", "POST"])
 def update_quantity(product_id):
+    csrf_token = request.form.get("csrf_token")
     quantity = int(request.form.get("quantity"))
     cart_item = CartItem.query.filter_by(product_id=product_id, user_id=current_user.id).first()
 
@@ -269,18 +254,214 @@ def remove_from_cart(product_id):
     return redirect(url_for("products.view_cart"))
 
 
-@bp.route("/checkoutPage", methods=["GET", "POST"])
-def checkout():
-    user = current_user
-    cart_items = CartItem.query.filter_by(user_id=user.id).all()
 
-    total_quantity = sum(item.quantity for item in cart_items)
-    total_price = sum(item.price * item.quantity for item in cart_items)
-
-    return render_template(
-        "products/checkout.html",
-        cart_items=cart_items,
-        total_quantity=total_quantity,
-        total_price=total_price,
-    )
     
+#payment Gateways
+output = ""
+def CheapPaymentGateway(CreditCardNumber, CardHolder, ExpirationDate, SecurityCode, Amount):
+    last4_cc = str(CreditCardNumber)[-4:]
+    output = "\nProccessed Payment of ${:,.2f} for {} with CheapPaymentGateway, Card ending in {}\n".format(Amount, CardHolder, last4_cc)
+    print(output)
+    return (1, output)
+
+def ExpensivePaymentGateway(CreditCardNumber, CardHolder, ExpirationDate, SecurityCode, Amount):
+    last4_cc = str(CreditCardNumber)[-4:]
+    output = "\nProccessed Payment of ${:,.2f} for {} with ExpensivePaymentGateway, Card ending in {}\n".format(Amount, CardHolder, last4_cc)
+    print(output)
+    return (1, output)
+
+def PremiumPaymentGateway(CreditCardNumber, CardHolder, ExpirationDate, SecurityCode, Amount):
+    last4_cc = str(CreditCardNumber)[-4:]
+    output = "\nProccessed Payment of ${:,.2f} for {} with PremiumPaymentGateway, Card ending in {}\n".format(Amount, CardHolder, last4_cc)
+    print(output)
+    return (1, output)
+
+
+#processPayment()
+# - CreditCardNumber (mandatory, string, it should be a valid credit card number)
+# - CardHolder: (mandatory, string)
+# - ExpirationDate (mandatory, DateTime, it cannot be in the past)
+# - SecurityCode (optional, string, 3 digits)
+# - Amount (mandatory decimal, positive amount) - Capped to anything under a million
+
+@bp.route("/paymentPage", methods=["GET", "POST"])
+def processPayment():
+    form = PaymentForm()
+    total_price = 0
+    user = current_user
+    checkout_items = CartItem.query.filter_by(user_id=user.id).all()
+    total_quantity = sum(item.quantity for item in checkout_items)
+    total_price = sum(item.price * item.quantity for item in checkout_items)
+    # for item in checkout_items:
+    #     if item.offered_price:
+    #         price = item.offered_price * item.quantity
+    #         total_price += price
+    #     else:
+    #         price = item.price * item.quantity
+    #         total_price += price
+
+    if form.validate_on_submit():
+        card_num = form.credit_card_number.data.strip().replace(" ","")
+        card_holder = str(form.card_holder.data).strip().upper()
+        expiry_date = form.expiration_date.data
+        security_code = str(form.security_code.data)
+        form.amount.data = total_price
+        amount = form.amount.data
+
+        card_num_len = len(card_num)
+
+        try:
+            #card number check
+            #assumming that card number pass MOD 10 algorithm check for now
+            if card_num_len in [13,15,16] and card_num.isdigit():
+                #Visa Card
+                if card_num_len == 16 and card_num.startswith('4'):
+                    pass
+                #MasterCard
+                elif card_num_len == 16 and card_num.startswith('5'):
+                    pass
+                #AMEX
+                elif card_num_len == 15 and (card_num.startswith('34') or card_num.startswith('37')):
+                    pass
+                #Discover
+                elif card_num_len == 16 and card_num.startswith('6'):
+                    pass
+                else:
+                    print("Invalid Card Number: {}\n".format(card_num))
+                    return 'The request is invalid', 400
+            
+            card_num = int(card_num)
+            print('Passed Card Num check')
+
+            #CardHolder check
+            # assumeing min/max 2-24 characters for first name and same for last name
+            # min length 5: 2 characters for first name, 1 for space, 2 for last name
+
+            if len(card_holder) > 4:
+                verify_name2 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name2))
+
+                verify_name3 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name3))
+
+                verify_name4 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name4))
+
+                if not verify_name2:
+                    if not verify_name3:
+                        if not verify_name4:
+                            print("Card Holder Value Invalid!\n")
+                            return 'The request is invalid', 400
+                else:
+                    print("Valid Card Holder")
+
+            else:
+                print("Card Holder Value Invalid!\n")
+                return 'The request is invalid', 400
+            
+
+            #expiration check
+            if type(expiry_date) is not datetime.date:
+                print("Invalid Expiry Date: {}\n".format(expiry_date))
+                #bad request
+                return 'The request is invalid', 400
+            
+
+            # ====================
+            # Amount Check
+            # 1-2 decimal places should be present - invalid if more
+            # Positive values only, example: 0.50, 1.51, 520.55
+            # Max: 999999.99
+            # ====================
+
+            # Precision of digits which Decimal lib will use to return
+            # any calculated number
+            getcontext().prec = 8
+            # Use regex to match what an amount would look like
+            # Max amount is limited to 999999.99 (assumption)
+            # 6 digits before & 2 after decimal
+            if bool(re.match(r'^[0-9]{1,6}\.[0-9]{1,2}$', str(amount))):
+                amount = Decimal(amount).quantize(Decimal('1.00'))
+                print("Amount valid: {}".format(str(amount)))
+            else:
+                print("Amount Invalid: {}\n".format(str(amount)))
+                #bad request
+                return 'The request is invalid', 400
+            
+
+            #security code check
+            if security_code:
+                security_str = str(security_code).strip()
+
+                if security_str.isdigit() and len(security_str) == 3:
+                    print("Valid Security Code")
+                    security_code = int(security_code)
+                else:
+                    print("Invalid Security Code: {}\n".format(str(security_code)))
+                    return 'The request is invalid', 400
+                
+            #add to checkout database
+            product_id = (item.product.id for item in checkout_items)
+            product_price = (item.price for item in checkout_items)
+            # for item in checkout_items:
+            #     if item.offered_price:
+            #         product_price.append(item.offered_price)
+            #     else:
+            #         product_price.append(item.price)
+            
+            
+            checkout = Checkout(id=str(uuid4())[:8], user_id=user.id, product_list=str(list(product_id)), 
+                                product_price=str(list(product_price)), 
+                                total_cost=total_price)
+            db.session.add(checkout)
+            db.session.commit()
+                
+        except Exception as e:
+            print("Exception Raised: {}\n".format(e))
+            return 'Internal server error', 500
+        
+        retry = 0
+
+        #Payment Proccessor
+        #assuming payment processor has boolean return on successful payment
+
+        if amount <= 20:
+            ret, output = CheapPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+            if ret:
+                #output = 'Payment is proccessed', 200
+                return output, 200
+            else:
+                return 'Internal server error: PaymentProccessor Failed', 500
+
+        elif 20 < amount < 501:
+            while retry < 2:
+                ret, output = ExpensivePaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+                if ret:
+                    #output = 'Payment is proccessed', 200
+                    return output, 200
+                else:
+                    retry += 1
+            
+            print("Could not proccess payment with ExpensivePaymentGateway")
+            return 'Internal server error: PaymentProcessor Failed', 500
+        
+        else:
+            while retry < 3:
+                ret, output = PremiumPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+                if ret:
+                    #output = 'Payment is proccessed', 200
+                    return output, 200
+                else:
+                    retry += 1
+            print("Could not proccess payment with PremiumPaymentGateway")
+            return 'Internal server error: PaymentProccessor Failed', 500
+
+        
+    
+        
+    return render_template('products/checkout.html', form=form, checkout_items=checkout_items,
+        total_quantity=total_quantity,
+        total_price=total_price)
+
+        
+
