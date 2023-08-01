@@ -37,27 +37,10 @@ def create_app(config_class=Config):
     xcaptcha = XCaptcha(app=app)
     db.init_app(app)
     mail.init_app(app)
-    # csrf.init_app(app)
+    csrf.init_app(app)
     login_manager.init_app(app)
     jwt.init_app(app)
     oauth.init_app(app)
-
-    oauth.register(
-        name="google",
-        client_id=Config.GOOGLE_CLIENT_ID,
-        client_secret=Config.GOOGLE_CLIENT_SECRET,
-        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
-    )
-
-    oauth.register(
-        name="azure",
-        client_id=Config.AZURE_CLIENT_ID,
-        client_secret=Config.AZURE_CLIENT_SECRET,
-        api_base_url="https://graph.microsoft.com/",
-        server_metadata_url="https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
-    )
 
     from app.main import bp as main_bp
     from app.auth import bp as auth_bp

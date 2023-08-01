@@ -5,13 +5,29 @@ from sqlalchemy import CheckConstraint
 from secrets import token_hex
 from uuid import uuid4
 from bcrypt import hashpw, gensalt, checkpw
+from itsdangerous import URLSafeTimedSerializer as Serializer
+import pickle
 
 # Local Modules
 from .extensions import db
-
+from config import Config
 
 # Mixins
 ###############################################################
+
+
+class CRUDMixin:
+    def save(self):
+        db.session.add(self)
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self, **kwargs):
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+        db.session.commit()
 
 
 class AccountManagementMixin:
@@ -49,6 +65,27 @@ class RolesAndPermissionsMixin:
         return self.role == required_role
 
 
+class ResetPasswordsMixin:
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer("your_secret_key_here")
+        payload = {"user_id": self.id}
+        serialized_payload = pickle.dumps(payload)
+        # Convert bytes to a JSON-serializable format (e.g., string)
+        token = serialized_payload.decode("latin1")
+        return token
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer("your_secret_key_here")
+        try:
+            # Convert the token back to bytes (reverse of the get_reset_token method)
+            serialized_payload = token.encode("latin1")
+            user_id = pickle.loads(serialized_payload)["user_id"]
+        except:
+            return None
+        return User.query.get(user_id)
+
+
 # Relations
 ####################################################
 
@@ -80,6 +117,7 @@ class User(
     UserMixin,
     AccountManagementMixin,
     RolesAndPermissionsMixin,
+    ResetPasswordsMixin,
 ):
     __tablename__ = "users"
 
@@ -170,13 +208,31 @@ class LockedUser(db.Model):
 
     id = db.Column(db.String(36), nullable=False, primary_key=True)
     user_id = db.Column(
-        db.INTEGER, db.ForeignKey("users.id"), nullable=False, unique=True
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
     locked_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_locked(self):
         lock_duration = timedelta(hours=1)
         return self.locked_at + lock_duration > datetime.utcnow()
+
+
+class APIKey(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(64), unique=True, nullable=False)
+    user_id = db.Column(
+        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
+    )
+    expiration_time = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, user_id):
+        self.key = str(uuid4())
+        self.user_id = user_id
+        self.expiration_time = datetime.utcnow() + timedelta(days=365)
+
+    @property
+    def has_expired(self):
+        return datetime.utcnow() > self.expiration_time
 
 
 class Tracker(db.Model):

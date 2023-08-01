@@ -1,6 +1,12 @@
-import re
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo, ValidationError
+from wtforms.validators import (
+    InputRequired,
+    Email,
+    Length,
+    EqualTo,
+    ValidationError,
+    NumberRange,
+)
 from wtforms import (
     StringField,
     SubmitField,
@@ -12,27 +18,6 @@ from wtforms import (
     PasswordField,
     BooleanField,
 )
-
-
-def password_check(form, field):
-    password = field.data
-
-    length_error = len(password) < 8
-    digit_error = re.search(r"\d", password is None)
-    uppercase_error = re.search(r"[A-Z]", password) is None
-    lowercase_error = re.search(r"[a-z]", password) is None
-    symbol_error = re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password) is None
-
-    if (
-        length_error
-        or digit_error
-        or uppercase_error
-        or lowercase_error
-        or symbol_error
-    ):
-        raise ValidationError(
-            "Password must be at least 8 characters long and contain at least one digit, one uppercase letter, one lowercase letter, and one symbol."
-        )
 
 
 class SettingsForm(FlaskForm):
@@ -109,3 +94,21 @@ class SignUpForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired()])
     age = IntegerField("Age", validators=[InputRequired()])
     phone = StringField("Phone", validators=[InputRequired()])
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    submit = SubmitField("Submit")
+
+
+class AccessCodeForm(FlaskForm):
+    access_code = IntegerField(
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
