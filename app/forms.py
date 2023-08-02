@@ -1,5 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired
+from wtforms.validators import (
+    InputRequired,
+    Email,
+    Length,
+    EqualTo,
+    ValidationError,
+    NumberRange,
+    DataRequired
+)
 from wtforms import (
     StringField,
     SubmitField,
@@ -21,7 +29,9 @@ class SettingsForm(FlaskForm):
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
     phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
-    gender = StringField("Gender")
+    gender = SelectField(
+        "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
+    )
     email = StringField("Email", validators=[Email()])
     password = PasswordField("Password")
     confirm_password = PasswordField(
@@ -88,6 +98,42 @@ class SignUpForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired()])
     age = IntegerField("Age", validators=[InputRequired()])
     phone = StringField("Phone", validators=[InputRequired()])
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    submit = SubmitField("Submit")
+
+
+class AccessCodeForm(FlaskForm):
+    access_code = IntegerField(
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    submit = SubmitField("Submit")
+
+
+class AccessCodeForm(FlaskForm):
+    access_code = IntegerField(
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
 
 
 class PaymentForm(FlaskForm):

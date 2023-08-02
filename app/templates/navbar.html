@@ -38,7 +38,7 @@
         data-dropdown-placement="bottom"
       >
         <span class="sr-only">Open user menu</span>
-        <img class="w-10 h-10 rounded-full" src="{{ url_for('management.profile_picture') }}" alt="Profile Picture">
+        <img class="w-10 h-10 rounded-full" src="{% if current_user.provider %}{{ current_user.profile_picture_url }}{% else %}{{ url_for('management.profile_picture') }}{% endif %}" alt="Profile Picture">
 
       </button>
       <!-- Dropdown menu -->

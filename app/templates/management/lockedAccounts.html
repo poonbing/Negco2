@@ -3,23 +3,69 @@ block content %}
 <h1>Locked Accounts</h1>
 
 <form method="POST" action="{{ url_for('management.locked_accounts') }}">
-  <table>
-    <tr>
-      <th>Username</th>
-      <th>Email</th>
-      <th>Action</th>
-    </tr>
-    {% for account in locked_accounts %}
-    <tr>
-      <td>{{ account.username }}</td>
-      <td>{{ account.email }}</td>
-      <td>
-        <input type="checkbox" name="unlock_account" value="{{ account.id }}" />
-      </td>
-    </tr>
-    {% endfor %}
+  <table
+    id="users-table"
+    class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+  >
+    <thead
+      class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+    >
+      <tr>
+        <th scope="col" class="p-4">
+          <div class="flex items-center">
+            <input
+              id="checkbox-all"
+              type="checkbox"
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label for="checkbox-all" class="sr-only">checkbox</label>
+          </div>
+        </th>
+        <th scope="col" class="px-6 py-3">Username</th>
+        <th scope="col" class="px-6 py-3">Name</th>
+        <th scope="col" class="px-6 py-3">Role</th>
+        <th scope="col" class="px-6 py-3">Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for account in locked_accounts %}
+      <tr
+        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+      >
+        <td class="w-4 p-4">
+          <div class="flex items-center">
+            <input
+              id="checkbox-table-{{ loop.index }}"
+              type="checkbox"
+              name="unlock_account"
+              value="{{ account.id }}"
+            />
+            <label for="checkbox-table-{{ loop.index }}" class="sr-only"
+              >checkbox</label
+            >
+          </div>
+        </td>
+        <th
+          scope="row"
+          class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+        >
+          {{ account.username }}
+        </th>
+        <td class="px-6 py-4">
+          {{ account.first_name }} {{account.last_name }}
+        </td>
+        <td class="px-6 py-4">{{ account.role }}</td>
+        <td class="px-6 py-4">{{ account.email }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
 
-  <button type="submit">Unlock Selected Accounts</button>
+  <button
+    type="submit"
+    class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+  >
+    Unlock Selected Accounts
+  </button>
 </form>
 {% endblock %}

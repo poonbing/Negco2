@@ -1,6 +1,7 @@
 # Python Modules
 from flask import render_template
 from sqlalchemy import desc
+from flask_login import current_user
 
 # Local Modules
 from app.main import bp

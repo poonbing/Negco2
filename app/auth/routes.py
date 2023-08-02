@@ -1,23 +1,50 @@
 # Python Modules
-from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
-from flask_dance.contrib.github import github
-from flask_dance.contrib.google import google
+from flask import render_template, request, redirect, url_for, flash, current_app
+from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import or_
 from datetime import datetime
+from uuid import uuid4
 
 
 # Local Modules
 from app.auth import bp
 from .utils import init_and_commit
-from ..models import User, Session
+from ..models import User, Session, OAuthUser
 from ..forms import LoginForm, SignUpForm
-from ..extensions import login_manager
+from ..extensions import login_manager, oauth, db
 
 
 @login_manager.user_loader
 def user_loader(user_id):
-    return User.query.get(user_id)
+    user = User.query.get(user_id)
+
+    if not user:
+        oauth_user_google = OAuthUser.query.get((user_id, "google"))
+        if oauth_user_google:
+            return oauth_user_google
+
+        oauth_user_azure = OAuthUser.query.get((user_id, "azure"))
+        if oauth_user_azure:
+            return oauth_user_azure
+
+    return user
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect(url_for("auth.login"))
+
+
+@bp.route("/login_with_google")
+def login_with_google():
+    redirect_uri = url_for("auth.auth", provider="google", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@bp.route("/login_with_azure")
+def login_with_azure():
+    redirect_uri = url_for("auth.auth", provider="azure", _external=True)
+    return oauth.azure.authorize_redirect(redirect_uri)
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -32,44 +59,79 @@ def login():
             or_(User.username == username, User.email == username)
         ).first()
 
-        if user and user.is_account_locked():
-            flash("Account locked. Contact the admin for assistance.", "error")
-        # elif not xcaptcha.verify():
-        #     flash("xCaptcha verification failed. Please try again.", "error")
+        if current_user.is_authenticated:
+            redirect(url_for("management.dashboard"))
         else:
-            if user and user.check_password(password):
-                session_attributes = {
-                    "user_id": user.id,
-                    "last_activity": datetime.now(),
-                    "ip_address": request.remote_addr,
-                    "user_agent": request.user_agent.string,
-                }
+            if user:
+                if user.is_account_locked():
+                    flash("Account locked. Contact the admin for assistance.", "error")
+                elif not xcaptcha.verify():
+                    flash("xCaptcha verification failed. Please try again.", "error")
+                elif not user.check_password(password):
+                    user.increment_login_attempts()
+                    flash("Invalid username or password.", "error")
 
-                init_and_commit(Session, session_attributes)
+                    current_app.logger.error(f"Authorization failed for Login")
 
-                user.reset_login_attempts()
-                login_user(user)
+                else:
+                    session_attributes = {
+                        "user_id": user.id,
+                        "last_activity": datetime.now(),
+                        "ip_address": request.remote_addr,
+                        "user_agent": request.user_agent.string,
+                    }
 
-                return redirect(url_for("management.dashboard"))
-            else:
-                user.increment_login_attempts()
-                flash("Invalid username or password.", "error")
+                    init_and_commit(Session, session_attributes)
+
+                    user.reset_login_attempts()
+                    login_user(user)
+
+                    return redirect(url_for("management.dashboard"))
 
     return render_template("auth/login.html", form=form)
 
 
-@bp.route("/login/google")
-def login_google():
-    if not google.authorized:
-        return redirect(url_for("google.login"))
-    return redirect(url_for("management.profile"))
+@bp.route("/auth/<provider>")
+def auth(provider):
+    if provider == "google":
+        token = oauth.google.authorize_access_token()
+        user_info = oauth.google.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo"
+        ).json()
+    elif provider == "azure":
+        token = oauth.azure.authorize_access_token()
+        user_info = oauth.azure.get("userinfo").json()
 
+    user_id = user_info.get("sub") if provider == "google" else user_info.get("id")
+    email = user_info.get("email")
+    print(user_info)
+    username = user_info.get("name")
+    access_token = token.get("access_token")
+    profile_picture_url = (
+        user_info.get("picture")
+        if provider == "google"
+        else user_info.get("avatar_url")
+    )
 
-@bp.route("/login/github")
-def login_github():
-    if not github.authorized:
-        return redirect(url_for("github.login"))
-    return redirect(url_for("management.profile"))
+    oauth_user = OAuthUser.query.filter_by(
+        provider_id=user_id, provider=provider
+    ).first()
+
+    if not oauth_user:
+        oauth_user = OAuthUser(
+            provider=provider,
+            provider_id=user_id,
+            username=username,
+            email=email,
+            access_token=access_token,
+            profile_picture_url=profile_picture_url,
+        )
+
+        db.session.add(oauth_user)
+        db.session.commit()
+
+    login_user(oauth_user)
+    return redirect(url_for("management.dashboard"))
 
 
 @bp.route("/logout")
@@ -106,7 +168,6 @@ def signup():
 
         else:
             user_attributes = {
-                "user_id": 6,
                 "username": username,
                 "password": password,
                 "role": "user",
