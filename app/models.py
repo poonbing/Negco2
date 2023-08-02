@@ -16,20 +16,6 @@ from config import Config
 ###############################################################
 
 
-class CRUDMixin:
-    def save(self):
-        db.session.add(self)
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self, **kwargs):
-        for attr, value in kwargs.items():
-            setattr(self, attr, value)
-        db.session.commit()
-
-
 class AccountManagementMixin:
     def increment_login_attempts(self):
         self.login_attempts += 1
@@ -156,7 +142,7 @@ class User(
     ):
         self.id = str(uuid4())[:8]
         self.username = username
-        self.password = hashpw(password.encode("utf-8"), gensalt())
+        self.password = self.hash_password(password)
         self.role = role
         self.email = email
         self.gender = gender
@@ -167,6 +153,9 @@ class User(
 
     def check_password(self, password):
         return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
 
 
 class OAuthUser(UserMixin, db.Model):

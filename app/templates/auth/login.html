@@ -37,7 +37,12 @@ content %}
           {% endfor %}
         </ul>
         {% endif %} {% endwith %}
-        <form id="login-form" class="space-y-4 md:space-y-6" method="POST">
+        <form
+          id="login-form"
+          class="space-y-4 md:space-y-6"
+          method="POST"
+          action="{{ url_for('auth.login') }}"
+        >
           {{ form.csrf_token }}
 
           <div>

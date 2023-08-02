@@ -35,7 +35,10 @@
         "error" %}
         <p class="text-red-500">{{ message }}</p>
         {% endif %} {% endfor %} {% endif %} {% endwith %}
-        <form method="POST">
+        <form
+          method="POST"
+          action="{{ url_for('recovery.enter_access_code', email=email) }}"
+        >
           {{ form.csrf_token }}
 
           <div>

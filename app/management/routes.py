@@ -5,7 +5,7 @@ from io import BytesIO
 
 # Local Modules
 from app.management import bp
-from .utils import role_required, update_password
+from .utils import role_required
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
@@ -13,9 +13,9 @@ from ..models import User
 
 
 @bp.route("/profile_picture")
+@login_required
 def profile_picture():
-    user = current_user
-    return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
+    return send_file(BytesIO(current_user.profile_picture), mimetype="image/jpeg")
 
 
 @bp.route("/show_users", methods=["GET"])
@@ -33,7 +33,8 @@ def locked_accounts():
     if request.method == "POST":
         locked_account_ids = request.form.getlist("unlock_account")
         for account_id in locked_account_ids:
-            user = User.query.get(account_id)
+            user = User.query.filter_by(id=account_id).first()
+
             if user:
                 user.unlock_account()
 
@@ -57,11 +58,23 @@ def settings():
         if form.profile_picture.data:
             user.profile_picture = form.profile_picture.data.read()
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
+        if form.first_name.data:
+            user.first_name = form.first_name.data
+
+        if form.last_name.data:
+            user.last_name = form.last_name.data
+
+        if form.phone.data:
+            user.phone = form.phone.data
+
+        if form.gender.data:
+            user.gender = form.gender.data
+
+        if form.email.data:
+            user.email = form.email.data
+
+        if form.password.data:
+            user.password = user.hash_password(form.password.data)
 
         db.session.commit()
 
@@ -77,7 +90,7 @@ def settings():
 @login_required
 @role_required("admin")
 def admin_settings(user_id):
-    user = User.query.get(user_id)
+    user = User.query.filter_by(id=user_id).first()
     form = SettingsForm()
     sessions = Session.query.filter_by(user_id=user.id).all()
 
@@ -85,11 +98,23 @@ def admin_settings(user_id):
         if form.profile_picture.data:
             user.profile_picture = form.profile_picture.data.read()
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
+        if form.first_name.data:
+            user.first_name = form.first_name.data
+
+        if form.last_name.data:
+            user.last_name = form.last_name.data
+
+        if form.phone.data:
+            user.phone = form.phone.data
+
+        if form.gender.data:
+            user.gender = form.gender.data
+
+        if form.email.data:
+            user.email = form.email.data
+
+        if form.password.data:
+            user.password = user.hash_password(form.password.data)
 
         db.session.commit()
 
@@ -105,5 +130,4 @@ def admin_settings(user_id):
 @login_required
 def dashboard():
     user = current_user
-
-    return render_template("management/dashboard.html", username=user.username)
+    return render_template("management/dashboard.html", user=user)
