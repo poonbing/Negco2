@@ -1,5 +1,5 @@
 # Python Modules
-from flask import render_template, redirect, url_for, request, current_app
+from flask import render_template, redirect, url_for, request, current_app, jsonify
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 import os
@@ -108,3 +108,31 @@ def post(id):
         )
     else:
         return render_template("error/404.html")
+
+@bp.route("/edit_comment/<int:comment_id>", methods=["POST"])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Check if the current user is the commenter and has permission to edit the comment
+    if current_user != comment.commenter:
+        abort(403)  # Return a forbidden error if the user doesn't have permission
+
+    form = Comment_Submission()
+    if form.validate_on_submit():
+        comment.content = remove_html_tags(form.content.data)
+
+        # Check if an image is uploaded and save it if necessary
+        if form.image.data:
+            filename = secure_filename(form.image.data.filename)
+            UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'images')
+            image_path = os.path.join(UPLOAD_FOLDER, filename)
+            form.image.data.save(image_path)
+            comment.image = filename
+
+        db.session.commit()
+        return jsonify({"success": True, "message": "Comment updated successfully"})
+
+    # If the form data is not valid, return an error response
+    return jsonify({"success": False, "message": "Invalid form data"}), 400
+

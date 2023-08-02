@@ -1,35 +1,170 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Post</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  </head>
-  <body>
-    {% block navbar %} {% include 'forum/CommentCreation.html' %} {% endblock %}
-    <div class="container mt-8">
-      <div class="post">
-        <h1 class="post-title">{{ post.title }}</h1>
-        <div class="post-content">{{ post.content | safe }}</div>
-      </div>
+<head>
+  <title>Post</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<style>
+  /* Add this CSS to show the edit button */
+  .edit-btn {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 6px 12px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-      <div class="comments">
-        {% for comment in comment_list %}
-        <div class="comment">
-          <div class="comment-content">{{ comment.content | safe }}</div>
-            {% if comment.image %}
-            <img src="{{ url_for('static', filename='images/' + comment.image) }}" alt="Uploaded Image">
-            {% endif %}
-          <div class="comment-details">
-            <span>Posted by {{current_user.username}}</span>
-          </div>
+  /* Add this CSS to style the image preview in the edit form */
+  .image-preview {
+    max-width: 150px;
+    max-height: 150px;
+    margin-top: 10px;
+    display: block;
+  }
+
+  /* Add this CSS to hide the input[type="file"] element in the edit form */
+  input[type="file"] {
+    display: none;
+  }
+</style>
+
+{% block navbar %} {% include 'forum/CommentCreation.html' %} {% endblock %}
+<div class="container mt-8">
+  <div class="post">
+    <h1 class="post-title">{{ post.title }}</h1>
+    <div class="post-content">{{ post.content | safe }}</div>
+  </div>
+
+  <div class="comments">
+    {% for comment in comment_list %}
+      <div class="comment">
+        {% if current_user == comment.commenter %}
+          <!-- Edit button for the comment -->
+          <button class="edit-btn" onclick="editComment({{ comment.id }})">Edit</button>
+        {% endif %}
+        <div class="comment-content" id="comment-content-{{ comment.id }}">
+          {{ comment.content | safe }}
         </div>
-        {% endfor %}
-      </div>
-    </div>
-  </body>
+        {% if comment.image %}
+          <img src="{{ url_for('static', filename='images/' + comment.image) }}" alt="Uploaded Image">
+        {% endif %}
+        <div class="comment-details">
+          <span>Posted by {{ current_user.username }}</span>
+        </div>
 
+        <!-- Edit form for the comment -->
+        <form class="edit-form hidden" id="edit-form-{{ comment.id }}" onsubmit="submitEditForm({{ comment.id }}, '{{ url_for('forum.edit_comment', comment_id=comment.id) }}'); return false;">
+          {{ form.csrf_token }}
+          {{ form.content(class="hidden", required="required") }}
+          {{ form.image }}
+          <button type="submit">Save</button>
+          <button type="button" onclick="cancelEdit({{ comment.id }})">Cancel</button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+</body>
+<script>
+// Global variable to track the commentId of the currently open edit form
+  let currentEditFormId = null;
+
+  function editComment(commentId) {
+    if (currentEditFormId !== null) {
+      // Close the currently open edit form before opening a new one
+      cancelEdit(currentEditFormId);
+    }
+
+    const contentElem = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+    const commentImage = document.getElementById(`image-${commentId}`).value;
+    const imagePreview = document.getElementById(`image-preview-${commentId}`);
+
+    contentElem.style.display = "none";
+    editForm.style.display = "block";
+    if (commentImage) {
+      imagePreview.src = `/static/images/${commentImage}`;
+      imagePreview.classList.remove("hidden");
+    } else {
+      imagePreview.src = "";
+      imagePreview.classList.add("hidden");
+    }
+
+    // Update the currentEditFormId with the commentId of the opened edit form
+    currentEditFormId = commentId;
+  }
+
+  function cancelEdit(commentId) {
+    const contentElem = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+    const imagePreview = document.getElementById(`image-preview-${commentId}`);
+
+    contentElem.style.display = "block";
+    editForm.style.display = "none";
+    imagePreview.classList.add("hidden");
+
+    // Reset the currentEditFormId when the edit form is closed
+    currentEditFormId = null;
+  }
+  // Function to toggle between view and edit modes
+  function editComment(commentId) {
+    const contentElem = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+
+    contentElem.style.display = "none";
+    editForm.style.display = "block";
+
+    // Fill the edit form with the current comment content
+    const commentContent = contentElem.innerHTML;
+    const commentImage = contentElem.nextElementSibling?.getAttribute("src");
+
+    document.getElementById(`content-${commentId}`).value = commentContent;
+    document.getElementById(`image-${commentId}`).value = commentImage;
+  }
+
+  // Function to cancel editing and switch back to view mode
+  function cancelEdit(commentId) {
+    const contentElem = document.getElementById(`comment-content-${commentId}`);
+    const editForm = document.getElementById(`edit-form-${commentId}`);
+
+    contentElem.style.display = "block";
+    editForm.style.display = "none";
+  }
+
+  // Function to submit the edit form
+  function submitEditForm(commentId, endpoint) {
+    const form = document.getElementById(`edit-form-${commentId}`);
+    const formData = new FormData(form);
+
+    fetch(endpoint, {  // Use the endpoint provided as a parameter
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Handle the response data here if needed
+        // For example, you can update the comment content or show a success message
+        console.log(data);
+
+        // After successful submission, switch back to view mode
+        cancelEdit(commentId);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+</script>
 </html>
