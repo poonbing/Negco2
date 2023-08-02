@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired
+from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired, NumberRange
 from wtforms import (
     StringField,
     SubmitField,
@@ -14,6 +14,7 @@ from wtforms import (
 )
 import datetime
 from wtforms_components import DateTimeField, DateRange
+from flask_wtf.file import FileRequired, FileAllowed
 
 
 class SettingsForm(FlaskForm):
@@ -30,30 +31,30 @@ class SettingsForm(FlaskForm):
 
 
 class createArticle(FlaskForm):
-    title = StringField("Title of Article:", validators=[InputRequired()])
+    title = StringField("Title of Article:", validators=[InputRequired(), Length(min=3, max=50)])
     description = TextAreaField(
         "Description:", validators=[InputRequired()], render_kw={"rows": 1}
     )
-    writer = StringField("Writer:", validators=[InputRequired()])
-    image = FileField("Image:", validators=[InputRequired()])
+    writer = StringField("Writer:", validators=[InputRequired(), Length(min=3, max=20)])
+    image = FileField("Image:", validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
     paragraph = TextAreaField(
-        "Paragraph:", validators=[InputRequired()], render_kw={"rows": 8}
+        "Paragraph:", validators=[InputRequired()], render_kw={"rows": 30}
     )
     submit = SubmitField("Submit")
 
 
 class createProduct(FlaskForm):
-    brand = StringField("Brand of Product:", validators=[InputRequired()])
-    name = StringField("Name of Product:", validators=[InputRequired()])
+    brand = StringField("Brand of Product:", validators=[InputRequired(), Length(min=2, max=20)])
+    name = StringField("Name of Product:", validators=[InputRequired(), Length(min=3, max=20)])
     description = TextAreaField(
-        "Description:", validators=[InputRequired()], render_kw={"rows": 4}
+        "Description:", validators=[InputRequired()], render_kw={"rows": 8}
     )
     category = SelectField(
         "Category:", choices=[("On-the-go"), ("Kitchen"), ("Bathroom")]
     )
-    price = DecimalField("Price of product($):", places=2, validators=[InputRequired()])
-    offer = IntegerField("Offer(%)", validators=[InputRequired()])
-    image = FileField("Image:", validators=[InputRequired()])
+    price = DecimalField("Price of product($):", places=2, validators=[InputRequired(), NumberRange(min=0, max=999)])
+    offer = IntegerField("Offer(%)", validators=[InputRequired(), NumberRange(min=0, max=100)])
+    image = FileField("Image:", validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField("Submit")
 
 
