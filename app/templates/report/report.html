@@ -1,6 +1,12 @@
-{% extends 'layout.html' %} {% block title %}Report{% endblock %} {% block
-content %}
-
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tracker Web App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    {% include 'navbar.html' %}
 <script>
     function createChart() {
         const height = 500;
@@ -41,8 +47,8 @@ content %}
     return Object.assign(svg.node(), {update});
     }
     // Parameters
-    let n = 3;
-    let m = 30;
+    let n = {{ n }};
+    let m = {{ m }};
 
     // Function to generate bumps
     function bumps(m) {
@@ -65,9 +71,13 @@ content %}
         return values;
     }
 
+
+
     // Data
     let xz = d3.range(m);
-    let yz = d3.range(n).map(() => bumps(m));
+    let yz = d3.range(n).map(() => {{ datapoints }});
+    console.log(xz)
+    console.log(yz)
 
     // Layout
     let layout = "stacked";  // or "grouped"
@@ -97,3 +107,7 @@ content %}
     <input type="radio" id="stacked" name="layout" value="stacked" checked>
     <label for="stacked">Stacked</label>
 </div>
+
+{% include 'footer.html' %}
+  </body>
+</html>

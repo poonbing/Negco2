@@ -6,6 +6,7 @@ from app import limiter
 from app.report import bp
 from .utils import ReportFunctions
 from flask_login import current_user, login_required
+import json
 
 
 
@@ -15,15 +16,16 @@ from flask_login import current_user, login_required
 def report():
     report_util = ReportFunctions()
     user = current_user.id
-    print(user)
     report = report_util.check_report(user)
-    print(report)
     if report == 'Failed':
         return render_template("error/500.html"), 500
     else:
-        datapoint = report_util.retrieve_data_points(user)
-        print(datapoint)
+        datapoint, list_names = report_util.retrieve_data_points(user)
+        nested_list = []
+        for lists in datapoint:
+            nested_list.append(lists)
+        nested_json_list = json.dumps(nested_list)
+        nested_json_name = json.dumps(list_names)
         trackers = report_util.retrieve_all_tracker_records(user)
-        print(trackers)
-        return render_template('report/report.html', datapoints=datapoint, trackers=trackers)
+        return render_template('report/report.html', datapoints=nested_json_list, n=len(datapoint), name_list=nested_json_name, m=len(list_names), trackers=trackers)
 

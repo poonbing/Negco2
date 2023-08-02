@@ -141,28 +141,27 @@ class TrackerFunctions:
             if len(list) < current_date:
                 list.append(total_usage)
             elif len(list) >= current_date:
-                list[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
+                list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
             report.datapoint = list
             total_report.total_usage += total_usage
             list2 = total_report.datapoint
             if len(list2) < current_date:
                 list2.append(total_usage)
             elif len(list2) >= current_date:
-                list2[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
+                list2[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
             total_report.datapoint = list2
         else:
             current_month = datetime.now().strftime('%m')
             current_year = datetime.now().year
             list = []
-            print(current_date)
             for i in range(current_date):
-                list.append('0')
-            print(list)
-            list[int(current_date-1)] = str(int(list[int(current_date-1)]) + total_usage)
+                list.append(0)
+            list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
             new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=tracker.name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
-            db.session.add(new_report)
-            total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='Total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
-            db.session.add(total_report)
+            db.session.add(new_report) 
+            if self.check_report(user_id, 'Total') == 'Failed':
+                total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='Total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
+                db.session.add(total_report)
         db.session.commit()
 
     def delete_tracker_record(self, user_id, tracker):

@@ -1,7 +1,56 @@
 {% extends 'layout.html' %} {% block title %} tracker {% endblock %} {% block
 content %}
 
+<script>
+    function startTimer(startTime, elementId) {
+          let start = new Date(startTime);
+          let [startYear, startMonth, startDay, startHours, startMinutes, startSeconds] = [
+              start.getFullYear(),
+              start.getMonth() + 1,
+              start.getDate(),
+              start.getHours(),
+              start.getMinutes(),
+              start.getSeconds()
+          ];
+          let now = new Date();
+          let diff = now - start;
+          let hours = Math.floor(diff / 1000 / 60 / 60);
+          let minutes = Math.floor(diff / 1000 / 60) % 60;
+          let seconds = Math.floor(diff / 1000) % 60;
+          let timerElement = document.getElementById(elementId);
+          timerElement.innerText = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          setInterval(function() {
+              now = new Date();
+              diff = now - start;
+              hours = Math.floor(diff / 1000 / 60 / 60);
+              minutes = Math.floor(diff / 1000 / 60) % 60;
+              seconds = Math.floor(diff / 1000) % 60;
+              timerElement.innerText = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          }, 1000);
+      }
 
+      function fillAndSubmitForm(formname, name, item, rate, action) {
+      document.getElementById('nameField').value = name;
+      document.getElementById('itemField').value = item;
+      document.getElementById('rateField').value = rate;
+      document.getElementById('actionField').value = action;
+      document.getElementById('oldnameField').value = name;
+      document.getElementById('olditemField').value = item;
+
+      document.getElementById(formname).submit();
+      }
+
+      function fillAndShowForm(formname, name, item, rate, action){
+          document.getElementById('nameField').value = name;
+          document.getElementById('itemField').value = item;
+          document.getElementById('rateField').value = rate;
+          document.getElementById('actionField').value = action;
+          document.getElementById('oldnameField').value = name;
+          document.getElementById('olditemField').value = item;
+
+          document.getElementById(formname).style = "display: inherit;";
+      }
+  </script>
     <div class="grid grid-cols-2 gap-4">
     {% for key in keylist %}
         <div id="trackercard" class="m-5 bg-emerald-100 rounded-lg">
