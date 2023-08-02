@@ -1,0 +1,114 @@
+<form method="POST" action="{{ url_for('auth.signup') }}">
+    {{ form.csrf_token }}
+    <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+      <div class="mt-5">
+        <label
+          for="email"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.email.label}}</label
+        >
+        {{form.email(class="bg-gray-50 border border-gray-300 text-gray-900
+        text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
+        block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="mt-5">
+        <label
+          for="username"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.username.label}}</label
+        >
+        {{form.username(class="block p-2.5 w-full text-sm text-gray-900
+        bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="mt-5">
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.password.label}}</label
+        >
+        {{form.password(class="block p-2.5 w-full text-sm text-gray-900
+        bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+        focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+        dark:focus:border-primary-500")}}
+      </div>
+      <div class="mt-5">
+        <label
+          for="confirm_password"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >{{form.confirm_password.label}}</label
+        >
+        {{form.confirm_password(class="block p-2.5 w-full text-sm
+        text-gray-900 bg-gray-50 rounded-lg border border-gray-300
+        focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700
+        dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+        dark:focus:ring-primary-500 dark:focus:border-primary-500")}}
+      </div>
+    </div>
+    <div class="mt-5">
+      <label
+        for="gender"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >{{form.gender.label}}</label
+      >
+      {{form.gender(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+      rounded-lg border border-gray-300 focus:ring-primary-500
+      focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+      dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+      dark:focus:border-primary-500")}}
+    </div>
+    <div class="mt-5">
+      <label
+        for="first_name"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >{{form.first_name.label}}</label
+      >
+      {{form.first_name(class="block p-2.5 w-full text-sm text-gray-900
+      bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+      focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+      dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+      dark:focus:border-primary-500")}}
+    </div>
+    <div class="mt-5">
+      <label
+        for="last_name"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >{{form.last_name.label}}</label
+      >
+      {{form.last_name(class="block p-2.5 w-full text-sm text-gray-900
+      bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
+      focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+      dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+      dark:focus:border-primary-500")}}
+    </div>
+    <div class="mt-5">
+      <label
+        for="age"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >{{form.age.label}}</label
+      >
+      {{form.age(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+      rounded-lg border border-gray-300 focus:ring-primary-500
+      focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+      dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+      dark:focus:border-primary-500")}}
+    </div>
+    <div class="mt-5">
+      <label
+        for="phone"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >{{form.phone.label}}</label
+      >
+      {{form.phone(class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50
+      rounded-lg border border-gray-300 focus:ring-primary-500
+      focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
+      dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
+      dark:focus:border-primary-500")}}
+    </div>
+    <button type="submit">Sign Up</button>
+  </form>
