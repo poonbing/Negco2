@@ -17,6 +17,7 @@ def create_app(config_class=Config):
     csrf = CSRFProtect()
     app.config['SECRET_KEY'] = key
     app.config.from_object(config_class)
+    
 
     # talisman.init_app(app)
     xcaptcha = XCaptcha(app=app)

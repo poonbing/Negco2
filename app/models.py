@@ -4,8 +4,6 @@ from flask_login import UserMixin
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
-from flask_serialize import FlaskSerializeMixin
-import json
 
 # Local Modules
 from .extensions import db
@@ -329,7 +327,7 @@ class Topic(db.Model):
     posts = db.relationship("Post", back_populates="topic")
 
 
-class Checkout(db.Model, FlaskSerializeMixin):
+class Checkout(db.Model):
     __tablename__ = 'checkout'
     id = db.Column(db.String(36), primary_key=True, unique=True)
     user_id = user_id = db.Column(
@@ -338,8 +336,11 @@ class Checkout(db.Model, FlaskSerializeMixin):
     product_list = db.Column(db.String(255), db.ForeignKey("products.id"), nullable=False)
     product_price = db.Column(db.String(255))
     product_quantity = db.Column(db.String(255))
-    total_cost = db.Column(db.Numeric(precision=10, scale=2))
+    total_cost = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     payment_date = db.Column(db.DateTime, default=datetime.today)
+    payment_valid = db.Column(db.Boolean, default=0)
+    email_validation = db.Column(db.Boolean, default=0)
+
 
 
     

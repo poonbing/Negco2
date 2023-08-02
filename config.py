@@ -21,9 +21,9 @@ class Config:
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = "chuayoushen5@gmail.com"
-    MAIL_PASSWORD = "bqpccxputtnresrf"
-    MAIL_DEFAULT_SENDER = ("NEGCO2", "chuayoushen@gmail.com")
+    MAIL_USERNAME = "negco2lewis@gmail.com"
+    MAIL_PASSWORD = "beshzazmbzfokmig"
+    MAIL_DEFAULT_SENDER = ("NEGCO2", "negco2lewis@gmail.com")
 
     # Path Configuration
     APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "app"))

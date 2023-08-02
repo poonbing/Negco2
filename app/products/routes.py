@@ -10,15 +10,15 @@ import datetime
 import re
 from decimal import Decimal
 from decimal import getcontext
+from flask_mail import Message
 
 
 
 # Local Modules
 from app.products import bp
-from config import Config
 from ..models import Products, CartItem, Checkout
 from ..forms import createProduct, PaymentForm
-from ..extensions import db
+from ..extensions import db, mail
 
 
 @bp.route("/createProduct", methods=["POST", "GET"])
@@ -255,6 +255,12 @@ def remove_from_cart(product_id):
 
 
 
+def send_recovery_email(email, checkout_items, total_price):
+    msg = Message("Thank you for you purchase!", recipients=[email])
+
+    msg.html = render_template("products/emailTemplate.html", checkout_items=checkout_items, total_price=total_price)
+    mail.send(msg)
+
     
 #payment Gateways
 output = ""
@@ -277,6 +283,32 @@ def PremiumPaymentGateway(CreditCardNumber, CardHolder, ExpirationDate, Security
     return (1, output)
 
 
+# Luhn algorithm
+# Return True if given card number is valid
+def checkLuhn(card_num):
+
+    no_of_digits = len(card_num)
+    nSum = 0
+    isSecond = False
+
+    for i in range(no_of_digits - 1, -1, -1):
+        d = ord(card_num[i]) - ord('0')
+
+        if isSecond:
+            d *= 2
+
+        nSum += d // 10
+        nSum += d % 10
+
+        isSecond = not isSecond
+
+    if nSum % 10 == 0:
+        return True
+    else:
+        return False
+
+
+
 #processPayment()
 # - CreditCardNumber (mandatory, string, it should be a valid credit card number)
 # - CardHolder: (mandatory, string)
@@ -292,13 +324,6 @@ def processPayment():
     checkout_items = CartItem.query.filter_by(user_id=user.id).all()
     total_quantity = sum(item.quantity for item in checkout_items)
     total_price = sum(item.price * item.quantity for item in checkout_items)
-    # for item in checkout_items:
-    #     if item.offered_price:
-    #         price = item.offered_price * item.quantity
-    #         total_price += price
-    #     else:
-    #         price = item.price * item.quantity
-    #         total_price += price
 
     if form.validate_on_submit():
         card_num = form.credit_card_number.data.strip().replace(" ","")
@@ -310,149 +335,159 @@ def processPayment():
 
         card_num_len = len(card_num)
 
-        try:
-            #card number check
-            #assumming that card number pass MOD 10 algorithm check for now
-            if card_num_len in [13,15,16] and card_num.isdigit():
-                #Visa Card
-                if card_num_len == 16 and card_num.startswith('4'):
-                    pass
-                #MasterCard
-                elif card_num_len == 16 and card_num.startswith('5'):
-                    pass
-                #AMEX
-                elif card_num_len == 15 and (card_num.startswith('34') or card_num.startswith('37')):
-                    pass
-                #Discover
-                elif card_num_len == 16 and card_num.startswith('6'):
-                    pass
+        #Luhn algorithm check
+        card_validation = checkLuhn(card_num)
+        if card_validation:
+            print('This is a valid card.')
+            pass
+            try:
+                #card number check
+                #assumming that card number pass MOD 10 algorithm check for now
+                if card_num_len in [13,15,16] and card_num.isdigit():
+                    #Visa Card
+                    if card_num_len == 16 and card_num.startswith('4'):
+                        pass
+                    #MasterCard
+                    elif card_num_len == 16 and card_num.startswith('5'):
+                        pass
+                    #AMEX
+                    elif card_num_len == 15 and (card_num.startswith('34') or card_num.startswith('37')):
+                        pass
+                    #Discover
+                    elif card_num_len == 16 and card_num.startswith('6'):
+                        pass
+                    else:
+                        print("Invalid Card Number: {}\n".format(card_num))
+                        return 'The request is invalid', 400
+                
+                card_num = int(card_num)
+                print('Passed Card Num check')
+
+                #CardHolder check
+                # assumeing min/max 2-24 characters for first name and same for last name
+                # min length 5: 2 characters for first name, 1 for space, 2 for last name
+                if len(card_holder) > 4:
+                    verify_name2 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                    print("Card Holder ({}) Verified: {}".format(card_holder,verify_name2))
+
+                    verify_name3 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                    print("Card Holder ({}) Verified: {}".format(card_holder,verify_name3))
+
+                    verify_name4 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
+                    print("Card Holder ({}) Verified: {}".format(card_holder,verify_name4))
+
+                    if not verify_name2:
+                        if not verify_name3:
+                            if not verify_name4:
+                                print("Card Holder Value Invalid!\n")
+                                return 'The request is invalid', 400
+                    else:
+                        print("Valid Card Holder")
+
                 else:
-                    print("Invalid Card Number: {}\n".format(card_num))
-                    return 'The request is invalid', 400
-            
-            card_num = int(card_num)
-            print('Passed Card Num check')
-
-            #CardHolder check
-            # assumeing min/max 2-24 characters for first name and same for last name
-            # min length 5: 2 characters for first name, 1 for space, 2 for last name
-
-            if len(card_holder) > 4:
-                verify_name2 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24}$', card_holder))
-                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name2))
-
-                verify_name3 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
-                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name3))
-
-                verify_name4 = bool(re.match(r'^[A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24} [A-Z]{2,24}$', card_holder))
-                print("Card Holder ({}) Verified: {}".format(card_holder,verify_name4))
-
-                if not verify_name2:
-                    if not verify_name3:
-                        if not verify_name4:
-                            print("Card Holder Value Invalid!\n")
-                            return 'The request is invalid', 400
-                else:
-                    print("Valid Card Holder")
-
-            else:
-                print("Card Holder Value Invalid!\n")
-                return 'The request is invalid', 400
-            
-
-            #expiration check
-            if type(expiry_date) is not datetime.date:
-                print("Invalid Expiry Date: {}\n".format(expiry_date))
-                #bad request
-                return 'The request is invalid', 400
-            
-
-            # ====================
-            # Amount Check
-            # 1-2 decimal places should be present - invalid if more
-            # Positive values only, example: 0.50, 1.51, 520.55
-            # Max: 999999.99
-            # ====================
-
-            # Precision of digits which Decimal lib will use to return
-            # any calculated number
-            getcontext().prec = 8
-            # Use regex to match what an amount would look like
-            # Max amount is limited to 999999.99 (assumption)
-            # 6 digits before & 2 after decimal
-            if bool(re.match(r'^[0-9]{1,6}\.[0-9]{1,2}$', str(amount))):
-                amount = Decimal(amount).quantize(Decimal('1.00'))
-                print("Amount valid: {}".format(str(amount)))
-            else:
-                print("Amount Invalid: {}\n".format(str(amount)))
-                #bad request
-                return 'The request is invalid', 400
-            
-
-            #security code check
-            if security_code:
-                security_str = str(security_code).strip()
-
-                if security_str.isdigit() and len(security_str) == 3:
-                    print("Valid Security Code")
-                    security_code = int(security_code)
-                else:
-                    print("Invalid Security Code: {}\n".format(str(security_code)))
+                    print("Card Holder Value Invalid!\n")
                     return 'The request is invalid', 400
                 
-            #add to checkout database
-            product_id = (item.product.id for item in checkout_items)
-            product_price = (item.price for item in checkout_items)
-            product_quantity = (item.quantity for item in checkout_items)
-            
-            
-            checkout = Checkout(id=str(uuid4())[:8], user_id=user.id, product_list=str(list(product_id)), 
-                                product_price=str(list(product_price)),
-                                product_quantity=str(list(product_quantity)), 
-                                total_cost=total_price)
-            db.session.add(checkout)
-            db.session.commit()
+
+                #expiration check
+                if type(expiry_date) is not datetime.date:
+                    print("Invalid Expiry Date: {}\n".format(expiry_date))
+                    #bad request
+                    return 'The request is invalid', 400
                 
-        except Exception as e:
-            print("Exception Raised: {}\n".format(e))
-            return 'Internal server error', 500
-        
-        retry = 0
 
-        #Payment Proccessor
-        #assuming payment processor has boolean return on successful payment
+                # ====================
+                # Amount Check
+                # 1-2 decimal places should be present - invalid if more
+                # Positive values only, example: 0.50, 1.51, 520.55
+                # Max: 999999.99
+                # ====================
 
-        if amount <= 20:
-            ret, output = CheapPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
-            if ret:
-                #output = 'Payment is proccessed', 200
-                return output, 200
+                # Precision of digits which Decimal lib will use to return
+                # any calculated number
+                getcontext().prec = 8
+                # Use regex to match what an amount would look like
+                # Max amount is limited to 999999.99 (assumption)
+                # 6 digits before & 2 after decimal
+                if bool(re.match(r'^[0-9]{1,6}\.[0-9]{1,2}$', str(amount))):
+                    amount = Decimal(amount).quantize(Decimal('1.00'))
+                    print("Amount valid: ${}".format(str(amount)))
+                else:
+                    print("Amount Invalid: ${}\n".format(str(amount)))
+                    #bad request
+                    return 'The request is invalid', 400
+                
+
+                #security code check
+                if security_code:
+                    security_str = str(security_code).strip()
+
+                    if security_str.isdigit() and len(security_str) == 3:
+                        print("Valid Security Code")
+                        security_code = int(security_code)
+                    else:
+                        print("Invalid Security Code: {}\n".format(str(security_code)))
+                        return 'The request is invalid', 400
+                    
+                #add to checkout database
+                product_id = (item.product.id for item in checkout_items)
+                product_price = (item.price for item in checkout_items)
+                product_quantity = (item.quantity for item in checkout_items)
+                
+                
+                checkout = Checkout(id=str(uuid4())[:8], user_id=user.id, product_list=str(list(product_id)), 
+                                    product_price=str(list(product_price)),
+                                    product_quantity=str(list(product_quantity)), 
+                                    total_cost=total_price, payment_valid=1)
+                
+                send_recovery_email(user.email, checkout_items, total_price)
+                checkout.email_validation = 1
+                db.session.add(checkout)
+                db.session.commit()
+                        
+                    
+            except Exception as e:
+                print("Exception Raised: {}\n".format(e))
+                return 'Internal server error', 500
+            
+            retry = 0
+
+            #Payment Proccessor
+            #assuming payment processor has boolean return on successful payment
+
+            if amount <= 20:
+                ret, output = CheapPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+                if ret:
+                    #output = 'Payment is proccessed', 200
+                    return output, 200
+                else:
+                    return 'Internal server error: PaymentProccessor Failed', 500
+
+            elif 20 < amount < 501:
+                while retry < 2:
+                    ret, output = ExpensivePaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+                    if ret:
+                        #output = 'Payment is proccessed', 200
+                        return output, 200
+                    else:
+                        retry += 1
+                
+                print("Could not proccess payment with ExpensivePaymentGateway")
+                return 'Internal server error: PaymentProcessor Failed', 500
+            
             else:
+                while retry < 3:
+                    ret, output = PremiumPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
+                    if ret:
+                        #output = 'Payment is proccessed', 200
+                        return output, 200
+                    else:
+                        retry += 1
+                print("Could not proccess payment with PremiumPaymentGateway")
                 return 'Internal server error: PaymentProccessor Failed', 500
-
-        elif 20 < amount < 501:
-            while retry < 2:
-                ret, output = ExpensivePaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
-                if ret:
-                    #output = 'Payment is proccessed', 200
-                    return output, 200
-                else:
-                    retry += 1
-            
-            print("Could not proccess payment with ExpensivePaymentGateway")
-            return 'Internal server error: PaymentProcessor Failed', 500
-        
         else:
-            while retry < 3:
-                ret, output = PremiumPaymentGateway(card_num, card_holder, expiry_date, security_code, amount)
-                if ret:
-                    #output = 'Payment is proccessed', 200
-                    return output, 200
-                else:
-                    retry += 1
-            print("Could not proccess payment with PremiumPaymentGateway")
-            return 'Internal server error: PaymentProccessor Failed', 500
-
+            print("This is an invalid card.")
+            return 'Invalid card number.'
         
     
         
