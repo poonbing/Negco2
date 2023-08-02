@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_xcaptcha import XCaptcha
 from flask_login import current_user
-from .models import CartItemfrom 
+from .models import CartItem
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging

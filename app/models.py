@@ -211,7 +211,6 @@ class LockedUser(db.Model):
     id = db.Column(db.String(36), nullable=False, primary_key=True)
     user_id = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
-        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
     locked_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -304,6 +303,7 @@ class SessionInfo(db.Model):
             "session_start": self.session_start,
             "rate": self.rate,
         }
+
 
 
 class Report(db.Model):
@@ -440,95 +440,6 @@ class Topic(db.Model):
     name = db.Column(db.String(255), nullable=False)
     posts = db.relationship("Post", back_populates="topic")
 
-
-class Report(db.Model):
-    __tablename__ = "report"
-
-    id = id = db.Column(db.String(36), primary_key=True, unique=True)
-    related_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
-    item_name = db.Column(db.String(45), nullable=False)
-    month = db.Column(db.String(2), nullable=False)
-    year = db.Column(db.String(4), nullable=False)
-    total_usage = db.Column(db.INTEGER)
-    energy_goals = db.Column(db.INTEGER)
-    datapoint = db.Column(db.JSON)
-
-    def __init__(
-        self,
-        id,
-        related_user,
-        item_name,
-        month,
-        year,
-        total_usage,
-        energy_goals,
-        datapoint,
-    ):
-        self.id = id
-        self.related_user = related_user
-        self.item_name = item_name
-        self.month = month
-        self.year = year
-        self.total_usage = total_usage
-        self.energy_goals = energy_goals
-        self.datapoint = datapoint
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "related_user": self.related_user,
-            "item_name": self.item_name,
-            "month": self.month,
-            "year": self.year,
-            "total_usage": self.total_usage,
-            "energy_goals": self.energy_goals,
-            "datapoint": self.datapoint,
-        }
-
-
-class Report(db.Model):
-    __tablename__ = "report"
-
-    id = id = db.Column(db.String(36), primary_key=True, unique=True)
-    related_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
-    item_name = db.Column(db.String(45), nullable=False)
-    month = db.Column(db.String(2), nullable=False)
-    year = db.Column(db.String(4), nullable=False)
-    total_usage = db.Column(db.INTEGER)
-    energy_goals = db.Column(db.INTEGER)
-    datapoint = db.Column(db.JSON)
-
-    def __init__(
-        self,
-        id,
-        related_user,
-        item_name,
-        month,
-        year,
-        total_usage,
-        energy_goals,
-        datapoint,
-    ):
-        self.id = id
-        self.related_user = related_user
-        self.item_name = item_name
-        self.month = month
-        self.year = year
-        self.total_usage = total_usage
-        self.energy_goals = energy_goals
-        self.datapoint = datapoint
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "related_user": self.related_user,
-            "item_name": self.item_name,
-            "month": self.month,
-            "year": self.year,
-            "total_usage": self.total_usage,
-            "energy_goals": self.energy_goals,
-            "datapoint": self.datapoint,
-        }
 
 
 class Checkout(db.Model, FlaskSerializeMixin):
