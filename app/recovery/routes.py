@@ -1,8 +1,7 @@
 # Python Modules
-from flask import redirect, url_for, render_template, request, flash
-from flask_login import current_user
-
-
+from flask import redirect, url_for, render_template, request, flash, current_app
+from flask_login import current_user, login_required
+from app import limiter
 # Local Modules
 from app.recovery import bp
 from .utils import access_codes, generate_access_code, send_recovery_email
@@ -34,6 +33,7 @@ def forgot_password():
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
 def enter_access_code():
+    current_app.logger.info('Receive and confirm access code for password recovery from %s for %s', request.remote_addr, request.path)
     email = request.args.get("email")
     if not email or email not in access_codes:
         return redirect(url_for("recovery.forgot_password"))
@@ -49,6 +49,7 @@ def enter_access_code():
             token = user.get_reset_token()
             return redirect(url_for("recovery.reset_password", token=token))
         else:
+            current_app.logger.info('Returning invalid access code from %s for %s', request.remote_addr, request.path)
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email, form=form)

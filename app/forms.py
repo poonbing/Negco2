@@ -146,3 +146,10 @@ class PaymentForm(FlaskForm):
     amount = DecimalField('Subtotal')
     submit = SubmitField('Place Order')
     
+class TrackerInteract(FlaskForm):
+    name = StringField("Name: ", validators=[InputRequired()])
+    item = StringField("Item: ", validators=[InputRequired()])
+    rate = StringField("Rate: ", validators=[InputRequired(), Length(min=1, max=5)])
+    action = StringField("action", validators=[InputRequired()])
+    old_name = StringField("old name", validators=[InputRequired()])
+    old_item = StringField("old item", validators=[InputRequired()])
