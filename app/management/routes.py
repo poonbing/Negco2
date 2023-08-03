@@ -10,6 +10,7 @@ from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
 from ..models import User
+from app import limiter
 
 
 @bp.route("/profile_picture")
@@ -46,6 +47,16 @@ def locked_accounts():
     )
 
 
+@bp.route("/delete/<string:user_id>")
+@limiter.limit("2/second")
+def delete_user(user_id):
+    user_to_delete = User.query.get_or_404(user_id)
+    db.session.delete(user_to_delete)
+    db.session.commit()
+    flash("User deleted succesfully!")
+    return redirect(url_for("management.show_users"))
+
+
 @bp.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
@@ -73,7 +84,7 @@ def settings():
     )
 
 
-@bp.route("/<int:user_id>/settings", methods=["GET", "POST"])
+@bp.route("/<string:user_id>/settings", methods=["GET", "POST"])
 @login_required
 @role_required("admin")
 def admin_settings(user_id):
