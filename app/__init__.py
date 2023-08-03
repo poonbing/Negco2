@@ -64,6 +64,7 @@ def create_app(config_class=Config):
                     source = record.__dict__.get('page', None),
                     logged_user = record.__dict__.get('user_id', None),
                     address = record.__dict__.get('address', None),
+                    category = record.__dict__.get('category', None),
                     log_text = log_text
                 )
                 print(log_entry.address, log_entry.logged_user)

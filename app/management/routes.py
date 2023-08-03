@@ -1,5 +1,5 @@
 # Python Modules
-from flask import redirect, render_template, request, url_for, abort, flash, send_file
+from flask import redirect, render_template, request, url_for, abort, flash, send_file, current_app
 from flask_login import current_user, login_required
 from io import BytesIO
 
@@ -86,6 +86,7 @@ def delete_user(user_id):
     try:
         db.session.delete(user)
         db.session.commit()
+        current_app.logger.info(f'User Deleted: {user.username}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Management'})
         flash(f"User {user.username} deleted successfully", "success")
     except Exception as e:
         db.session.rollback()
@@ -114,7 +115,6 @@ def admin_settings(user_id):
         user.email = form.email.data
 
         db.session.commit()
-
     return render_template(
         "management/admin_settings.html",
         user=user,

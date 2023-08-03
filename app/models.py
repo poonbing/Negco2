@@ -476,4 +476,5 @@ class Log(db.Model):
     source = db.Column(db.String, nullable=False)
     logged_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
     address = db.Column(db.String(36), nullable=False)
+    category = db.Column(db.String(45), nullable=False)
     log_text = db.Column(db.String, nullable=False)

@@ -9,8 +9,9 @@ from flask import (
     escape,
     Response,
     jsonify,
+    current_app
 )
-from flask_login import current_user
+from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 from sqlalchemy import func, and_, not_
 from config import Config
@@ -27,12 +28,15 @@ from flask_mail import Message
 
 # Local Modules
 from app.products import bp
+from app.management.utils import role_required
 from ..models import Products, CartItem, Checkout
 from ..forms import createProduct, PaymentForm
 from ..extensions import db, mail
 
 
 @bp.route("/createProduct", methods=["POST", "GET"])
+@login_required
+@role_required("editor")
 @limiter.limit('4/second')
 def publishProduct():
     form = createProduct()
@@ -69,6 +73,7 @@ def publishProduct():
             )
             db.session.add(product)
             db.session.commit()
+            current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
             flash("Product added successfully!")
             return redirect(url_for("products.viewProduct"))
 
@@ -87,6 +92,7 @@ def publishProduct():
             )
             db.session.add(product)
             db.session.commit()
+            current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
             flash("Product added successfully!")
             return redirect(url_for("products.viewProduct"))
 
@@ -103,6 +109,8 @@ def viewProduct():
 
 
 @bp.route("/updateProduct/<string:id>", methods=["GET", "POST"])
+@login_required
+@role_required("editor")
 def updateProduct(id):
     form = createProduct()
     product_to_update = Products.query.get_or_404(id)
@@ -124,6 +132,7 @@ def updateProduct(id):
         else:
             product_to_update.offered_price = None
         try:
+            current_app.logger.info(f'Product Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
             db.session.commit()
             flash("Product updated successfully!")
             return redirect(url_for("products.viewProduct"))
@@ -144,11 +153,14 @@ def updateProduct(id):
 
 
 @bp.route("/deleteProduct/<string:id>")
+@login_required
+@role_required("editor")
 def deleteProduct(id):
     product_to_delete = Products.query.get_or_404(id)
     try:
         db.session.delete(product_to_delete)
         db.session.commit()
+        current_app.logger.info(f'Product Deleted: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
         flash("Product deleted succesfully!")
         return redirect(url_for("products.viewProduct"))
 

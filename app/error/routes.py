@@ -1,5 +1,5 @@
 # Python Modules
-from flask import render_template
+from flask import render_template, current_app
 
 # Local Modules
 from app.error import bp
