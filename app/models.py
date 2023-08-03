@@ -473,4 +473,7 @@ class Log(db.Model):
     __tablename__ = "logs"
     id = db.Column(db.INTEGER, primary_key=True, nullable=False, autoincrement=True)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    source = db.Column(db.String, nullable=False)
+    logged_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    address = db.Column(db.String(36), nullable=False)
     log_text = db.Column(db.String, nullable=False)

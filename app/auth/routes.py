@@ -73,9 +73,6 @@ def login():
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 flash("Invalid username or password.", "error")
-
-                current_app.logger.error(f"Authorization failed for Login")
-
             else:
                 sess = Session(
                     user.id,

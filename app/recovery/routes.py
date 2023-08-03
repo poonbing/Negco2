@@ -36,11 +36,6 @@ def forgot_password():
 @bp.route("/enter_access_code", methods=["GET", "POST"])
 @limiter.limit('4/second')
 def enter_access_code():
-    current_app.logger.info(
-        "Receive and confirm access code for password recovery from %s for %s",
-        request.remote_addr,
-        request.path,
-    )
     email = request.args.get("email")
     if not email or email not in access_codes:
         return redirect(url_for("recovery.forgot_password"))
@@ -58,11 +53,6 @@ def enter_access_code():
             token = user.get_reset_token()
             return redirect(url_for("recovery.reset_password", token=token))
         else:
-            current_app.logger.info(
-                "Returning invalid access code from %s for %s",
-                request.remote_addr,
-                request.path,
-            )
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email, form=form)
