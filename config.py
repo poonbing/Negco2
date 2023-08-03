@@ -35,6 +35,7 @@ class Config:
     STATIC_FOLDER = os.path.join(APP_ROOT, "static")
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
 
+
     # Oauth Configuration
     GOOGLE_CLIENT_ID = (
         "43510388979-2l3aedm3mce7trakvl09n9rcblcm1lco.apps.googleusercontent.com"

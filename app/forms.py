@@ -42,30 +42,30 @@ class SettingsForm(FlaskForm):
 
 class createArticle(FlaskForm):
     title = StringField(
-        "Title of Article:", validators=[InputRequired(), Length(min=3, max=50)]
+        "Title of Article:", validators=[InputRequired(), Length(min=3, max=100)]
     )
     description = TextAreaField(
-        "Description:", validators=[InputRequired()], render_kw={"rows": 1}
+        "Description:", validators=[InputRequired(), Length(min=3, max=300)], render_kw={"rows": 1}
     )
-    writer = StringField("Writer:", validators=[InputRequired(), Length(min=3, max=20)])
+    writer = StringField("Writer:", validators=[InputRequired(), Length(min=3, max=50)])
     image = FileField(
         "Image:", validators=[FileRequired(), FileAllowed(["jpg", "jpeg", "png"])]
     )
     paragraph = TextAreaField(
-        "Paragraph:", validators=[InputRequired()], render_kw={"rows": 30}
+        "Paragraph:", validators=[InputRequired(), Length(min=100, max=1000000)], render_kw={"rows": 30}
     )
     submit = SubmitField("Submit")
 
 
 class createProduct(FlaskForm):
     brand = StringField(
-        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=20)]
+        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=50)]
     )
     name = StringField(
-        "Name of Product:", validators=[InputRequired(), Length(min=3, max=20)]
+        "Name of Product:", validators=[InputRequired(), Length(min=3, max=50)]
     )
     description = TextAreaField(
-        "Description:", validators=[InputRequired()], render_kw={"rows": 8}
+        "Description:", validators=[InputRequired(), Length(min=10, max=1000)], render_kw={"rows": 8}
     )
     category = SelectField(
         "Category:", choices=[("On-the-go"), ("Kitchen"), ("Bathroom")]

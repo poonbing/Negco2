@@ -18,6 +18,7 @@ def create_app(config_class=Config):
     # Whose is this??
     key = secrets.token_urlsafe(16)
     app.config["SECRET_KEY"] = key
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
     app.config.from_object(config_class)
     
 
