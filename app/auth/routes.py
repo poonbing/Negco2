@@ -15,7 +15,7 @@ from ..extensions import login_manager, oauth, db
 
 
 @login_manager.user_loader
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def user_loader(user_id):
     user = User.query.get(user_id)
 
@@ -32,20 +32,20 @@ def user_loader(user_id):
 
 
 @login_manager.unauthorized_handler
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def unauthorized():
     return redirect(url_for("auth.login"))
 
 
 @bp.route("/login_with_google")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def login_with_google():
     redirect_uri = url_for("auth.auth", provider="google", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
 @bp.route("/login_with_azure")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def login_with_azure():
     redirect_uri = url_for("auth.auth", provider="azure", _external=True)
     return oauth.azure.authorize_redirect(redirect_uri)
@@ -53,7 +53,7 @@ def login_with_azure():
 
 @bp.route("/login", methods=["GET", "POST"])
 @not_logged_in_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def login():
     xcaptcha = bp.xcaptcha
     form = LoginForm()
@@ -80,7 +80,15 @@ def login():
                     request.remote_addr,
                     request.user_agent.string,
                 )
-                current_app.logger.info(f'User Logged In: {user.id}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Login'})
+                current_app.logger.info(
+                    f"User Logged In: {user.id}",
+                    extra={
+                        "user_id": user.id,
+                        "address": request.remote_addr,
+                        "page": request.path,
+                        "category": "Login",
+                    },
+                )
                 db.session.add(sess)
                 db.session.commit()
 
@@ -93,7 +101,7 @@ def login():
 
 
 @bp.route("/auth/<provider>")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def auth(provider):
     if provider == "google":
         token = oauth.google.authorize_access_token()
@@ -138,21 +146,28 @@ def auth(provider):
 
 @bp.route("/logout")
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def logout():
-    current_app.logger.info(f'User Logged Out: {current_user.id}', extra={'user_id': current_user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Login'})
+    current_app.logger.info(
+        f"User Logged Out: {current_user.id}",
+        extra={
+            "user_id": current_user.id,
+            "address": request.remote_addr,
+            "page": request.path,
+            "category": "Login",
+        },
+    )
     logout_user()
     return redirect(url_for("auth.login"))
 
 
 @bp.route("/signup", methods=["GET", "POST"])
 @not_logged_in_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        print("reached here")
         username = form.username.data
         password = form.password.data
         confirm_password = form.confirm_password.data
@@ -187,7 +202,15 @@ def signup():
             )
             db.session.add(user)
             db.session.commit()
-            current_app.logger.info(f'User Created: {user.id}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Signup'})
+            current_app.logger.info(
+                f"User Created: {user.id}",
+                extra={
+                    "user_id": user.id,
+                    "address": request.remote_addr,
+                    "page": request.path,
+                    "category": "Signup",
+                },
+            )
             return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)

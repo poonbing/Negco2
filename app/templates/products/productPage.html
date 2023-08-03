@@ -194,6 +194,7 @@ get_flashed_messages() %}
 
   <div class="text-center text-gray-800">
     <form action="" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <p class="text-xl">Leave a rating...</p>
       <input type="radio" name="rating" value="1" required>1<ion-icon name="star-outline"></ion-icon> 
       <input type="radio" name="rating" value="2">2<ion-icon name="star-outline"></ion-icon> 
