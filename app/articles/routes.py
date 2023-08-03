@@ -18,7 +18,7 @@ from ..__init__ import limiter
 def allArticles():
     page = request.args.get("page", 1, type=int)
     articles = Articles.query.order_by(Articles.date_added.desc()).paginate(
-        per_page=2, page=page
+        per_page=6, page=page
     )
     return render_template("articles/allArticles.html", articles=articles)
 
