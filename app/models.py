@@ -6,6 +6,7 @@ from secrets import token_hex
 from uuid import uuid4
 from bcrypt import hashpw, gensalt, checkpw
 from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask_jwt_extended import create_access_token, decode_token
 import pickle
 
 # Local Modules
@@ -67,23 +68,22 @@ class RolesAndPermissionsMixin:
 
 class ResetPasswordsMixin:
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer("your_secret_key_here")
-        payload = {"user_id": self.id}
-        serialized_payload = pickle.dumps(payload)
-        # Convert bytes to a JSON-serializable format (e.g., string)
-        token = serialized_payload.decode("latin1")
-        return token
+        # Replace "user_id" with any additional data you want to include in the token payload.
+        access_token = create_access_token(
+            identity=self.id, expires_delta=timedelta(seconds=expires_sec)
+        )
+        return access_token
 
     @staticmethod
     def verify_reset_token(token):
-        s = Serializer("your_secret_key_here")
         try:
-            # Convert the token back to bytes (reverse of the get_reset_token method)
-            serialized_payload = token.encode("latin1")
-            user_id = pickle.loads(serialized_payload)["user_id"]
-        except:
-            return None
-        return User.query.get(user_id)
+            # Decode the token to retrieve the payload (identity).
+            decoded_token = decode_token(token)
+            user_id = decoded_token["sub"]
+            return User.query.get(user_id)
+        except Exception as e:
+            # Handle expired token (optional, based on your requirements).
+            return f"Error: {e}"
 
 
 # Relations
@@ -156,7 +156,7 @@ class User(
     ):
         self.id = str(uuid4())[:8]
         self.username = username
-        self.password = hashpw(password.encode("utf-8"), gensalt())
+        self.password = self.hash_password(password)
         self.role = role
         self.email = email
         self.gender = gender
@@ -164,6 +164,9 @@ class User(
         self.last_name = last_name
         self.age = age
         self.phone = phone
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
 
     def check_password(self, password):
         return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

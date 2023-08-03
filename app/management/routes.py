@@ -13,6 +13,7 @@ from ..models import User
 
 
 @bp.route("/profile_picture")
+@login_required
 def profile_picture():
     user = current_user
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
@@ -73,7 +74,21 @@ def settings():
     )
 
 
-@bp.route("/<int:user_id>/settings", methods=["GET", "POST"])
+@bp.route("/delete_user/<string:user_id>", methods=["POST"])
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash(f"User {user.username} deleted successfully", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while deleting the user: {str(e)}", "error")
+
+    return redirect(url_for("management.show_users"))
+
+
+@bp.route("/<string:user_id>/settings", methods=["GET", "POST"])
 @login_required
 @role_required("admin")
 def admin_settings(user_id):
