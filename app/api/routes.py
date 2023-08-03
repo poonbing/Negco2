@@ -3,10 +3,12 @@ from app.api import bp
 from ..models import User, Report
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from ..extensions import csrf
+from app import limiter
 
 
 @bp.route("/token", methods=["POST"])
 @csrf.exempt
+@limiter.limit('4/second')
 def get_token():
     data = request.get_json()
     username = data.get("username")
@@ -24,6 +26,7 @@ def get_token():
 
 @bp.route("/user_info", methods=["GET"])
 @jwt_required()
+@limiter.limit('4/second')
 def get_user_data():
     username = get_jwt_identity()
     print(username)

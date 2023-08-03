@@ -185,9 +185,9 @@ class PaymentForm(FlaskForm):
 
 
 class TrackerInteract(FlaskForm):
-    name = StringField("Name: ", validators=[InputRequired()])
-    item = StringField("Item: ", validators=[InputRequired()])
-    rate = StringField("Rate: ", validators=[InputRequired(), Length(min=1, max=5)])
-    action = StringField("action", validators=[InputRequired()])
-    old_name = StringField("old name", validators=[InputRequired()])
-    old_item = StringField("old item", validators=[InputRequired()])
+    name = StringField("Name: ", validators=[DataRequired()])
+    item = StringField("Item: ", validators=[DataRequired()])
+    rate = StringField("Rate: ", validators=[DataRequired(), Length(min=1, max=5)])
+    action = StringField("action", validators=[DataRequired()])
+    old_name = StringField("old name", validators=[DataRequired()])
+    old_item = StringField("old item", validators=[DataRequired()])

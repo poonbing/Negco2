@@ -7,12 +7,14 @@ from app.report import bp
 from .utils import ReportFunctions
 from flask_login import current_user, login_required
 import json
+from datetime import datetime
+import calendar
 
 
 
 @bp.route("/tracker_report", methods=['GET', 'POST'])
 @login_required
-@limiter.limit('2/second')
+@limiter.limit('4/second')
 def report():
     report_util = ReportFunctions()
     user = current_user.id
@@ -26,6 +28,7 @@ def report():
             nested_list.append(lists)
         nested_json_list = json.dumps(nested_list)
         nested_json_name = json.dumps(list_names)
+        num_days = calendar.monthrange(datetime.now().year, datetime.now().month)[1]
         trackers = report_util.retrieve_all_tracker_records(user)
-        return render_template('report/report.html', datapoints=nested_json_list, n=len(datapoint), name_list=nested_json_name, m=len(list_names), trackers=trackers)
+        return render_template('report/report.html', datapoints=nested_json_list, name_list=nested_json_name, n=len(list_names), trackers=trackers, num_days=num_days, target=report.energy_goals)
 

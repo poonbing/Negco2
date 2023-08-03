@@ -10,7 +10,7 @@
 <script>
     function createChart() {
         const height = 500;
-        const marginTop = 0;
+        const marginTop = 100;
         const marginRight = 0;
         const marginBottom = 10;
         const marginLeft = 0;
@@ -48,7 +48,7 @@
     }
     // Parameters
     let n = {{ n }};
-    let m = {{ m }};
+    let m = {{ num_days }};
 
     // Function to generate bumps
     function bumps(m) {
@@ -71,13 +71,35 @@
         return values;
     }
 
+    function divideAndUpdateValues(inputArray, divisor) {
+        if (divisor === 0) {
+            throw new Error("Divisor cannot be zero");
+        }
 
+        let yz_array = Array({{ n }}).fill().map(() => Array({{ num_days }}).fill(0));
+
+        for (let i = 0; i < inputArray.length; i++) {
+            const item = inputArray[i];
+
+            for (let j = 0; j < item.length; j++) {
+                const dividedValue = item[j] / (divisor/{{ num_days }});
+                console.log(dividedValue)
+                yz_array[i][j] = dividedValue;
+                console.log(yz_array)
+            }
+        }
+
+        return yz_array;
+    }
+
+const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
 
     // Data
     let xz = d3.range(m);
-    let yz = d3.range(n).map(() => {{ datapoints }});
+    let yz = resultArray;
     console.log(xz)
     console.log(yz)
+    console.log({{ datapoints }})
 
     // Layout
     let layout = "stacked";  // or "grouped"
@@ -87,6 +109,12 @@
     // Update
     let update = chart.update(layout);
 </script>
+<div>
+    <input type="radio" id="grouped" name="layout" value="grouped">
+    <label for="grouped">Grouped</label><br>
+    <input type="radio" id="stacked" name="layout" value="stacked" checked>
+    <label for="stacked">Stacked</label>
+</div>
 <script>
     // Function to change layout mode
     function changeLayoutMode(newLayout) {
@@ -102,12 +130,11 @@
     });
 </script>
 <div>
-    <input type="radio" id="grouped" name="layout" value="grouped">
-    <label for="grouped">Grouped</label><br>
-    <input type="radio" id="stacked" name="layout" value="stacked" checked>
-    <label for="stacked">Stacked</label>
+    {% for tracker in trackers %}
+        <div style="border:2px; width: 50px;"></div>
+        <br>
+    {% endfor %}
 </div>
-
 {% include 'footer.html' %}
   </body>
 </html>

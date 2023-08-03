@@ -4,11 +4,13 @@ from sqlalchemy import desc, not_
 from flask_login import current_user
 
 # Local Modules
+from app import limiter
 from app.main import bp
 from ..models import Products, Articles
 
 
 @bp.route("/")
+@limiter.limit('20/second')
 def index():
     articles = Articles.query.order_by(desc(Articles.date_added)).limit(3)
     products = Products.query.order_by(desc(Products.date_added)).limit(4)
