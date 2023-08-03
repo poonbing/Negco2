@@ -11,12 +11,12 @@ content %}
     alt="image description"
   />
 </div>
-<div class="lg:grid grid-cols-3 mb-6">
+<div class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 mb-6">
   {% for article in articles %}
   <div
     class="max-w-md bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mx-auto mt-4"
   >
-    <a href="#">
+    <a href="{{url_for('articles.articlePage', id=article.id)}}">
       <img class="rounded-t-lg" src="/static/images/{{article.image}}" alt="" />
     </a>
     <div class="p-5">
@@ -33,7 +33,7 @@ content %}
       </p>
       <a
         href="{{url_for('articles.articlePage', id=article.id)}}"
-        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-teal-500 rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 duration-500"
+        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 duration-500"
       >
         Read more
         <svg

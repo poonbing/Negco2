@@ -41,7 +41,7 @@ def articlePage(id):
 @limiter.limit('2/second')
 def publishArticle():
     form = createArticle()
-    if request.method == "POST":
+    if form.validate_on_submit():
         title = form.title.data
         description = form.description.data
         writer = form.writer.data
@@ -79,7 +79,7 @@ def publishArticle():
 def viewArticle():
     page = request.args.get("page", 1, type=int)
     articles = Articles.query.order_by(Articles.date_added.desc()).paginate(
-        per_page=1, page=page
+        per_page=4, page=page
     )
     return render_template("articles/viewArticle.html", articles=articles)
 

@@ -36,7 +36,7 @@ from ..extensions import db, mail
 @limiter.limit('4/second')
 def publishProduct():
     form = createProduct()
-    if request.method == "POST":
+    if form.validate_on_submit():
         brand = form.brand.data
         name = form.name.data
         description = form.description.data
@@ -97,7 +97,7 @@ def publishProduct():
 def viewProduct():
     page = request.args.get("page", 1, type=int)
     products = Products.query.order_by(Products.date_added.desc()).paginate(
-        per_page=4, page=page
+        per_page=6, page=page
     )
     return render_template("products/viewProduct.html", products=products)
 
@@ -106,7 +106,8 @@ def viewProduct():
 def updateProduct(id):
     form = createProduct()
     product_to_update = Products.query.get_or_404(id)
-    if request.method == "POST":
+    if request.method == 'POST':
+        product_to_update.brand = form.brand.data
         product_to_update.name = form.name.data
         product_to_update.description = form.description.data
         product_to_update.price = form.price.data
@@ -130,6 +131,7 @@ def updateProduct(id):
         except:
             return "Opps! Looks like something went wrong."
     else:
+        form.brand.data = product_to_update.brand
         form.name.data = product_to_update.name
         form.description.data = product_to_update.description
         form.price.data = product_to_update.price
@@ -184,7 +186,7 @@ def productPage(id):
 @bp.route("/allProducts", methods=["GET", "POST"])
 def allProducts():
     page = request.args.get("page", 1, type=int)
-    products = Products.query.paginate(per_page=4, page=page)
+    products = Products.query.paginate(per_page=8, page=page)
     return render_template("products/allProducts.html", products=products)
 
 
@@ -192,7 +194,7 @@ def allProducts():
 def filterProducts(category):
     page = request.args.get("page", 1, type=int)
     products = Products.query.filter_by(category=category).paginate(
-        per_page=4, page=page
+        per_page=8, page=page
     )
     return render_template(
         "products/filteredProducts.html", products=products, category=category
@@ -261,7 +263,6 @@ def view_cart():
 
 @bp.route("/update_quantity/<string:product_id>", methods=["GET", "POST"])
 def update_quantity(product_id):
-    csrf_token = request.form.get("csrf_token")
     quantity = int(request.form.get("quantity"))
     cart_item = CartItem.query.filter_by(
         product_id=product_id, user_id=current_user.id

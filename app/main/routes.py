@@ -6,7 +6,7 @@ from flask_login import current_user
 # Local Modules
 from app import limiter
 from app.main import bp
-from ..models import Products, Articles, Post
+from ..models import Products, Articles
 
 
 @bp.route("/")

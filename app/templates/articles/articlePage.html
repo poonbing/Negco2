@@ -1,16 +1,17 @@
 {% extends 'layout.html' %} {% block content %}
 <!-- Container for demo purpose -->
 <div class="container my-24 mx-auto md:px-6">
+  <h1 class="mb-6 text-3xl font-bold mx-16 text-center text-zinc-800">{{article_to_view.title}}</h1>
   <!-- Section: Design Block -->
   <section class="mb-32 mx-10">
     <img
       src="/static/images/{{article_to_view.image}}"
-      class="mb-6 w-full rounded-lg shadow-lg dark:shadow-black/20"
+      class="mb-6 w-auto rounded-lg shadow-lg dark:shadow-black/20 mx-auto"
       alt="image"
     />
 
     <div class="mb-6 flex items-center">
-      <div>
+      <div class="mx-auto">
         <span>
           Published on
           <u class="no-underline">{{article_to_view.date_added.date()}}</u> by
@@ -19,9 +20,8 @@
       </div>
     </div>
     <hr class="h-px my-8 bg-gray-200 border-2 dark:bg-gray-700" />
-    <h1 class="mb-6 text-3xl font-bold">{{article_to_view.title}}</h1>
     <div class="flex flex-col space-y-8">
-      <p class="text-left bg-sky-600 p-4 rounded-lg text-white">
+      <p class="text-left p-4 rounded-lg text-zinc-800 lg:mx-60">
         {{article_to_view.paragraph}}
       </p>
     </div>
@@ -30,8 +30,8 @@
 </div>
 <hr class="h-px my-8 bg-gray-200 border-2 dark:bg-gray-700" />
 
-<h2 class="text-3xl font-semibold text-center">Related Articles</h2>
-<div class="lg:grid grid-cols-3 mb-6">
+<h2 class="text-3xl font-semibold text-center text-zinc-800">Related Articles</h2>
+<div class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 mb-6">
   {% for article in more_article %}
   <div
     class="max-w-md bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mx-auto mt-4"
