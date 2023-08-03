@@ -2,7 +2,7 @@
 from flask import render_template, request, url_for, session, redirect, flash, escape, Response, jsonify
 from flask_login import current_user
 from werkzeug.utils import secure_filename
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, not_
 from uuid import uuid4
 import os
 # checkout module
@@ -185,6 +185,13 @@ def filterProducts(category):
     return render_template(
         "products/filteredProducts.html", products=products, category=category
     )
+
+@bp.route("/productsOnSale", methods=["GET", "POST"])
+def productsOnSale():
+    products_on_sale = Products.query.filter(not_(Products.offered_price.is_(None))).all()
+    return render_template(
+        "products/productsOnSale.html", products_on_sale=products_on_sale)
+
 
 
 @bp.route("/add_to_cart/<string:product_id>")
