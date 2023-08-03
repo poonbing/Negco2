@@ -79,11 +79,12 @@ content %}
     </div>
     <div id="redirect to report">
         <form method="POST" action="/tracker_report">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <button type="submit">Report</button>
         </form>
     </div>
     <form method="POST" id="trackerForm" style="display: none;">
-        {{ form.csrf }}
+        {{ form.hidden_tag() }}
         <div>{{ form.name.label }} {{ form.name(id='nameField', value='None') }}</div>
         <div> {{ form.item.label }} {{ form.item(id='itemField', value='None') }}</div>
         <div>{{ form.rate.label }} {{ form.rate(id='rateField', value='None') }}</div>
@@ -92,4 +93,17 @@ content %}
         <div>{{ form.old_item(id='olditemField', value='None', style='display: none;') }}</div>
         <div><button type="submit">Submit</button></div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const submitButton = document.getElementById('submit-button');
+          const formInputs = document.querySelectorAll('input[required]');
+      
+          formInputs.forEach(input => {
+            input.addEventListener('input', () => {
+              const allInputsFilled = Array.from(formInputs).every(input => input.value.trim() !== '');
+              submitButton.disabled = !allInputsFilled;
+            });
+          });
+        });
+      </script>
 {% endblock %}
