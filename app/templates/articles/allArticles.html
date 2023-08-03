@@ -1,16 +1,21 @@
 {% extends "layout.html" %} {% block title %} Home {% endblock %} {% block
 content %}
-<div class="grid grid-cols-2 bg-gray-50">
-  <p class="text-center my-auto text-gray-900">
-    <span class="text-4xl font-semibold">Sustainability News</span><br />
-    Get updated on what is happening with our environment.<br />
-  </p>
-  <img
-    class="h-auto max-w-3xl ml-auto"
-    src="/static/images/article-page-image.jpg"
-    alt="image description"
-  />
+<!-- Jumbotron -->
+<div
+  class="relative overflow-hidden rounded-lg bg-cover bg-no-repeat p-12 text-center"
+  style="background-image: url('/static/images/article-page-image.jpg'); height: 600px">
+  <div
+    class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-fixed"
+    style="background-color: rgba(0, 0, 0, 0.6)">
+    <div class="flex h-full items-center justify-center">
+      <div class="text-white">
+        <h2 class="mb-4 text-4xl font-semibold">SUSTAINABILITY NEWS</h2>
+        <h4 class="mb-6 text-xl font-semibold">GET UPDATED</h4>
+      </div>
+    </div>
+  </div>
 </div>
+<!-- Jumbotron -->
 <div class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 mb-6">
   {% for article in articles %}
   <div
@@ -28,7 +33,7 @@ content %}
           {{article.title}}
         </h5>
       </a>
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+      <p class="mb-3 font-normal text-gray-600 dark:text-gray-400">
         {{article.description}}
       </p>
       <a
