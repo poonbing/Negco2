@@ -1,5 +1,14 @@
 # Python Modules
-from flask import redirect, render_template, request, url_for, abort, flash, send_file, current_app
+from flask import (
+    redirect,
+    render_template,
+    request,
+    url_for,
+    abort,
+    flash,
+    send_file,
+    current_app,
+)
 from flask_login import current_user, login_required
 from io import BytesIO
 
@@ -88,22 +97,6 @@ def settings():
         sessions=sessions,
         form=form,
     )
-
-
-@bp.route("/delete_user/<string:user_id>", methods=["POST"])
-@limiter.limit("4/second")
-def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    try:
-        db.session.delete(user)
-        db.session.commit()
-        current_app.logger.info(f'User Deleted: {user.username}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Management'})
-        flash(f"User {user.username} deleted successfully", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"An error occurred while deleting the user: {str(e)}", "error")
-
-    return redirect(url_for("management.show_users"))
 
 
 @bp.route("/<string:user_id>/settings", methods=["GET", "POST"])
