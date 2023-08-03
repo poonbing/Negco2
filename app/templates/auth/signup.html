@@ -27,6 +27,13 @@ content %}
           >
             Create an account
           </h1>
+          {% with messages = get_flashed_messages() %} {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <p class="text-red-500">{{ message }}</p>
+            {% endfor %}
+          </ul>
+          {% endif %} {% endwith %}
           <form method="POST" action="{{ url_for('auth.signup') }}">
             {{ form.csrf_token }}
 

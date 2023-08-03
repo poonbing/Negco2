@@ -1,11 +1,12 @@
 {% extends "layout.html" %} {% block title %} Home {% endblock %} {% block
 content %}
-<div id="animation-carousel" class="relative w-full" data-carousel="static">
+<div id="animation-carousel" class="relative w-full z-0" data-carousel="static">
   <!-- Carousel wrapper -->
   <div class="relative h-56 overflow-hidden rounded-lg md:h-screen">
     <!-- Item 1 -->
     <div class="hidden duration-200 ease-linear" data-carousel-item>
-      <a href="/allProducts"><img
+      <a href="/allProducts"
+        ><img
           src="/static/images/carousel1.jpg"
           class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
           alt="..."
@@ -14,39 +15,43 @@ content %}
     </div>
     <!-- Item 2 -->
     <div class="hidden duration-200 ease-linear" data-carousel-item>
-      <a href="/allProducts"><img
-        src="/static/images/carousel2.jpg"
-        class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
-        alt="..."
-      />
-    </a>
+      <a href="/allProducts"
+        ><img
+          src="/static/images/carousel2.jpg"
+          class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
+          alt="..."
+        />
+      </a>
     </div>
     <!-- Item 3 -->
     <div class="hidden duration-200 ease-linear" data-carousel-item="active">
-      <a href="/allArticles"><img
-        src="/static/images/carousel3.jpg"
-        class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
-        alt="..."
-      />
-    </a>
+      <a href="/allArticles"
+        ><img
+          src="/static/images/carousel3.jpg"
+          class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
+          alt="..."
+        />
+      </a>
     </div>
     <!-- Item 4 -->
     <div class="hidden duration-200 ease-linear" data-carousel-item>
-      <a href="/allProducts"><img
-        src="/static/images/carousel4.jpg"
-        class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
-        alt="..."
-      />
-    </a>
+      <a href="/allProducts"
+        ><img
+          src="/static/images/carousel4.jpg"
+          class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
+          alt="..."
+        />
+      </a>
     </div>
     <!-- Item 5 -->
     <div class="hidden duration-200 ease-linear" data-carousel-item>
-      <a href="/allProducts"><img
-        src="/static/images/carousel5.jpg"
-        class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
-        alt="..."
-      />
-    </a>
+      <a href="/allProducts"
+        ><img
+          src="/static/images/carousel5.jpg"
+          class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 hover:grayscale transition-all duration-500"
+          alt="..."
+        />
+      </a>
     </div>
   </div>
   <!-- Slider controls -->
@@ -160,10 +165,12 @@ content %}
     alt="image description"
   />
   <p class="text-center text-white my-auto">
-    <span class="text-4xl font-semibold">Did you know?</span><br/>
-    With growing environmental consciousness, most Singaporeans are making conscious <br>
-    efforts to reduce their household electricity use (89%). <br>
-    This includes reducing the use of air conditioning and fans when not needed (81%); <br>
+    <span class="text-4xl font-semibold">Did you know?</span><br />
+    With growing environmental consciousness, most Singaporeans are making
+    conscious <br />
+    efforts to reduce their household electricity use (89%). <br />
+    This includes reducing the use of air conditioning and fans when not needed
+    (81%); <br />
     and choosing more energy efficient home appliances (52%).
   </p>
 </div>

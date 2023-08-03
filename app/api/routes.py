@@ -2,9 +2,11 @@ from flask import jsonify, request
 from app.api import bp
 from ..models import User, Report
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from ..extensions import csrf
 
 
 @bp.route("/token", methods=["POST"])
+@csrf.exempt
 def get_token():
     data = request.get_json()
     username = data.get("username")
@@ -32,7 +34,15 @@ def get_user_data():
             item_name="total", related_user=user.id
         ).first()
 
-    if user_data:
-        return jsonify({"user_data": user_data})
+        if user_data:
+            user_data_dict = {
+                "username": user.username,
+                "item_name": user_data.item_name,
+                "month": user_data.month,
+                "year": user_data.year,
+                "total_usage": user_data.total_usage,
+                "energy_goals": user_data.energy_goals,
+            }
+            return jsonify({"user_data": user_data_dict})
     else:
         return jsonify({"message": "User data not found"}), 404

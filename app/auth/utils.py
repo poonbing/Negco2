@@ -1,13 +1,6 @@
 from flask import redirect, url_for
 from flask_login import current_user
-from ..extensions import db
 from functools import wraps
-
-
-def init_and_commit(cls, attributes):
-    instance = cls(**attributes)
-    db.session.add(instance)
-    db.session.commit()
 
 
 def not_logged_in_required(view_func):

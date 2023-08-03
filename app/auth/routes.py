@@ -3,12 +3,11 @@ from flask import render_template, request, redirect, url_for, flash, current_ap
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import or_
 from datetime import datetime
-from uuid import uuid4
 
 
 # Local Modules
 from app.auth import bp
-from .utils import init_and_commit, not_logged_in_required
+from .utils import not_logged_in_required
 from ..models import User, Session, OAuthUser
 from ..forms import LoginForm, SignUpForm
 from ..extensions import login_manager, oauth, db
@@ -72,14 +71,14 @@ def login():
                 current_app.logger.error(f"Authorization failed for Login")
 
             else:
-                session_attributes = {
-                    "user_id": user.id,
-                    "last_activity": datetime.now(),
-                    "ip_address": request.remote_addr,
-                    "user_agent": request.user_agent.string,
-                }
-
-                init_and_commit(Session, session_attributes)
+                sess = Session(
+                    user.id,
+                    datetime.now(),
+                    request.remote_addr,
+                    request.user_agent.string,
+                )
+                db.session.add(sess)
+                db.session.commit()
 
                 user.reset_login_attempts()
                 login_user(user)
@@ -167,18 +166,19 @@ def signup():
             flash("Passwords do not match. Please try again.", "error")
 
         else:
-            user_attributes = {
-                "username": username,
-                "password": password,
-                "role": "user",
-                "email": email,
-                "gender": gender,
-                "first_name": first_name,
-                "last_name": last_name,
-                "age": age,
-                "phone": phone,
-            }
-            init_and_commit(User, user_attributes)
+            user = User(
+                username,
+                password,
+                "user",
+                email,
+                gender,
+                first_name,
+                last_name,
+                age,
+                phone,
+            )
+            db.session.add(user)
+            db.session.commit()
 
             return redirect(url_for("auth.login"))
 
