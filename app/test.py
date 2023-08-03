@@ -3,9 +3,7 @@ from io import BytesIO
 import re
 
 
-def resize(
-    image_input, width=None, height=None, antialias=True, keep_aspect_ratio=True
-):
+def resize(image_input, width=None, height=None, keep_aspect_ratio=True):
     if isinstance(image_input, str):
         with open(image_input, "rb") as file:
             image_bytes = file.read()
@@ -32,9 +30,6 @@ def resize(
         elif height is None:
             height = int(width * original_height / original_width)
 
-    if antialias:
-        foo = foo.resize((width, height), Image.ANTIALIAS)
-    else:
         foo = foo.resize((width, height))
 
     output_bytes = BytesIO()
