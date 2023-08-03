@@ -1,5 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Email, Length, EqualTo, DataRequired, NumberRange
+from wtforms.validators import (
+    InputRequired,
+    Email,
+    Length,
+    EqualTo,
+    ValidationError,
+    NumberRange,
+    DataRequired,
+)
 from wtforms import (
     StringField,
     SubmitField,
@@ -10,7 +18,7 @@ from wtforms import (
     DecimalField,
     PasswordField,
     BooleanField,
-    DateField
+    DateField,
 )
 import datetime
 from wtforms_components import DateTimeField, DateRange
@@ -22,7 +30,9 @@ class SettingsForm(FlaskForm):
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
     phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
-    gender = StringField("Gender")
+    gender = SelectField(
+        "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
+    )
     email = StringField("Email", validators=[Email()])
     password = PasswordField("Password")
     confirm_password = PasswordField(
@@ -31,12 +41,16 @@ class SettingsForm(FlaskForm):
 
 
 class createArticle(FlaskForm):
-    title = StringField("Title of Article:", validators=[InputRequired(), Length(min=3, max=50)])
+    title = StringField(
+        "Title of Article:", validators=[InputRequired(), Length(min=3, max=50)]
+    )
     description = TextAreaField(
         "Description:", validators=[InputRequired()], render_kw={"rows": 1}
     )
     writer = StringField("Writer:", validators=[InputRequired(), Length(min=3, max=20)])
-    image = FileField("Image:", validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
+    image = FileField(
+        "Image:", validators=[FileRequired(), FileAllowed(["jpg", "jpeg", "png"])]
+    )
     paragraph = TextAreaField(
         "Paragraph:", validators=[InputRequired()], render_kw={"rows": 30}
     )
@@ -44,17 +58,29 @@ class createArticle(FlaskForm):
 
 
 class createProduct(FlaskForm):
-    brand = StringField("Brand of Product:", validators=[InputRequired(), Length(min=2, max=20)])
-    name = StringField("Name of Product:", validators=[InputRequired(), Length(min=3, max=20)])
+    brand = StringField(
+        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=20)]
+    )
+    name = StringField(
+        "Name of Product:", validators=[InputRequired(), Length(min=3, max=20)]
+    )
     description = TextAreaField(
         "Description:", validators=[InputRequired()], render_kw={"rows": 8}
     )
     category = SelectField(
         "Category:", choices=[("On-the-go"), ("Kitchen"), ("Bathroom")]
     )
-    price = DecimalField("Price of product($):", places=2, validators=[InputRequired(), NumberRange(min=0, max=999)])
-    offer = IntegerField("Offer(%)", validators=[InputRequired(), NumberRange(min=0, max=100)])
-    image = FileField("Image:", validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
+    price = DecimalField(
+        "Price of product($):",
+        places=2,
+        validators=[InputRequired(), NumberRange(min=0, max=999)],
+    )
+    offer = IntegerField(
+        "Offer(%)", validators=[InputRequired(), NumberRange(min=0, max=100)]
+    )
+    image = FileField(
+        "Image:", validators=[FileRequired(), FileAllowed(["jpg", "jpeg", "png"])]
+    )
     submit = SubmitField("Submit")
 
 
@@ -91,13 +117,77 @@ class SignUpForm(FlaskForm):
     phone = StringField("Phone", validators=[InputRequired()])
 
 
-class PaymentForm(FlaskForm):
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    submit = SubmitField("Submit")
 
-    #Field types followed by label and data validators
-    credit_card_number = StringField('Card Details', [DataRequired(), Length(min=13, max=16, message="Invalid Credit Card Number")], render_kw={"placeholder": "xxxx-xxxx-xxxx-xxxx"})
-    card_holder = StringField('Credit Card Holder', [DataRequired(), Length(min=5, max=49, message="Invalid Length")], render_kw={"placeholder": "Name on the Card"})
-    expiration_date = DateField('Expiry Date (YYYY-MM-DD)', [DataRequired(), DateRange(min=datetime.datetime.today().date(), max=datetime.date(2030, 12, 31))], format='%Y-%m-%d')
-    security_code = StringField('CVC', [DataRequired(), Length(min=3, max=3, message="Length should be 3 digits")], render_kw={"placeholder": "CVC"})
-    amount = DecimalField('Subtotal')
-    submit = SubmitField('Place Order')
-    
+
+class AccessCodeForm(FlaskForm):
+    access_code = IntegerField(
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    submit = SubmitField("Submit")
+
+
+class AccessCodeForm(FlaskForm):
+    access_code = IntegerField(
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[InputRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+
+class PaymentForm(FlaskForm):
+    # Field types followed by label and data validators
+    credit_card_number = StringField(
+        "Card Details",
+        [DataRequired(), Length(min=13, max=16, message="Invalid Credit Card Number")],
+        render_kw={"placeholder": "xxxx-xxxx-xxxx-xxxx"},
+    )
+    card_holder = StringField(
+        "Credit Card Holder",
+        [DataRequired(), Length(min=5, max=49, message="Invalid Length")],
+        render_kw={"placeholder": "Name on the Card"},
+    )
+    expiration_date = DateField(
+        "Expiry Date (YYYY-MM-DD)",
+        [
+            DataRequired(),
+            DateRange(
+                min=datetime.datetime.today().date(), max=datetime.date(2030, 12, 31)
+            ),
+        ],
+        format="%Y-%m-%d",
+    )
+    security_code = StringField(
+        "CVC",
+        [DataRequired(), Length(min=3, max=3, message="Length should be 3 digits")],
+        render_kw={"placeholder": "CVC"},
+    )
+    amount = DecimalField("Subtotal")
+    submit = SubmitField("Place Order")
+
+
+class TrackerInteract(FlaskForm):
+    name = StringField("Name: ", validators=[InputRequired()])
+    item = StringField("Item: ", validators=[InputRequired()])
+    rate = StringField("Rate: ", validators=[InputRequired(), Length(min=1, max=5)])
+    action = StringField("action", validators=[InputRequired()])
+    old_name = StringField("old name", validators=[InputRequired()])
+    old_item = StringField("old item", validators=[InputRequired()])

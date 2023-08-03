@@ -2,80 +2,8 @@
 <html>
   <head>
     <title>Tracker Web App</title>
-    <script>
-      function startTimer(startTime, elementId) {
-        if (startTime !== "None") {
-          var startDate = new Date(startTime);
-          var element = document.getElementById(elementId);
-          document.getElementById("start_tracker").innerHTML = "Stop";
-          var interval = setInterval(function () {
-            var currentDate = new Date();
-            var elapsedTime = currentDate - startDate;
-
-            var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-            var minutes = Math.floor(
-              (elapsedTime % (1000 * 60 * 60)) / (1000 * 60)
-            );
-            var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-
-            var elapsedTimeString =
-              hours + "h " + minutes + "m " + seconds + "s";
-
-            element.innerHTML = elapsedTimeString;
-          }, 1000);
-        }
-      }
-
-      function toggleform(index, name, item, rate, method) {
-        var form = document.getElementById("item_form");
-        var new_name = document.getElementById("new_name");
-        var new_item = document.getElementById("new_item");
-        var new_rate = document.getElementById("new_rate");
-        var item_index = document.getElementById("item_index");
-        var form_action = document.getElementById("form_action");
-        var form_label = document.getElementById("form_action_header");
-
-        form_action.value = method;
-        form_label.innerHTML = method;
-        new_name.value = name;
-        new_item.value = item;
-        new_rate.value = rate;
-        item_index.value = index;
-        form.style.display = "flex";
-      }
-
-      function closedisplay(item) {
-        var item = document.getElementById(item);
-        item.style.display = "none";
-      }
-
-      function opendisplay(item, type) {
-        var item = document.getElementById(item);
-        item.style.display = type;
-      }
-    </script>
-    <script>
-      var ctx = document.getElementById("myChart").getContext("2d");
-      var dates = JSON.parse(document.getElementById("y-axis").innerHTML);
-      var dataset = JSON.parse(document.getElementById("x-axis").innerHTML);
-      var data = {
-        labels: dataset,
-        datasets: [
-          {
-            label: "Example Dataset",
-            data: dates,
-            borderColor: "black",
-            fill: false,
-          },
-        ],
-      };
-
-      var myChart = new Chart(ctx, {
-        type: "line",
-        data: data,
-        options: {},
-      });
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
   </head>
   <body>
     {% include 'navbar.html' %} {% block content %} {% endblock %} {% include

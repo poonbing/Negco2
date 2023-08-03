@@ -1,7 +1,5 @@
 # Python Modules
 from flask import redirect, render_template, request, url_for, abort, flash, send_file
-from flask_dance.contrib.google import google
-from flask_dance.contrib.github import github
 from flask_login import current_user, login_required
 from io import BytesIO
 
@@ -57,21 +55,15 @@ def settings():
 
     if form.validate_on_submit():
         if form.profile_picture.data:
-            user.profile_picture = form.profile_picture.data
+            user.profile_picture = form.profile_picture.data.read()
 
-            user.first_name = form.first_name.data
-            user.last_name = form.last_name.data
-            user.phone = form.phone.data
-            user.gender = form.gender.data
-            user.email = form.email.data
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.phone = form.phone.data
+        user.gender = form.gender.data
+        user.email = form.email.data
 
-        password_updated = update_password(user, form)
-
-        if password_updated:
-            db.session.commit()
-            flash("User information updated successfully!", "success")
-        else:
-            flash("Password and confirm password do not match.", "error")
+        db.session.commit()
 
     return render_template(
         "management/settings.html",
@@ -81,13 +73,11 @@ def settings():
     )
 
 
-@bp.route("/<int:no>/settings", methods=["GET", "POST"])
+@bp.route("/<int:user_id>/settings", methods=["GET", "POST"])
 @login_required
-def admin_settings(no):
-    if current_user.role != "admin" and current_user.id != no:
-        abort(403)
-
-    user = User.query.get(no)
+@role_required("admin")
+def admin_settings(user_id):
+    user = User.query.get(user_id)
     form = SettingsForm()
     sessions = Session.query.filter_by(user_id=user.id).all()
 
@@ -95,16 +85,16 @@ def admin_settings(no):
         if form.profile_picture.data:
             user.profile_picture = form.profile_picture.data.read()
 
-            user.first_name = form.first_name.data
-            user.last_name = form.last_name.data
-            user.phone = form.phone.data
-            user.gender = form.gender.data
-            user.email = form.email.data
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.phone = form.phone.data
+        user.gender = form.gender.data
+        user.email = form.email.data
 
-            db.session.commit()
+        db.session.commit()
 
     return render_template(
-        "management/settings.html",
+        "management/admin_settings.html",
         user=user,
         sessions=sessions,
         form=form,
@@ -117,20 +107,3 @@ def dashboard():
     user = current_user
 
     return render_template("management/dashboard.html", username=user.username)
-
-
-@bp.route("/profile")
-def profile():
-    if google.authorized:
-        account_info = get_account_info(google, "/oauth2/v2/userinfo")
-    elif github.authorized:
-        account_info = get_account_info(github, "/user")
-    else:
-        return redirect(url_for("auth.login"))
-
-
-def get_account_info(provider, endpoint):
-    info = provider.get(endpoint)
-    if info.ok:
-        account_info = info.json()
-        return account_info
