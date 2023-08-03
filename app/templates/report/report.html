@@ -9,13 +9,13 @@
     {% include 'navbar.html' %}
 <script>
     function createChart() {
-        const height = 500;
+        const height = 800;
         const marginTop = 100;
         const marginRight = 0;
         const marginBottom = 10;
         const marginLeft = 0;
-        const barWidth = 20;  // The desired width of the bars in pixels
-        const barPadding = 2;  // The desired space between the bars in pixels
+        const barWidth = 30;  // The desired width of the bars in pixels
+        const barPadding = 5;  // The desired space between the bars in pixels
         const totalWidth = (barWidth + barPadding) * m;
         const width = totalWidth + marginLeft + marginRight;
         const y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)).map((data, i) => data.map(([y0, y1]) => [y0, y1, i]));
