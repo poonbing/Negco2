@@ -12,10 +12,11 @@ from flask import (
 from flask_login import current_user, login_required
 from io import BytesIO
 
+
 # Local Modules
 from app import limiter
 from app.management import bp
-from .utils import role_required, update_password
+from .utils import role_required, update_password, resize
 from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
@@ -110,7 +111,7 @@ def admin_settings(user_id):
 
     if form.validate_on_submit():
         if form.profile_picture.data:
-            user.profile_picture = form.profile_picture.data.read()
+            user.profile_picture = resize(form.profile_picture.data.read())
 
         user.first_name = form.first_name.data
         user.last_name = form.last_name.data
