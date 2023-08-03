@@ -87,3 +87,8 @@ class SignUpForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired()])
     age = IntegerField("Age", validators=[InputRequired()])
     phone = StringField("Phone", validators=[InputRequired()])
+
+class EditCommentForm(FlaskForm):
+    content = TextAreaField("Content", validators=[InputRequired()])
+    image = FileField("Image")
+    submit = SubmitField("Save")

@@ -2,13 +2,14 @@
 from flask import render_template, redirect, url_for, request, current_app, jsonify
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
+from config import Config
 import os
-
+from app.models import User
 # Local Modules
 from app.forum import bp
 from .utils import remove_html_tags
 from ..models import Comment, Post, Topic
-from ..forms import Comment_Submission, Post_Submission
+from ..forms import Comment_Submission, Post_Submission, EditCommentForm
 from ..extensions import db
 
 
@@ -75,6 +76,8 @@ def post(id):
         print("Form image data:", form.image.data)
         print("test3")
         user = current_user
+
+        print(type(current_user))
         print("test4")
         new_comment = Comment(commenter=user.id, post_id=id, content=remove_html_tags(form.content.data))
         if form.image.data:
@@ -82,13 +85,10 @@ def post(id):
             # Save the image as a file on the server
             filename = secure_filename(form.image.data.filename)
             print(filename)
-            UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'images')
-            current_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-            image=os.path.join(UPLOAD_FOLDER, filename)
+            image = form.image.data
+            image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
+            print(current_app)
             print(image)
-            form.image.data.save(filename)
-
-            # Set the image_path attribute in the Comment model
             new_comment.image = filename
         print("Success")
         print(new_comment)
@@ -104,10 +104,11 @@ def post(id):
     post = Post.query.get(id)
     if post:
         return render_template(
-            "forum/Comments.html", post=post, form=form, comment_list=comment_list
+            "forum/Comments.html", post=post, form=form, comment_list=comment_list, current_user = current_user
         )
     else:
         return render_template("error/404.html")
+
 
 @bp.route("/edit_comment/<int:comment_id>", methods=["POST"])
 @login_required
@@ -115,11 +116,13 @@ def edit_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
 
     # Check if the current user is the commenter and has permission to edit the comment
-    if current_user != comment.commenter:
-        abort(403)  # Return a forbidden error if the user doesn't have permission
+    if current_user.id != comment.commenter:
+        return jsonify({"success": False, "message": "Permission denied"}), 403
 
-    form = Comment_Submission()
+    form = EditCommentForm()
     if form.validate_on_submit():
+
+
         comment.content = remove_html_tags(form.content.data)
 
         # Check if an image is uploaded and save it if necessary
@@ -131,8 +134,12 @@ def edit_comment(comment_id):
             comment.image = filename
 
         db.session.commit()
-        return jsonify({"success": True, "message": "Comment updated successfully"})
+        return redirect(url_for("forum.post", id=comment.post_id))
 
-    # If the form data is not valid, return an error response
-    return jsonify({"success": False, "message": "Invalid form data"}), 400
+    # If the form data is not valid, render the post page with the error messages
+    post = Post.query.get(comment.post_id)
+    comment_list = Comment.query.filter_by(post_id=comment.post_id).all()
+    return render_template(
+        "forum/Comments.html", post=post, form=form, comment_list=comment_list
+    )
 
