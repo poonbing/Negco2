@@ -10,13 +10,7 @@
     />
   </head>
   <body class="bg-gray-100">
-    <div class="bg-gray-900 py-4">
-      <div class="container mx-auto px-4">
-        <h1 class="text-3xl font-bold text-white">
-          Official News and Information
-        </h1>
-      </div>
-    </div>
+
     <!DOCTYPE html>
     <html lang="en">
       <head>
@@ -28,23 +22,60 @@
           rel="stylesheet"
         />
       </head>
-      <body class="bg-gray-100">
-        <div class="bg-gray-900 py-4"></div>
+
+      <body class="">
+      <aside id="default-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+   <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+      <ul class="space-y-2 font-medium">
+         <li>
+            <a href="{{ url_for('forum.topic_posts', topic_id=1) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+               <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+
+               </svg>
+               <span class="ml-3">Rules and Regulations</span>
+            </a>
+         </li>
+         <li>
+            <a href="{{ url_for('forum.topic_posts', topic_id=2) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+               <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+
+               </svg>
+               <span class="flex-1 ml-3 whitespace-nowrap">General Discussion</span>
+
+            </a>
+         </li>
+         <li>
+            <a href="{{ url_for('forum.topic_posts', topic_id=3) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+               <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               </svg>
+               <span class="flex-1 ml-3 whitespace-nowrap">Bug Reports</span>
+
+            </a>
+         </li>
+         <li>
+            <a href="{{ url_for('forum.topic_posts', topic_id=4) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+               <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+               </svg>
+               <span class="flex-1 ml-3 whitespace-nowrap">Suggestion and feedback</span>
+            </a>
+         </li>
+      </ul>
+   </div>
+</aside>
+
         <div class="container mx-auto px-4 py-8">
-          {% block navbar %} {% include 'forum/PostCreation.html' %} {% endblock
-          %}
+          {% block navbar %} {% include 'forum/PostCreation.html' %} {% endblock %}
+          <div class="container mx-auto px-4 py-8">
           <div class="max-w-3xl mx-auto">
             <div class="flex flex-col space-y-6">
               {% for post in post_list %}
-              <div
-                class="bg-white border border-gray-300 rounded-lg overflow-hidden"
-              >
+              <div class="bg-white border border-gray-300 rounded-lg overflow-hidden">
                 <div class="bg-gray-200 p-4">
-                  <a href="{{ url_for('forum.post', id=post.id) }}"
-                    ><h2 class="text-xl font-bold text-gray-800">
+                  <a href="{{ url_for('forum.post', id=post.id) }}">
+                    <h2 class="text-xl font-bold text-gray-800">
                       {{ post.title }}
-                    </h2></a
-                  >
+                    </h2>
+                  </a>
                 </div>
                 <div class="p-4">
                   <p class="text-gray-800">{{ post.content | safe }}</p>
@@ -56,43 +87,33 @@
         </div>
       </body>
     </html>
+    <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+  <div class="flex flex-1 justify-between sm:hidden">
 
-    <div class="container mx-auto px-4 py-8">
-      <div class="max-w-3xl mx-auto">
-        <div class="flex flex-col space-y-6">
-          {% for post in Post_list %}
-          <div
-            class="bg-white border border-gray-300 rounded-lg overflow-hidden"
-          >
-            <div class="bg-gray-200 p-4">
-              <a href="{{ url_for('forum.post', id=post.get_post_id()) }}"
-                ><h2 class="text-xl font-bold text-gray-800">
-                  {{ post.title }}
-                </h2></a
-              >
-            </div>
-            <div class="p-4">
-              <p class="text-gray-800">{{ post.content | safe }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
+    <a href="{{ url_for('forum.topic_posts', topic_id=topic_id, page=page_num) }}" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+    <a href="{{ url_for('forum.topic_posts', topic_id=topic_id, page=page_num) }}" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+  </div>
+  <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+    <div>
     </div>
     <div>
-      {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
-      left_current = 1, right_current=2) %} {%if page_num%} {% if page ==
-      page_num %}
-      <a
-        href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
-        >{{page_num}}</a
-      >
-      {% else %}
-      <a
-        href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
-        >{{page_num}}
-      </a>
-      {% endif %} {% else %} ... {% endif %} {% endfor %}
+      <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+        {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+          {% if page_num %}
+            {% if page == page_num %}
+              <a href="{{ url_for('forum.topic_posts', topic_id=topic_id, page=page_num) }}" aria-current="page" class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus:ring-1 focus:ring-indigo-600">{{ page_num }}</a>
+            {% else %}
+              <a href="{{ url_for('forum.topic_posts', topic_id=topic_id, page=page_num) }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline focus:ring-1 focus:ring-indigo-600">{{ page_num }}</a>
+            {% endif %}
+          {% else %}
+            <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>
+          {% endif %}
+        {% endfor %}
+      </nav>
     </div>
+  </div>
+</div>
   </body>
 </html>
+
+
