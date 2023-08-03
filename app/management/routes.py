@@ -11,11 +11,12 @@ from ..models import User, LockedUser, Session
 from ..extensions import db
 from ..forms import SettingsForm
 from ..models import User
+from app import limiter
 
 
 @bp.route("/profile_picture")
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def profile_picture():
     user = current_user
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
@@ -24,7 +25,7 @@ def profile_picture():
 @bp.route("/show_users", methods=["GET"])
 @login_required
 @role_required("admin")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def show_users():
     all_users = User.query.all()
     return render_template("management/users.html", users=all_users)
@@ -33,7 +34,7 @@ def show_users():
 @bp.route("/locked-accounts", methods=["GET", "POST"])
 @login_required
 @role_required("admin")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def locked_accounts():
     if request.method == "POST":
         locked_account_ids = request.form.getlist("unlock_account")
@@ -51,9 +52,19 @@ def locked_accounts():
     )
 
 
+@bp.route("/delete/<string:user_id>")
+@limiter.limit("2/second")
+def delete_user(user_id):
+    user_to_delete = User.query.get_or_404(user_id)
+    db.session.delete(user_to_delete)
+    db.session.commit()
+    flash("User deleted succesfully!")
+    return redirect(url_for("management.show_users"))
+
+
 @bp.route("/settings", methods=["GET", "POST"])
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def settings():
     user = current_user
     form = SettingsForm()
@@ -80,7 +91,7 @@ def settings():
 
 
 @bp.route("/delete_user/<string:user_id>", methods=["POST"])
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     try:
@@ -98,7 +109,7 @@ def delete_user(user_id):
 @bp.route("/<string:user_id>/settings", methods=["GET", "POST"])
 @login_required
 @role_required("admin")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def admin_settings(user_id):
     user = User.query.get(user_id)
     form = SettingsForm()
@@ -125,7 +136,7 @@ def admin_settings(user_id):
 
 @bp.route("/dashboard")
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def dashboard():
     user = current_user
 
