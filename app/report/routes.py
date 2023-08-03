@@ -14,7 +14,7 @@ import calendar
 
 @bp.route("/tracker_report", methods=['GET', 'POST'])
 @login_required
-@limiter.limit('2/second')
+@limiter.limit('4/second')
 def report():
     report_util = ReportFunctions()
     user = current_user.id

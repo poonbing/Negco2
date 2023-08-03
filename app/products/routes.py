@@ -16,7 +16,7 @@ from sqlalchemy import func, and_, not_
 from config import Config
 from uuid import uuid4
 import os
-
+from app import limiter
 # checkout module
 import datetime
 import re
@@ -33,6 +33,7 @@ from ..extensions import db, mail
 
 
 @bp.route("/createProduct", methods=["POST", "GET"])
+@limiter.limit('4/second')
 def publishProduct():
     form = createProduct()
     if request.method == "POST":

@@ -6,6 +6,7 @@ from datetime import datetime
 
 
 # Local Modules
+from app import limiter
 from app.auth import bp
 from .utils import not_logged_in_required
 from ..models import User, Session, OAuthUser
@@ -14,6 +15,7 @@ from ..extensions import login_manager, oauth, db
 
 
 @login_manager.user_loader
+@limiter.limit('4/second')
 def user_loader(user_id):
     user = User.query.get(user_id)
 
@@ -30,17 +32,20 @@ def user_loader(user_id):
 
 
 @login_manager.unauthorized_handler
+@limiter.limit('4/second')
 def unauthorized():
     return redirect(url_for("auth.login"))
 
 
 @bp.route("/login_with_google")
+@limiter.limit('4/second')
 def login_with_google():
     redirect_uri = url_for("auth.auth", provider="google", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
 @bp.route("/login_with_azure")
+@limiter.limit('4/second')
 def login_with_azure():
     redirect_uri = url_for("auth.auth", provider="azure", _external=True)
     return oauth.azure.authorize_redirect(redirect_uri)
@@ -48,6 +53,7 @@ def login_with_azure():
 
 @bp.route("/login", methods=["GET", "POST"])
 @not_logged_in_required
+@limiter.limit('4/second')
 def login():
     xcaptcha = bp.xcaptcha
     form = LoginForm()
@@ -89,6 +95,7 @@ def login():
 
 
 @bp.route("/auth/<provider>")
+@limiter.limit('4/second')
 def auth(provider):
     if provider == "google":
         token = oauth.google.authorize_access_token()
@@ -133,6 +140,7 @@ def auth(provider):
 
 @bp.route("/logout")
 @login_required
+@limiter.limit('4/second')
 def logout():
     logout_user()
     return redirect(url_for("auth.login"))
@@ -140,6 +148,7 @@ def logout():
 
 @bp.route("/signup", methods=["GET", "POST"])
 @not_logged_in_required
+@limiter.limit('4/second')
 def signup():
     form = SignUpForm()
 

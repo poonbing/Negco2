@@ -12,6 +12,7 @@ from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
 
 
 @bp.route("/forgot_password", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def forgot_password():
     form = ForgotPasswordForm()
 
@@ -33,6 +34,7 @@ def forgot_password():
 
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def enter_access_code():
     current_app.logger.info(
         "Receive and confirm access code for password recovery from %s for %s",
@@ -67,6 +69,7 @@ def enter_access_code():
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for("management.dashboard"))
