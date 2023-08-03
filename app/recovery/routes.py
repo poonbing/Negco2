@@ -2,6 +2,7 @@
 from flask import redirect, url_for, render_template, request, flash, current_app
 from flask_login import current_user, login_required
 from app import limiter
+
 # Local Modules
 from app.recovery import bp
 from .utils import access_codes, generate_access_code, send_recovery_email
@@ -11,6 +12,7 @@ from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
 
 
 @bp.route("/forgot_password", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def forgot_password():
     form = ForgotPasswordForm()
 
@@ -32,8 +34,8 @@ def forgot_password():
 
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def enter_access_code():
-    current_app.logger.info('Receive and confirm access code for password recovery from %s for %s', request.remote_addr, request.path)
     email = request.args.get("email")
     if not email or email not in access_codes:
         return redirect(url_for("recovery.forgot_password"))
@@ -41,21 +43,23 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
+        print("reached here")
         entered_code = form.access_code.data
         correct_code = access_codes[email]
         if entered_code == correct_code:
+            print("Correct code")
             del access_codes[email]
             user = User.query.filter_by(email=email).first()
             token = user.get_reset_token()
             return redirect(url_for("recovery.reset_password", token=token))
         else:
-            current_app.logger.info('Returning invalid access code from %s for %s', request.remote_addr, request.path)
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email, form=form)
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
+@limiter.limit('4/second')
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for("management.dashboard"))
@@ -70,7 +74,7 @@ def reset_password(token):
 
     if form.validate_on_submit():
         new_password = request.form.get("password")
-        user.password = new_password
+        user.password = user.hash_password(new_password)
         db.session.commit()
         return redirect(url_for("auth.login"))
 

@@ -19,6 +19,11 @@
     >All ({{products.total}})</a
   >
   <a
+    href="/productsOnSale"
+    class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+    >Sale Corner</a
+  >
+  <a
     href="{{url_for('products.filterProducts', category='On-the-go')}}"
     class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
     >On-the-go</a
@@ -35,7 +40,7 @@
   >
 </div>
 
-<div class="lg:grid grid-cols-4 mb-6">
+<div class="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mb-6">
   {% for product in products %}
   <div
     class="w-full max-w-xs bg-white border border-gray-300 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mx-auto mt-8 hover:bg-gray-200 duration-500"

@@ -3,6 +3,7 @@ from flask import render_template, redirect, url_for, request
 from flask_login import current_user, login_required
 
 # Local Modules
+from app import limiter
 from app.forum import bp
 from .utils import remove_html_tags
 from ..models import Comment, Post, Topic
@@ -16,6 +17,7 @@ def allowed_file(filename):
 
 
 @bp.route("/forum")
+@limiter.limit('4/second')
 def home():
     topics = Topic.query.all()
     return render_template("forum/Home.html", topic=topics)
@@ -23,6 +25,7 @@ def home():
 
 @bp.route("/topics/<int:topic_id>/posts", methods=["GET", "POST"])
 @login_required
+@limiter.limit('4/second')
 def topic_posts(topic_id):
     print("Topic ID:", topic_id)
 
@@ -61,6 +64,7 @@ def topic_posts(topic_id):
 
 @bp.route("/post/<int:id>/", methods=["GET", "POST"])
 @login_required
+@limiter.limit('4/second')
 def post(id):
     db.session.rollback()
     comment_list = Comment.query.filter_by(post_id=id).all()

@@ -128,7 +128,6 @@ class TrackerFunctions:
     def end_tracker(self, id, user_id):
         tracker = Tracker.query.get(id)
         report = self.check_report(user_id, tracker.name)
-        total_report = self.check_report(user_id, 'Total')
         current_date = int(datetime.now().day)
         start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
         current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -136,20 +135,23 @@ class TrackerFunctions:
         current_time = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%S")
         total_usage = int(tracker.rate)*int(round((current_time - start_time).total_seconds()/60))
         if report != "Failed":
+            report = self.check_report(user_id, tracker.name)
             report.total_usage += total_usage
+            db.session.commit()
             list = report.datapoint
-            if len(list) < current_date:
-                list.append(total_usage)
-            elif len(list) >= current_date:
+            try:
                 list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
+            except: 
+                list.append(total_usage)
             report.datapoint = list
+            db.session.commit()
+            total_report = self.check_report(user_id, 'Total')
             total_report.total_usage += total_usage
+            db.session.commit()
             list2 = total_report.datapoint
-            if len(list2) < current_date:
-                list2.append(total_usage)
-            elif len(list2) >= current_date:
-                list2[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
+            list2[int(current_date-1)] = int(list2[int(current_date-1)]) + total_usage
             total_report.datapoint = list2
+            db.session.commit()
         else:
             current_month = datetime.now().strftime('%m')
             current_year = datetime.now().year
@@ -157,12 +159,12 @@ class TrackerFunctions:
             for i in range(current_date):
                 list.append(0)
             list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
-            new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=tracker.name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
+            new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=tracker.name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=list)
             db.session.add(new_report) 
             if self.check_report(user_id, 'Total') == 'Failed':
-                total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='Total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=53160, datapoint=list)
+                total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='Total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=list)
                 db.session.add(total_report)
-        db.session.commit()
+            db.session.commit()
 
     def delete_tracker_record(self, user_id, tracker):
         report = self.check_report(user_id, tracker.name)
@@ -182,7 +184,7 @@ class TrackerFunctions:
         except TypeError:
             pass
         db.session.delete(tracker)
-        db.session.commit
+        db.session.commit()
 
     def check_report(self, user_id, item_name):
         month = datetime.now().month
