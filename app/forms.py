@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+import re
 from wtforms.validators import (
     InputRequired,
     Email,
@@ -25,6 +26,27 @@ from wtforms_components import DateTimeField, DateRange
 from flask_wtf.file import FileRequired, FileAllowed
 
 
+def password_check(form, field):
+    password = field.data
+
+    length_error = len(password) < 8
+    digit_error = not re.search(r"\d", password)
+    uppercase_error = not re.search(r"[A-Z]", password)
+    lowercase_error = not re.search(r"[a-z]", password)
+    symbol_error = not re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password)
+
+    if (
+        length_error
+        or digit_error
+        or uppercase_error
+        or lowercase_error
+        or symbol_error
+    ):
+        raise ValidationError(
+            "Password must be at least 8 characters long and contain at least one digit, one uppercase letter, one lowercase letter, and one symbol."
+        )
+
+
 class SettingsForm(FlaskForm):
     profile_picture = FileField("Profile Picture")
     first_name = StringField("First Name", validators=[InputRequired()])
@@ -45,14 +67,18 @@ class createArticle(FlaskForm):
         "Title of Article:", validators=[InputRequired(), Length(min=3, max=100)]
     )
     description = TextAreaField(
-        "Description:", validators=[InputRequired(), Length(min=3, max=300)], render_kw={"rows": 1}
+        "Description:",
+        validators=[InputRequired(), Length(min=3, max=300)],
+        render_kw={"rows": 1},
     )
     writer = StringField("Writer:", validators=[InputRequired(), Length(min=3, max=50)])
     image = FileField(
         "Image:", validators=[FileRequired(), FileAllowed(["jpg", "jpeg", "png"])]
     )
     paragraph = TextAreaField(
-        "Paragraph:", validators=[InputRequired(), Length(min=100, max=1000000)], render_kw={"rows": 30}
+        "Paragraph:",
+        validators=[InputRequired(), Length(min=100, max=1000000)],
+        render_kw={"rows": 30},
     )
     submit = SubmitField("Submit")
 
@@ -65,7 +91,9 @@ class createProduct(FlaskForm):
         "Name of Product:", validators=[InputRequired(), Length(min=3, max=50)]
     )
     description = TextAreaField(
-        "Description:", validators=[InputRequired(), Length(min=10, max=1000)], render_kw={"rows": 8}
+        "Description:",
+        validators=[InputRequired(), Length(min=10, max=1000)],
+        render_kw={"rows": 8},
     )
     category = SelectField(
         "Category:", choices=[("On-the-go"), ("Kitchen"), ("Bathroom")]
@@ -103,7 +131,7 @@ class LoginForm(FlaskForm):
 
 class SignUpForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired()])
-    password = PasswordField("Password", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired(), password_check])
     confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
     email = StringField("Email", validators=[InputRequired(), Email()])
     gender = SelectField(
