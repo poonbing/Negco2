@@ -6,6 +6,7 @@ from .models import CartItem
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging
+
 # Local Modules
 from config import Config
 from .extensions import db, mail, login_manager, oauth, csrf, jwt
@@ -13,16 +14,18 @@ from .models import CartItem, Log
 from flask_wtf.csrf import CSRFProtect
 import secrets
 
-                  #storage_uri="mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2")
+# storage_uri="mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2")
 limiter = Limiter(key_func=get_remote_address)
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     key = secrets.token_urlsafe(16)
     csrf = CSRFProtect()
-    app.config['SECRET_KEY'] = key
+    app.config["SECRET_KEY"] = key
     app.config.from_object(config_class)
     limiter.init_app(app)
+
     @app.after_request
     def add_security_headers(response):
         response.headers[
@@ -74,8 +77,12 @@ def create_app(config_class=Config):
     #     return dict(total_quantity=total_quantity)
     @app.context_processor
     def cart_total_quantity():
-        cart_items = CartItem.query.all()
-        total_quantity = sum(item.quantity for item in cart_items)
+        if current_user.is_authenticated:
+            cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+            total_quantity = sum(item.quantity for item in cart_items)
+        else:
+            total_quantity = 0
+
         return dict(cart_total_quantity=total_quantity)
 
     class SQLAlchemyHandler(logging.Handler):

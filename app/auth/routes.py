@@ -8,7 +8,7 @@ from uuid import uuid4
 
 # Local Modules
 from app.auth import bp
-from .utils import init_and_commit
+from .utils import init_and_commit, not_logged_in_required
 from ..models import User, Session, OAuthUser
 from ..forms import LoginForm, SignUpForm
 from ..extensions import login_manager, oauth, db
@@ -48,6 +48,7 @@ def login_with_azure():
 
 
 @bp.route("/login", methods=["GET", "POST"])
+@not_logged_in_required
 def login():
     xcaptcha = bp.xcaptcha
     form = LoginForm()
@@ -59,34 +60,31 @@ def login():
             or_(User.username == username, User.email == username)
         ).first()
 
-        if current_user.is_authenticated:
-            redirect(url_for("management.dashboard"))
-        else:
-            if user:
-                if user.is_account_locked():
-                    flash("Account locked. Contact the admin for assistance.", "error")
-                elif not xcaptcha.verify():
-                    flash("xCaptcha verification failed. Please try again.", "error")
-                elif not user.check_password(password):
-                    user.increment_login_attempts()
-                    flash("Invalid username or password.", "error")
+        if user:
+            if user.is_account_locked():
+                flash("Account locked. Contact the admin for assistance.", "error")
+            elif not xcaptcha.verify():
+                flash("xCaptcha verification failed. Please try again.", "error")
+            elif not user.check_password(password):
+                user.increment_login_attempts()
+                flash("Invalid username or password.", "error")
 
-                    current_app.logger.error(f"Authorization failed for Login")
+                current_app.logger.error(f"Authorization failed for Login")
 
-                else:
-                    session_attributes = {
-                        "user_id": user.id,
-                        "last_activity": datetime.now(),
-                        "ip_address": request.remote_addr,
-                        "user_agent": request.user_agent.string,
-                    }
+            else:
+                session_attributes = {
+                    "user_id": user.id,
+                    "last_activity": datetime.now(),
+                    "ip_address": request.remote_addr,
+                    "user_agent": request.user_agent.string,
+                }
 
-                    init_and_commit(Session, session_attributes)
+                init_and_commit(Session, session_attributes)
 
-                    user.reset_login_attempts()
-                    login_user(user)
+                user.reset_login_attempts()
+                login_user(user)
 
-                    return redirect(url_for("management.dashboard"))
+                return redirect(url_for("management.dashboard"))
 
     return render_template("auth/login.html", form=form)
 
@@ -142,10 +140,12 @@ def logout():
 
 
 @bp.route("/signup", methods=["GET", "POST"])
+@not_logged_in_required
 def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
+        print("reached here")
         username = form.username.data
         password = form.password.data
         confirm_password = form.confirm_password.data
