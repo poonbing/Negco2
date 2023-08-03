@@ -73,9 +73,6 @@ def login():
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 flash("Invalid username or password.", "error")
-
-                current_app.logger.error(f"Authorization failed for Login")
-
             else:
                 sess = Session(
                     user.id,
@@ -83,6 +80,7 @@ def login():
                     request.remote_addr,
                     request.user_agent.string,
                 )
+                current_app.logger.info(f'User Logged In: {user.id}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Login'})
                 db.session.add(sess)
                 db.session.commit()
 
@@ -142,6 +140,7 @@ def auth(provider):
 @login_required
 @limiter.limit('4/second')
 def logout():
+    current_app.logger.info(f'User Logged Out: {current_user.id}', extra={'user_id': current_user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Login'})
     logout_user()
     return redirect(url_for("auth.login"))
 
@@ -188,7 +187,7 @@ def signup():
             )
             db.session.add(user)
             db.session.commit()
-
+            current_app.logger.info(f'User Created: {user.id}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Signup'})
             return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)

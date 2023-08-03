@@ -25,7 +25,7 @@ def forgot_password():
             access_codes[email] = access_code
 
             send_recovery_email(email, access_code)
-
+            current_app.logger.info(f'Recovery Email Sent: {email}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Password Recovery'})
             return redirect(url_for("recovery.enter_access_code", email=email))
         else:
             flash("Invalid email address.", "error")
@@ -36,11 +36,6 @@ def forgot_password():
 @bp.route("/enter_access_code", methods=["GET", "POST"])
 @limiter.limit('4/second')
 def enter_access_code():
-    current_app.logger.info(
-        "Receive and confirm access code for password recovery from %s for %s",
-        request.remote_addr,
-        request.path,
-    )
     email = request.args.get("email")
     if not email or email not in access_codes:
         return redirect(url_for("recovery.forgot_password"))
@@ -56,13 +51,10 @@ def enter_access_code():
             del access_codes[email]
             user = User.query.filter_by(email=email).first()
             token = user.get_reset_token()
+            current_app.logger.info(f'Recovery Access Code: Correct', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Password Recovery'})
             return redirect(url_for("recovery.reset_password", token=token))
         else:
-            current_app.logger.info(
-                "Returning invalid access code from %s for %s",
-                request.remote_addr,
-                request.path,
-            )
+            current_app.logger.info(f'Recovery Access Code: Incorrect', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Password Recovery'})
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email, form=form)
@@ -86,6 +78,7 @@ def reset_password(token):
         new_password = request.form.get("password")
         user.password = user.hash_password(new_password)
         db.session.commit()
+        current_app.logger.info(f'Password Resetted: {user.id}', extra={'user_id': user.id, 'address': request.remote_addr, 'page': request.path, 'category':'Password Recovery'})
         return redirect(url_for("auth.login"))
 
     return render_template("recovery/resetPassword.html", form=form)

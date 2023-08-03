@@ -57,9 +57,22 @@ def create_app(config_class=Config):
     # Two Logging Mechanism
     class SQLAlchemyHandler(logging.Handler):
         def emit(self, record):
-            log_entry = Log(log_text=self.format(record))
-            db.session.add(log_entry)
-            db.session.commit()
+            try:
+                extra_args = record.args
+                log_text = record.msg.format(*extra_args)
+                log_entry = Log(
+                    source = record.__dict__.get('page', None),
+                    logged_user = record.__dict__.get('user_id', None),
+                    address = record.__dict__.get('address', None),
+                    category = record.__dict__.get('category', None),
+                    log_text = log_text
+                )
+                print(log_entry.address, log_entry.logged_user)
+                db.session.add(log_entry)
+                db.session.commit()
+            except Exception:
+                self.handleError(record)
+
 
     handler = SQLAlchemyHandler()
     app.logger.addHandler(handler)
@@ -92,10 +105,10 @@ def create_app(config_class=Config):
 
     auth_bp.xcaptcha = xcaptcha
 
-    file_handler = logging.FileHandler(Config.LOG_FILE)
-    file_handler.setLevel(Config.LOG_LEVEL)
-    file_handler.setFormatter(Config.LOG_FORMAT)
+    # file_handler = logging.FileHandler(Config.LOG_FILE)
+    # file_handler.setLevel(Config.LOG_LEVEL)
+    # file_handler.setFormatter(Config.LOG_FORMAT)
 
-    app.logger.addHandler(file_handler)
+    # app.logger.addHandler(file_handler)
 
     return app
