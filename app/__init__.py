@@ -3,26 +3,24 @@ from flask import Flask
 from flask_xcaptcha import XCaptcha
 from flask_login import current_user
 from .models import CartItem
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+
 import logging
+
 # Local Modules
 from config import Config
-from .extensions import db, mail, login_manager, oauth, csrf, jwt
+from .extensions import db, mail, login_manager, oauth, csrf, jwt, limiter
 from .models import CartItem, Log
-from flask_wtf.csrf import CSRFProtect
 import secrets
 
-                  #storage_uri="mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2")
-limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
+    # Whose is this??
     key = secrets.token_urlsafe(16)
-    csrf = CSRFProtect()
-    app.config['SECRET_KEY'] = key
+    app.config["SECRET_KEY"] = key
     app.config.from_object(config_class)
-    limiter.init_app(app)
+    
+
     @app.after_request
     def add_security_headers(response):
         response.headers[
@@ -47,6 +45,7 @@ def create_app(config_class=Config):
         return dict(cart_total_quantity=total_quantity)
 
     xcaptcha = XCaptcha(app=app)
+    limiter.init_app(app)
     db.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
@@ -54,30 +53,7 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     oauth.init_app(app)
 
-    with app.app_context():
-        db.create_all()
-
-        # def get_total_quantity():
-    #     if "cart" not in session:
-    #         return 0
-
-    #     total_quantity = 0
-    #     cart_items = session["cart"]
-    #     for item in cart_items:
-    #         total_quantity += item["quantity"]
-
-    #     return total_quantity
-
-    # @app.context_processor
-    # def inject_total_quantity():
-    #     total_quantity = get_total_quantity()
-    #     return dict(total_quantity=total_quantity)
-    @app.context_processor
-    def cart_total_quantity():
-        cart_items = CartItem.query.all()
-        total_quantity = sum(item.quantity for item in cart_items)
-        return dict(cart_total_quantity=total_quantity)
-
+    # Two Logging Mechanism
     class SQLAlchemyHandler(logging.Handler):
         def emit(self, record):
             log_entry = Log(log_text=self.format(record))

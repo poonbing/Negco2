@@ -3,13 +3,12 @@ from datetime import datetime, timedelta
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
-from flask_serialize import FlaskSerializeMixin
-import json
 from uuid import uuid4
 from bcrypt import hashpw, gensalt, checkpw
 from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask_jwt_extended import create_access_token, decode_token
 import pickle
-import logging
+
 # Local Modules
 from .extensions import db
 from config import Config
@@ -69,23 +68,22 @@ class RolesAndPermissionsMixin:
 
 class ResetPasswordsMixin:
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer("your_secret_key_here")
-        payload = {"user_id": self.id}
-        serialized_payload = pickle.dumps(payload)
-        # Convert bytes to a JSON-serializable format (e.g., string)
-        token = serialized_payload.decode("latin1")
-        return token
+        # Replace "user_id" with any additional data you want to include in the token payload.
+        access_token = create_access_token(
+            identity=self.id, expires_delta=timedelta(seconds=expires_sec)
+        )
+        return access_token
 
     @staticmethod
     def verify_reset_token(token):
-        s = Serializer("your_secret_key_here")
         try:
-            # Convert the token back to bytes (reverse of the get_reset_token method)
-            serialized_payload = token.encode("latin1")
-            user_id = pickle.loads(serialized_payload)["user_id"]
-        except:
-            return None
-        return User.query.get(user_id)
+            # Decode the token to retrieve the payload (identity).
+            decoded_token = decode_token(token)
+            user_id = decoded_token["sub"]
+            return User.query.get(user_id)
+        except Exception as e:
+            # Handle expired token (optional, based on your requirements).
+            return f"Error: {e}"
 
 
 # Relations
@@ -158,7 +156,7 @@ class User(
     ):
         self.id = str(uuid4())[:8]
         self.username = username
-        self.password = hashpw(password.encode("utf-8"), gensalt())
+        self.password = self.hash_password(password)
         self.role = role
         self.email = email
         self.gender = gender
@@ -166,6 +164,9 @@ class User(
         self.last_name = last_name
         self.age = age
         self.phone = phone
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
 
     def check_password(self, password):
         return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
@@ -284,7 +285,9 @@ class SessionInfo(db.Model):
     session_start = db.Column(db.String(20))
     rate = db.Column(db.INTEGER, nullable=False)
 
-    def __init__(self, id, active_sessions, name, item, session_id, session_start, rate):
+    def __init__(
+        self, id, active_sessions, name, item, session_id, session_start, rate
+    ):
         self.id = id
         self.active_sessions = active_sessions
         self.name = name
@@ -305,7 +308,6 @@ class SessionInfo(db.Model):
         }
 
 
-
 class Report(db.Model):
     __tablename__ = "report"
 
@@ -318,7 +320,17 @@ class Report(db.Model):
     energy_goals = db.Column(db.INTEGER)
     datapoint = db.Column(db.JSON)
 
-    def __init__(self, id, related_user, item_name, month, year, total_usage, energy_goals, datapoint):
+    def __init__(
+        self,
+        id,
+        related_user,
+        item_name,
+        month,
+        year,
+        total_usage,
+        energy_goals,
+        datapoint,
+    ):
         self.id = id
         self.related_user = related_user
         self.item_name = item_name
@@ -337,7 +349,7 @@ class Report(db.Model):
             "year": self.year,
             "total_usage": self.total_usage,
             "energy_goals": self.energy_goals,
-            "datapoint": self.datapoint
+            "datapoint": self.datapoint,
         }
 
 
@@ -363,7 +375,7 @@ class Articles(db.Model):
             minutes = time_difference.seconds // 60
             return f"{minutes} minutes ago"
         else:
-            return "Just now", 
+            return ("Just now",)
 
 
 class Products(db.Model):
@@ -387,10 +399,9 @@ class Products(db.Model):
             rating_result = 0
             return rating_result
         else:
-            rating_result = (self.rating_score / (self.rating_count*5))*5
+            rating_result = (self.rating_score / (self.rating_count * 5)) * 5
 
         return round(rating_result, 1)
-
 
 
 class CartItem(db.Model):
@@ -441,23 +452,25 @@ class Topic(db.Model):
     posts = db.relationship("Post", back_populates="topic")
 
 
-
-class Checkout(db.Model, FlaskSerializeMixin):
-    __tablename__ = 'checkout'
+class Checkout(db.Model):
+    __tablename__ = "checkout"
     id = db.Column(db.String(36), primary_key=True, unique=True)
     user_id = user_id = db.Column(
         db.INTEGER, db.ForeignKey("users.id"), unique=True, nullable=False
     )
-    product_list = db.Column(db.String(255), db.ForeignKey("products.id"), nullable=False)
+    product_list = db.Column(
+        db.String(255), db.ForeignKey("products.id"), nullable=False
+    )
     product_price = db.Column(db.String(255))
     product_quantity = db.Column(db.String(255))
-    total_cost = db.Column(db.Numeric(precision=10, scale=2))
+    total_cost = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     payment_date = db.Column(db.DateTime, default=datetime.today)
+    payment_valid = db.Column(db.Boolean, default=0)
+    email_validation = db.Column(db.Boolean, default=0)
 
 
-    
 class Log(db.Model):
-    __tablename__ = 'logs'
+    __tablename__ = "logs"
     id = db.Column(db.INTEGER, primary_key=True, nullable=False, autoincrement=True)
-    timestamp = db.Column(db.DateTime, default = db.func.current_timestamp())
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
     log_text = db.Column(db.String, nullable=False)

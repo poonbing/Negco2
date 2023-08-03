@@ -1,6 +1,6 @@
 {% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
 content %}
-<div class="p-4 sm:ml-64">
+<div class="py-8 mx-auto max-w-4xl lg:py-16">
   <h1 class="text-3xl font-bold mt-4">Users List</h1>
   <br />
 
@@ -153,14 +153,16 @@ content %}
           <td class="px-6 py-4">{{ user.email }}</td>
           <td>
             <a
-              href="#"
+              href="{{ url_for('management.admin_settings', user_id=user.id) }}"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline px-3"
               >Edit</a
             >
             <a
-              href="#"
+              href="{{ url_for('management.delete_user', user_id=user.id) }}"
               class="font-medium text-red-600 dark:text-red-500 hover:underline px-3"
+              onclick="return confirm('Are you sure you want to delete this user?');"
               >Delete</a
+            >
             >
           </td>
         </tr>
