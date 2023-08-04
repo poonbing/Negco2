@@ -16,7 +16,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import func, and_, not_
 from config import Config
 from uuid import uuid4
-import os
+import os, stripe
 from app import limiter
 # checkout module
 import datetime
@@ -32,6 +32,25 @@ from app.management.utils import role_required
 from ..models import Products, CartItem, Checkout
 from ..forms import createProduct, PaymentForm
 from ..extensions import db, mail
+
+
+def check_splcharacter(test): 
+  
+    # Make an RE character set and pass  
+    # this as an argument in compile function
+ 
+    string_check= re.compile('[@_!#$^&*<>?/\|}{~]') 
+      
+    # Pass the string in search function  
+    # of RE object (string_check).
+     
+    if(string_check.search(test) == None): 
+        print("String does not contain Special Characters.")
+        return True
+          
+    else: 
+        print("String contains Special Characters.") 
+        return False
 
 
 @bp.route("/createProduct", methods=["POST", "GET"])
@@ -55,51 +74,38 @@ def publishProduct():
                 secure_filename(image.filename),
             )
         )
-        # grab image name
-        image_name = secure_filename(image.filename)
-        if offer > 0:
-            offered_price = price - (price * offer / 100)
-            # add to db
-            product = Products(
-                id=str(uuid4())[:8],
-                brand=brand,
-                name=name,
-                description=description,
-                category=category,
-                price=price,
-                offer=offer,
-                image=image_name,
-                offered_price=round(offered_price, 2),
-            )
-            db.session.add(product)
-            db.session.commit()
-            current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
-            flash("Product added successfully!")
-            return redirect(url_for("products.viewProduct"))
-
+        verify_characters = check_splcharacter(description)
+        if verify_characters:
+            # grab image name
+            image_name = secure_filename(image.filename)
+            if offer > 0:
+                offered_price = price - (price * offer / 100)
+                # add to db
+                product = Products(
+                    id=str(uuid4())[:8],
+                    brand=brand,
+                    name=name,
+                    description=description,
+                    category=category,
+                    price=price,
+                    offer=offer,
+                    image=image_name,
+                    offered_price=round(offered_price, 2),
+                )
+                db.session.add(product)
+                db.session.commit()
+                current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
+                flash("Product added successfully!")
+                return redirect(url_for("products.viewProduct"))
         else:
-            # add to db
-            product = Products(
-                id=str(uuid4())[:8],
-                brand=brand,
-                name=name,
-                description=description,
-                category=category,
-                price=price,
-                offer=offer,
-                image=image_name,
-                offered_price=None,
-            )
-            db.session.add(product)
-            db.session.commit()
-            current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
-            flash("Product added successfully!")
-            return redirect(url_for("products.viewProduct"))
+            print("This data is suspicious.")
 
     return render_template("products/createProduct.html", form=form)
 
 
 @bp.route("/viewProduct")
+@login_required
+@role_required("editor")
 def viewProduct():
     page = request.args.get("page", 1, type=int)
     products = Products.query.order_by(Products.date_added.desc()).paginate(
@@ -122,31 +128,35 @@ def updateProduct(id):
         product_to_update.image = form.image.data
         product_to_update.offer = form.offer.data
         product_to_update.category = form.category.data
+        verify_characters = check_splcharacter(product_to_update.description)
+        if verify_characters:
+            if product_to_update.offer > 0:
+                product_to_update.offered_price = round(
+                    product_to_update.price
+                    - (product_to_update.price * product_to_update.offer / 100),
+                    2,
+                )
+            else:
+                product_to_update.offered_price = None
+            try:
+                # current_app.logger.info(f'Product Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
+                db.session.commit()
+                flash("Product updated successfully!")
+                return redirect(url_for("products.viewProduct"))
 
-        if product_to_update.offer > 0:
-            product_to_update.offered_price = round(
-                product_to_update.price
-                - (product_to_update.price * product_to_update.offer / 100),
-                2,
-            )
+            except:
+                return "Opps! Looks like something went wrong."
         else:
-            product_to_update.offered_price = None
-        try:
-            current_app.logger.info(f'Product Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
-            db.session.commit()
-            flash("Product updated successfully!")
-            return redirect(url_for("products.viewProduct"))
+            print("This data is suspicious.")
 
-        except:
-            return "Opps! Looks like something went wrong."
-    else:
-        form.brand.data = product_to_update.brand
-        form.name.data = product_to_update.name
-        form.description.data = product_to_update.description
-        form.price.data = product_to_update.price
-        form.image.data = product_to_update.image
-        form.offer.data = product_to_update.offer
-        form.category.data = product_to_update.category
+    form.brand.data = product_to_update.brand
+    form.name.data = product_to_update.name
+    form.description.data = product_to_update.description
+    form.price.data = product_to_update.price
+    form.image.data = product_to_update.image
+    form.offer.data = product_to_update.offer
+    form.category.data = product_to_update.category
+    
     return render_template(
         "products/updateProduct.html", form=form, product_to_update=product_to_update
     )
@@ -583,11 +593,12 @@ def processPayment():
         else:
             print("This is an invalid card.")
             return "Invalid card number."
+    
 
     return render_template(
         "products/checkout.html",
         form=form,
         checkout_items=checkout_items,
         total_quantity=total_quantity,
-        total_price=total_price,
+        total_price=total_price
     )

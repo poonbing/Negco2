@@ -10,7 +10,7 @@ import logging
 from config import Config
 from .extensions import db, mail, login_manager, oauth, csrf, jwt, limiter
 from .models import CartItem, Log
-import secrets
+import secrets, stripe
 
 
 def create_app(config_class=Config):
@@ -20,6 +20,11 @@ def create_app(config_class=Config):
     app.config["SECRET_KEY"] = key
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
     app.config.from_object(config_class)
+    # stripe_keys = {
+    #     "secret_key": os.environ["STRIPE_SECRET_KEY"],
+    #     "publishable_key": os.eviron["STRIPE_PUBLISHABLE_KEY"]
+    # }
+    # stripe.api_key = stripe_keys["secret_key"]
     
 
     @app.after_request
@@ -27,9 +32,10 @@ def create_app(config_class=Config):
         response.headers[
             "Strict-Transport-Security"
         ] = "max-age=31536000; includeSubDomains"
-        # response.headers[
-        #     "Content-Security-Policy"
-        # ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://assets.hcaptcha.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src https://assets.hcaptcha.com; frame-src https://assets.hcaptcha.com; script-src https://hcaptcha.com https://assets.hcaptcha.com;"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://unpkg.com https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com;"
+
+        
+
 
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
