@@ -13,6 +13,26 @@ from ..models import Articles
 from ..forms import createArticle
 from ..extensions import db
 from app import limiter
+import re
+
+
+def check_splcharacter(test): 
+  
+    # Make an RE character set and pass  
+    # this as an argument in compile function
+ 
+    string_check= re.compile('[@_!#$^&*<>?/\|}{~]') 
+      
+    # Pass the string in search function  
+    # of RE object (string_check).
+     
+    if(string_check.search(test) == None): 
+        print("String does not contain Special Characters.")
+        return True
+          
+    else: 
+        print("String contains Special Characters.") 
+        return False
 
 @bp.route("/allArticles")
 @limiter.limit('5/second')
@@ -57,23 +77,29 @@ def publishArticle():
                 secure_filename(image.filename),
             )
         )
-        # grab image name
-        image_name = secure_filename(image.filename)
-        # add to db
-        id=str(uuid4())[:8]
-        article = Articles(
-            id=id,
-            title=title,
-            description=description,
-            writer=writer,
-            image=image_name,
-            paragraph=paragraph,
-        )
-        current_app.logger.info(f'Article Published: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
-        db.session.add(article)
-        db.session.commit()
-        flash("Article added successfully!")
-        return redirect(url_for("articles.viewArticle"))
+        verify_characters = check_splcharacter(description)
+        verify_characters2 = check_splcharacter(paragraph)
+        if verify_characters:
+            if verify_characters2:
+                # grab image name
+                image_name = secure_filename(image.filename)
+                # add to db
+                id=str(uuid4())[:8]
+                article = Articles(
+                    id=id,
+                    title=title,
+                    description=description,
+                    writer=writer,
+                    image=image_name,
+                    paragraph=paragraph,
+                )
+                current_app.logger.info(f'Article Published: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
+                db.session.add(article)
+                db.session.commit()
+                flash("Article added successfully!")
+                return redirect(url_for("articles.viewArticle"))
+        else:
+            print("This data is suspicious.")
 
     return render_template("articles/publishArticle.html", form=form)
 
@@ -81,6 +107,8 @@ def publishArticle():
 # retrieve article db
 @bp.route("/viewArticle")
 @limiter.limit('5/second')
+@login_required
+@role_required("editor")
 def viewArticle():
     page = request.args.get("page", 1, type=int)
     articles = Articles.query.order_by(Articles.date_added.desc()).paginate(
@@ -103,29 +131,34 @@ def updateArticle(id):
         article_to_update.writer = form.writer.data
         article_to_update.paragraph = form.paragraph.data
         article_to_update.image = form.image.data
+        verify_characters = check_splcharacter(article_to_update.description)
+        verify_characters2 = check_splcharacter(article_to_update.paragraph)
+        if verify_characters:
+            if verify_characters2:
+                # Save the updated article to the database
+                try:
+                    # current_app.logger.info(f'Article Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
+                    db.session.commit()
+                    flash("Article updated successfully!")
+                    return redirect(url_for("articles.viewArticle"))
 
-        # Save the updated article to the database
-        try:
-            current_app.logger.info(f'Article Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
-            db.session.commit()
-            flash("Article updated successfully!")
-            return redirect(url_for("articles.viewArticle"))
+                except:
+                    return "Oops! Looks like something went wrong."
+        else:
+            print("Data is suspicious")
 
-        except:
-            return "Oops! Looks like something went wrong."
-    else:
-        # Pre-fill the form fields with the article details
-        form.title.data = article_to_update.title
-        form.description.data = article_to_update.description
-        form.writer.data = article_to_update.writer
-        form.paragraph.data = article_to_update.paragraph
-        form.image.data = article_to_update.image
+    # Pre-fill the form fields with the article details
+    form.title.data = article_to_update.title
+    form.description.data = article_to_update.description
+    form.writer.data = article_to_update.writer
+    form.paragraph.data = article_to_update.paragraph
+    form.image.data = article_to_update.image
 
-        return render_template(
-            "articles/updateArticle.html",
-            form=form,
-            article_to_update=article_to_update,
-        )
+    return render_template(
+        "articles/updateArticle.html",
+        form=form,
+        article_to_update=article_to_update,
+    )
 
 
 # delete article db

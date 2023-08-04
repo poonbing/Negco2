@@ -1,5 +1,5 @@
 import os
-import logging
+import logging, stripe
 
 
 class Config:
@@ -11,6 +11,8 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = 1800
+    
+    
 
     # xCaptcha configuration
     XCAPTCHA_SITE_KEY = "906a1dab-2e2c-4c80-880a-9fb359a89b73"
