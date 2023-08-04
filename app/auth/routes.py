@@ -73,6 +73,15 @@ def login():
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 flash("Invalid username or password.", "error")
+                current_app.logger.info(
+                    f"User Login Failed: Incorrect Password",
+                    extra={
+                        "user_id": "null",
+                        "address": request.remote_addr,
+                        "page": request.path,
+                        "category": "Login",
+                    },
+                )
             else:
                 sess = Session(
                     user.id,
@@ -96,7 +105,17 @@ def login():
                 login_user(user)
 
                 return redirect(url_for("management.dashboard"))
-
+        else:
+            flash("Invalid username or password.", "error")
+            current_app.logger.info(
+                f"User login Failed: Incorrect Username",
+                extra={
+                    "user_id": "null",
+                    "address": request.remote_addr,
+                    "page": request.path,
+                    "category": "login",
+                },
+            )
     return render_template("auth/login.html", form=form)
 
 

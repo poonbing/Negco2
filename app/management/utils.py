@@ -33,7 +33,7 @@ def update_password(user, form):
         return False
 
 
-def resize(image_input, width=None, height=None, keep_aspect_ratio=True):
+def resize(image_input, width=30, height=30, keep_aspect_ratio=False):
     if isinstance(image_input, str):
         with open(image_input, "rb") as file:
             image_bytes = file.read()
