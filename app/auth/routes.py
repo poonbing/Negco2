@@ -68,10 +68,28 @@ def login():
         if user:
             if user.is_account_locked():
                 flash("Account locked. Contact the admin for assistance.", "error")
+                current_app.logger.info(
+                    f"User Login Failed: Locked User",
+                    extra={
+                        "user_id": 'null',
+                        "address": request.remote_addr,
+                        "page": request.path,
+                        "category": "Login",
+                    },
+                )
             elif not xcaptcha.verify():
                 flash("xCaptcha verification failed. Please try again.", "error")
             elif not user.check_password(password):
                 user.increment_login_attempts()
+                current_app.logger.info(
+                    f"User Login Failed: Incorrect Password",
+                    extra={
+                        "user_id": 'null',
+                        "address": request.remote_addr,
+                        "page": request.path,
+                        "category": "Login",
+                    },
+                )
                 flash("Invalid username or password.", "error")
             else:
                 sess = Session(
@@ -96,7 +114,17 @@ def login():
                 login_user(user)
 
                 return redirect(url_for("management.dashboard"))
-
+    else:
+        flash("Invalid username or password.", "error")
+        current_app.logger.info(
+                    f"User Login Failed: Incorrect Username",
+                    extra={
+                        "user_id": 'null',
+                        "address": request.remote_addr,
+                        "page": request.path,
+                        "category": "Login",
+                    },
+                )
     return render_template("auth/login.html", form=form)
 
 

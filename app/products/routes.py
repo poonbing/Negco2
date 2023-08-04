@@ -97,6 +97,23 @@ def publishProduct():
                 current_app.logger.info(f'Product Created: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
                 flash("Product added successfully!")
                 return redirect(url_for("products.viewProduct"))
+            else:
+                    # add to db
+                product = Products(
+                    id=str(uuid4())[:8],
+                    brand=brand,
+                    name=name,
+                    description=description,
+                    category=category,
+                    price=price,
+                    offer=offer,
+                    image=image_name,
+                    offered_price=None,
+                )
+                db.session.add(product)
+                db.session.commit()
+                flash("Product added successfully!")
+                return redirect(url_for("products.viewProduct"))
         else:
             print("This data is suspicious.")
 
@@ -139,7 +156,7 @@ def updateProduct(id):
             else:
                 product_to_update.offered_price = None
             try:
-                # current_app.logger.info(f'Product Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
+                current_app.logger.info(f'Product Updated: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Product'})
                 db.session.commit()
                 flash("Product updated successfully!")
                 return redirect(url_for("products.viewProduct"))
@@ -408,7 +425,6 @@ def processPayment():
         security_code = str(form.security_code.data)
         form.amount.data = total_price
         amount = form.amount.data
-
         card_num_len = len(card_num)
 
         # Luhn algorithm check

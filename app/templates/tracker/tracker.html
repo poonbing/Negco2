@@ -72,7 +72,7 @@ content %}
                 startTimer("{{ key.session_start }}", "timer-{{ key.name }}");
             }
             </script>
-            <button onclick="fillAndSubmitForm('trackerForm','{{ key.name }}', ' {{ key.item }} ', ' {{key.rate}} ', 'start')"> Start </button>
+            <button id="" onclick="fillAndSubmitForm('trackerForm','{{ key.name }}', ' {{ key.item }} ', ' {{key.rate}} ', 'start')"> Start </button>
         </div>
     {% endfor %}
     </div>

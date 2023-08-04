@@ -1,5 +1,5 @@
 # Python Modules
-from flask import render_template, request, session, current_app
+from flask import render_template, request, session, current_app, url_for, redirect, flash
 from flask_login import current_user, login_required
 from app import limiter
 # Local Modules
@@ -20,9 +20,12 @@ def report():
     user = current_user.id
     report = report_util.check_report(user)
     if report == 'Failed':
-        return render_template("error/500.html"), 500
+        flash('Report not found as there are no records of tracker use. \n Please use the tracker first before using report ;)', 'error')
+        return redirect(url_for('tracker.track'))
     else:
         datapoint, list_names = report_util.retrieve_data_points(user)
+        print(datapoint)
+        print(list_names)
         nested_list = []
         for lists in datapoint:
             nested_list.append(lists)
