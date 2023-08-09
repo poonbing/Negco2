@@ -93,7 +93,7 @@ def publishArticle():
                     image=image_name,
                     paragraph=paragraph,
                 )
-                current_app.logger.info(f'Article Published: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
+                # current_app.logger.info(f'Article Published: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
                 db.session.add(article)
                 db.session.commit()
                 flash("Article added successfully!")
@@ -169,7 +169,7 @@ def updateArticle(id):
 def deleteArticle(id):
     article_to_delete = Articles.query.get_or_404(id)
     try:
-        current_app.logger.info(f'Article Deleted: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
+        # current_app.logger.info(f'Article Deleted: {id}', extra={'user_id': 'editor', 'address': request.remote_addr, 'page': request.path, 'category':'Article'})
         db.session.delete(article_to_delete)
         db.session.commit()
         flash("Article deleted succesfully!")

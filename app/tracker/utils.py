@@ -137,20 +137,21 @@ class TrackerFunctions:
         if report != "Failed":
             report = self.check_report(user_id, tracker.name)
             report.total_usage += total_usage
-            db.session.commit()
-            list = report.datapoint
             try:
-                list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
-            except: 
-                list.append(total_usage)
-            report.datapoint = list
+                report.datapoint[int(current_date-1)] = int(report.datapoint[int(current_date-1)]) + total_usage
+            except:
+                report.datapoint.append(total_usage)
+            db.session.flush()
             db.session.commit()
             total_report = self.check_report(user_id, 'Total')
+            print(total_report)
             total_report.total_usage += total_usage
-            db.session.commit()
-            list2 = total_report.datapoint
-            list2[int(current_date-1)] = int(list2[int(current_date-1)]) + total_usage
-            total_report.datapoint = list2
+            try:
+                total_report.datapoint[int(current_date-1)] = int(total_report.datapoint[int(current_date-1)]) + total_usage
+            except:
+                total_report.datapoint.append(total_usage)
+            print(total_report.datapoint)
+            db.session.flush()
             db.session.commit()
         else:
             current_month = datetime.now().strftime('%m')
