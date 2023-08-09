@@ -68,8 +68,8 @@ def login():
         if user:
             if user.is_account_locked():
                 flash("Account locked. Contact the admin for assistance.", "error")
-            elif not xcaptcha.verify():
-                flash("xCaptcha verification failed. Please try again.", "error")
+            # elif not xcaptcha.verify():
+            #     flash("xCaptcha verification failed. Please try again.", "error")
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 flash("Invalid username or password.", "error")

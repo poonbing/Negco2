@@ -1,6 +1,17 @@
 {% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
 content %}
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
+  <div
+    class="loading-screen fixed inset-0 flex items-center justify-center z-50 bg-white dark:bg-gray-900"
+    id="loading-screen"
+  >
+    <div class="w-full h-15 text-center loader">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
   <h1 class="text-3xl font-bold mt-4">Users List</h1>
   <br />
 
@@ -125,49 +136,7 @@ content %}
           <th scope="col" class="px-6 py-3">Action</th>
         </tr>
       </thead>
-      <tbody>
-        {% for user in users %}
-        <tr
-          class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-        >
-          <td class="w-4 p-4">
-            <div class="flex items-center">
-              <input
-                id="checkbox-table-{{ loop.index }}"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label for="checkbox-table-{{ loop.index }}" class="sr-only"
-                >checkbox</label
-              >
-            </div>
-          </td>
-          <th
-            scope="row"
-            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-          >
-            {{ user.username }}
-          </th>
-          <td class="px-6 py-4">{{ user.first_name }} {{user.last_name }}</td>
-          <td class="px-6 py-4">{{ user.role }}</td>
-          <td class="px-6 py-4">{{ user.email }}</td>
-          <td>
-            <a
-              href="{{ url_for('management.admin_settings', user_id=user.id) }}"
-              class="font-medium text-blue-600 dark:text-blue-500 hover:underline px-3"
-              >Edit</a
-            >
-            <a
-              href="{{ url_for('management.delete_user', user_id=user.id) }}"
-              class="font-medium text-red-600 dark:text-red-500 hover:underline px-3"
-              onclick="return confirm('Are you sure you want to delete this user?');"
-              >Delete</a
-            >
-            >
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 </div>
@@ -212,5 +181,92 @@ content %}
       checkbox.checked = isChecked;
     }
   });
+
+  fetch("/get_users_data")
+    .then((response) => response.json())
+    .then((data) => {
+      const loadingScreen = document.getElementById("loading-screen");
+      loadingScreen.classList.add("hidden");
+      const users = data;
+      const tbody = table.querySelector("tbody");
+
+      users.forEach((user) => {
+        const row = document.createElement("tr");
+        row.classList.add(
+          "bg-white",
+          "border-b",
+          "dark:bg-gray-800",
+          "dark:border-gray-700",
+          "hover:bg-gray-50",
+          "dark:hover:bg-gray-600"
+        );
+
+        // Create checkbox cell
+        const checkboxCell = document.createElement("td");
+        checkboxCell.className = "w-4 p-4";
+        const checkboxDiv = document.createElement("div");
+        checkboxDiv.className = "flex items-center";
+        const checkboxInput = document.createElement("input");
+        checkboxInput.id = `checkbox-table-${user.id}`;
+        checkboxInput.type = "checkbox";
+        checkboxInput.className =
+          "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600";
+        const checkboxLabel = document.createElement("label");
+        checkboxLabel.setAttribute("for", `checkbox-table-${user.id}`);
+        checkboxLabel.className = "sr-only";
+        checkboxDiv.appendChild(checkboxInput);
+        checkboxDiv.appendChild(checkboxLabel);
+        checkboxCell.appendChild(checkboxDiv);
+        row.appendChild(checkboxCell);
+
+        // Create username cell
+        const usernameCell = document.createElement("th");
+        usernameCell.setAttribute("scope", "row");
+        usernameCell.className =
+          "px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white";
+        usernameCell.textContent = user.username;
+        row.appendChild(usernameCell);
+
+        // Create name cell
+        const nameCell = document.createElement("td");
+        nameCell.className = "px-6 py-4";
+        nameCell.textContent = `${user.first_name} ${user.last_name}`;
+        row.appendChild(nameCell);
+
+        // Create role cell
+        const roleCell = document.createElement("td");
+        roleCell.className = "px-6 py-4";
+        roleCell.textContent = user.role;
+        row.appendChild(roleCell);
+
+        // Create email cell
+        const emailCell = document.createElement("td");
+        emailCell.className = "px-6 py-4";
+        emailCell.textContent = user.email;
+        row.appendChild(emailCell);
+
+        // Create action cell
+        const actionCell = document.createElement("td");
+        const editLink = document.createElement("a");
+        editLink.href = `/${user.id}/settings`;
+        editLink.className =
+          "font-medium text-blue-600 dark:text-blue-500 hover:underline px-3";
+        editLink.textContent = "Edit";
+        const deleteLink = document.createElement("a");
+        deleteLink.href = `/delete/${user.id}`;
+        deleteLink.className =
+          "font-medium text-red-600 dark:text-red-500 hover:underline px-3";
+        deleteLink.textContent = "Delete";
+        deleteLink.onclick = function () {
+          return confirm("Are you sure you want to delete this user?");
+        };
+        actionCell.appendChild(editLink);
+        actionCell.appendChild(deleteLink);
+        row.appendChild(actionCell);
+
+        // Append the row to the table body
+        tbody.appendChild(row);
+      });
+    });
 </script>
 {% endblock %}

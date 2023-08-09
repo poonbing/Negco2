@@ -4,10 +4,9 @@ from flask import (
     render_template,
     request,
     url_for,
-    abort,
     flash,
+    jsonify,
     send_file,
-    current_app,
 )
 from flask_login import current_user, login_required
 from io import BytesIO
@@ -16,10 +15,10 @@ from io import BytesIO
 # Local Modules
 from app import limiter
 from app.management import bp
-from .utils import role_required, update_password, resize
+from .utils import role_required, compress_and_resize
 from ..models import User, LockedUser, Session
 from ..extensions import db
-from ..forms import SettingsForm
+from ..forms import SettingsForm, UnlockAccountForm
 from ..models import User
 from app import limiter
 
@@ -37,8 +36,30 @@ def profile_picture():
 @role_required("admin")
 @limiter.limit("4/second")
 def show_users():
+    return render_template("management/users.html")
+
+
+@bp.route("/get_users_data", methods=["GET"])
+@login_required
+@role_required("admin")
+@limiter.limit("4/second")
+def get_users_data():
     all_users = User.query.all()
-    return render_template("management/users.html", users=all_users)
+    user_data = []
+
+    for user in all_users:
+        user_data.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "role": user.role,
+                "email": user.email,
+            }
+        )
+
+    return jsonify(user_data)
 
 
 @bp.route("/locked-accounts", methods=["GET", "POST"])
@@ -46,19 +67,22 @@ def show_users():
 @role_required("admin")
 @limiter.limit("4/second")
 def locked_accounts():
-    if request.method == "POST":
-        locked_account_ids = request.form.getlist("unlock_account")
-        for account_id in locked_account_ids:
+    locked_accounts = User.query.join(LockedUser).all()
+
+    form = UnlockAccountForm()
+    if form.validate_on_submit():
+        selected_accounts = [
+            account.id for account in locked_accounts if form.unlock_account.data
+        ]
+        for account_id in selected_accounts:
             user = User.query.get(account_id)
             if user:
                 user.unlock_account()
 
         return redirect(url_for("management.locked_accounts"))
 
-    locked_accounts = User.query.join(LockedUser).all()
-
     return render_template(
-        "management/lockedAccounts.html", locked_accounts=locked_accounts
+        "management/lockedAccounts.html", locked_accounts=locked_accounts, form=form
     )
 
 
@@ -82,15 +106,21 @@ def settings():
 
     if form.validate_on_submit():
         if form.profile_picture.data:
-            user.profile_picture = form.profile_picture.data.read()
+            user.profile_picture = compress_and_resize(form.profile_picture.data.read())
 
         user.first_name = form.first_name.data
         user.last_name = form.last_name.data
         user.phone = form.phone.data
         user.gender = form.gender.data
         user.email = form.email.data
+        if form.password.data:
+            if form.password.data != form.confirm_password.data:
+                flash("Password and Confirm Password must be the same", "error")
+            else:
+                user.password = user.hash_password(form.password.data)
 
         db.session.commit()
+        flash("Setting Information changes successful", "success")
 
     return render_template(
         "management/settings.html",
@@ -111,15 +141,21 @@ def admin_settings(user_id):
 
     if form.validate_on_submit():
         if form.profile_picture.data:
-            user.profile_picture = resize(form.profile_picture.data.read())
+            user.profile_picture = compress_and_resize(form.profile_picture.data.read())
 
         user.first_name = form.first_name.data
         user.last_name = form.last_name.data
         user.phone = form.phone.data
         user.gender = form.gender.data
         user.email = form.email.data
+        if form.password.data:
+            if form.password.data != form.confirm_password.data:
+                flash("Password and Confirm Password must be the same", "error")
+            else:
+                user.password = user.hash_password(form.password.data)
 
         db.session.commit()
+
     return render_template(
         "management/admin_settings.html",
         user=user,

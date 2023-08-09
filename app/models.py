@@ -209,7 +209,7 @@ class OAuthUser(UserMixin, db.Model):
 class LockedUser(db.Model):
     __tablename__ = "locked_users"
 
-    id = db.Column(db.String(36), nullable=False, primary_key=True)
+    id = db.Column(db.INTEGER, nullable=False, primary_key=True, auto_increment=True)
     user_id = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
