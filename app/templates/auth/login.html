@@ -54,12 +54,14 @@ content %}
             {{ form.password.label(class_="block mb-2 text-sm font-medium
             text-gray-900 dark:text-white") }}
             <div class="relative">
-              <input
-                class="js-password bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600 focus:border-teal-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                type="password"
-                placeholder="••••••••"
-                required="true"
-              />
+              {{ form.password(class_="js-password bg-gray-50 border
+              border-gray-300 text-gray-900 sm:text-sm rounded-lg
+              focus:ring-teal-600 focus:border-teal-600 block w-full p-2.5
+              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+              dark:text-white dark:focus:ring-blue-500
+              dark:focus:border-blue-500", placeholder="••••••••",
+              required=true, type="password") }}
+
               <label
                 class="bg-gray-300 hover:bg-gray-400 rounded px-2 py-1 text-sm text-gray-600 font-mono cursor-pointer js-password-label absolute right-2 top-2"
                 for="toggle"
