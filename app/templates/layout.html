@@ -173,6 +173,20 @@
           top: 0;
         }
       }
+
+      .create-post {
+        position: fixed;
+        bottom: -500px;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 20px;
+        transition: bottom 0.3s ease-in-out;
+      }
+
+      .create-post.active {
+        bottom: 0;
+      }
     </style>
   </head>
   <body class="mt-20 font-serif flex flex-col min-h-screen">
