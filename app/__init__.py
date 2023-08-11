@@ -10,7 +10,7 @@ import logging
 from config import Config
 from .extensions import db, mail, login_manager, oauth, csrf, jwt, limiter
 from .models import CartItem, Log
-import secrets, stripe
+import secrets, stripe, os
 
 
 def create_app(config_class=Config):
@@ -20,11 +20,12 @@ def create_app(config_class=Config):
     app.config["SECRET_KEY"] = key
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1000 * 1000
     app.config.from_object(config_class)
-    # stripe_keys = {
-    #     "secret_key": os.environ["STRIPE_SECRET_KEY"],
-    #     "publishable_key": os.eviron["STRIPE_PUBLISHABLE_KEY"]
-    # }
-    # stripe.api_key = stripe_keys["secret_key"]
+    stripe_keys = {
+         "secret_key": os.environ["STRIPE_SECRET_KEY"],
+         "publishable_key": os.environ["STRIPE_PUBLISHABLE_KEY"]
+    }
+    stripe.api_key = stripe_keys["secret_key"]
+    
 
     @app.after_request
     def add_security_headers(response):

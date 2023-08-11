@@ -24,6 +24,9 @@
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
     <style>
+      body{
+        padding-top: 64px;
+      }
       .forum-card {
         background-color: #192d3e;
         border-radius: 10px;
@@ -189,11 +192,17 @@
       }
     </style>
   </head>
-  <body class="mt-20 font-serif flex flex-col min-h-screen">
-    {% include 'navbar.html' %}
-    <div class="flex-1">{% block content %} {% endblock %}</div>
-    <div class="mt-4">{% include 'footer.html' %}</div>
-
+  <body class="font-serif flex flex-col min-h-screen">
+    {% include 'navbar.html' %} 
+      <div class="flex-1">
+        {% block content %} 
+        {% endblock %}
+      </div>
+      <div class="mt-4">
+        {% include 'footer.html' %}
+      </div>
+      
+    
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
   </body>
