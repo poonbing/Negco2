@@ -31,6 +31,11 @@ def profile_picture():
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
 
 
+@bp.route("/sexy")
+def sexy():
+    return render_template("management/test.html")
+
+
 @bp.route("/show_users", methods=["GET"])
 @login_required
 @role_required("admin")
