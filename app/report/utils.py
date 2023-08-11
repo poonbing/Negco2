@@ -44,7 +44,14 @@ class ReportFunctions:
         dict = {}
         tracker = Tracker.query.filter(and_(Tracker.user_id==user_id, func.substring(Tracker.end_time, 1, 4)==year, func.substring(Tracker.end_time, 6, 2) == month)).all()
         for entry in tracker:
-            total_usage = int(entry.rate)*int(round((datetime.strptime(entry.end_time, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(entry.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
-            dict[entry.name] = ({'name':entry.name, 'start_time':entry.start_time, 'end_time':entry.end_time, 'rate':entry.rate, 'total_usgae':total_usage})
-            dict['total'] = ({'name':entry.name, 'start_time':entry.start_time, 'end_time':entry.end_time, 'rate':entry.rate, 'total_usgae':total_usage})
+            timer = int(round((datetime.strptime(entry.end_time, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(entry.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
+            total_usage = int(entry.rate)*timer
+            try:
+                dict[entry.name].append({'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage})
+            except:
+                dict[entry.name] = [{'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage}]
+            try:
+                dict['total'].append({'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage})
+            except:
+                dict['total'] = [{'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage}]
         return dict

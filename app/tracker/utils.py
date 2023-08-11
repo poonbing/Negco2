@@ -126,46 +126,48 @@ class TrackerFunctions:
         return id, current_time
 
     def end_tracker(self, id, user_id):
-        tracker = Tracker.query.get(id)
-        report = self.check_report(user_id, tracker.name)
-        current_date = int(datetime.now().day)
-        start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
-        current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        tracker.end_time = current_time
-        current_time = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%S")
-        total_usage = int(tracker.rate)*int(round((current_time - start_time).total_seconds()/60))
-        if report != "Failed":
+        try:
+            tracker = Tracker.query.get(id)
             report = self.check_report(user_id, tracker.name)
-            report.total_usage += total_usage
-            try:
-                report.datapoint[int(current_date-1)] = int(report.datapoint[int(current_date-1)]) + total_usage
-            except:
-                report.datapoint.append(total_usage)
-            db.session.flush()
-            db.session.commit()
+            print(tracker.name)
+            print(report)
+            start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
+            current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            tracker.end_time = current_time
+            current_time = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%S")
+            total_usage = int(tracker.rate) * int(round((current_time - start_time).total_seconds() / 60))
+            if report:
+                self.update_report(user_id, tracker.name, total_usage)
+            else:
+                self.create_new_report(user_id, tracker.name, total_usage)
             total_report = self.check_report(user_id, 'Total')
-            print(total_report)
-            total_report.total_usage += total_usage
-            try:
-                total_report.datapoint[int(current_date-1)] = int(total_report.datapoint[int(current_date-1)]) + total_usage
-            except:
-                total_report.datapoint.append(total_usage)
-            print(total_report.datapoint)
-            db.session.flush()
+            if total_report:
+                self.update_report(user_id, 'Total', total_usage)
+            else:
+                self.create_new_report(user_id, 'Total', total_usage)  
             db.session.commit()
-        else:
-            current_month = datetime.now().strftime('%m')
-            current_year = datetime.now().year
-            list = []
-            for i in range(current_date):
-                list.append(0)
-            list[int(current_date-1)] = int(list[int(current_date-1)]) + total_usage
-            new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=tracker.name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=list)
-            db.session.add(new_report) 
-            if self.check_report(user_id, 'Total') == 'Failed':
-                total_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name='Total', month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=list)
-                db.session.add(total_report)
-            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print("An error occurred:", str(e))
+            raise
+
+    def update_report(self, user_id, name, total_usage):
+        report = self.check_report(user_id, name)
+        total_usage2 = total_usage + report.total_usage
+        report.total_usage = total_usage2
+        datapoint = list(report.datapoint)
+        datapoint += [0] * (int(datetime.now().day) - len(datapoint))
+        datapoint[int(datetime.now().day) - 1] += total_usage
+        report.datapoint = datapoint
+        db.session.commit()
+
+    def create_new_report(self, user_id, name, total_usage):
+        current_month = datetime.now().strftime('%m')
+        current_year = datetime.now().year
+        datapoints = [0] * int(datetime.now().day)
+        datapoints[int(datetime.now().day) - 1] = total_usage
+        new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=datapoints)
+        db.session.add(new_report)
 
     def delete_tracker_record(self, user_id, tracker):
         report = self.check_report(user_id, tracker.name)
@@ -194,5 +196,5 @@ class TrackerFunctions:
             and_(Report.related_user == user_id, Report.item_name == item_name, Report.month == month, Report.year == year)
         ).first()
         if report is None:
-            return "Failed"
+            return False
         return report

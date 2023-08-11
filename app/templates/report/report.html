@@ -133,11 +133,17 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
         });
     });
 </script>
+<br>
 <div>
-    {% for tracker in trackers %}
+    {% for records in trackers['total'] %}
         <div style="border:2px; width: 50px;"></div>
+        <div>{{ loop.index }}) {{ records['name'] }}</div>
+        <div>Total Use Time: {{ records['use_time'] }}</div>
+        <div>Power Rate (Watt/Minute): {{ records['rate'] }}</div>
+        <div>Total Power Usage: {{ records['total_usage'] }}</div>
         <br>
     {% endfor %}
+    <div style="border:2px; width: 50px;"></div>
 </div>
 {% include 'footer.html' %}
   </body>
