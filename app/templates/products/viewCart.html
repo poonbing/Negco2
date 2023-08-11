@@ -2,7 +2,7 @@
 get_flashed_messages() %}
 <div
   id="alert-1"
-  class="flex p-4 mb-4 text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+  class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-blue-400 mt-2.5"
   role="alert"
 >
   <svg
@@ -22,7 +22,7 @@ get_flashed_messages() %}
   <div class="ml-3 text-sm font-medium">{{message}}</div>
   <button
     type="button"
-    class="ml-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+    class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-green-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
     data-dismiss-target="#alert-1"
     aria-label="Close"
   >
@@ -130,13 +130,23 @@ get_flashed_messages() %}
     {% endfor %}
   </ul>
   <div class="space-y-1 text-right">
-    <p>
-      Total amount:
-      <span class="font-semibold">{{"$%.2f"|format(total_price)}}</span>
-    </p>
-    <p class="text-sm dark:text-gray-400">
-      Not including taxes and shipping costs
-    </p>
+    {% if total_price >= 60 %}
+      <p>
+        Subtotal amount:
+        <span class="font-semibold">{{"$%.2f"|format(total_price)}}</span>
+      </p>
+      <p class="text-sm dark:text-gray-400">
+        Congrats! you are eligible for free delivery.
+      </p>
+    {% else %}
+      <p>
+        Subtotal amount:
+        <span class="font-semibold">{{"$%.2f"|format(total_price)}}</span>
+      </p>
+      <p class="text-sm dark:text-gray-400">
+        Spend {{"$%.2f"|format(remaining_amount)}} more to get free delivery.
+      </p>
+    {% endif %}
   </div>
   <div class="flex justify-end space-x-4">
     <a

@@ -134,6 +134,7 @@ class User(
     phone = db.Column(db.String(15), nullable=False)
     login_attempts = db.Column(db.INTEGER, default=0)
     locked = db.relationship("LockedUser", backref="user", uselist=False)
+    rating_token = db.Column(db.String(500))
 
     __table_args__ = (
         CheckConstraint(gender.in_(["male", "female"]), name="check_gender"),
@@ -393,6 +394,7 @@ class Products(db.Model):
     offered_price = db.Column(db.Numeric(precision=10, scale=2))
     rating_score = db.Column(db.Integer)
     rating_count = db.Column(db.Integer)
+    stripe_price_id = db.Column(db.String(50), nullable=False)
 
     def rating_result(self):
         if self.rating_count == None:

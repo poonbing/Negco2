@@ -92,7 +92,7 @@ class createProduct(FlaskForm):
     )
     description = TextAreaField(
         "Description:",
-        validators=[InputRequired(), Length(min=10, max=1000)],
+        validators=[InputRequired(), Length(min=10, max=2000)],
         render_kw={"rows": 8},
     )
     category = SelectField(

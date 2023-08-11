@@ -2,7 +2,7 @@
 get_flashed_messages() %}
 <div
   id="alert-1"
-  class="flex p-4 mb-4 text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+  class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-blue-400 mt-2.5"
   role="alert"
 >
   <svg
@@ -22,7 +22,7 @@ get_flashed_messages() %}
   <div class="ml-3 text-sm font-medium">{{message}}</div>
   <button
     type="button"
-    class="ml-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+    class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-green-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
     data-dismiss-target="#alert-1"
     aria-label="Close"
   >
@@ -87,7 +87,12 @@ get_flashed_messages() %}
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
               ></path>
             </svg>
-            <span class="ml-1">{{product_to_view.rating_result()}}/5.0</span>
+            {% if product_to_view.rating_result() == 0 %}
+              <span class="ml-1">5.0/5.0</span>
+            {% else %}
+              <span class="ml-1">{{product_to_view.rating_result()}}/5.0</span>
+            {% endif %}
+
             {% if product_to_view.rating_count == None %}
               <span class="text-gray-600 ml-3">No reviews yet</span>
             
@@ -247,10 +252,18 @@ get_flashed_messages() %}
               d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
             ></path>
           </svg>
-          <span
+        {% if product.rating_result() == 0 %}
+            <span
             class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-1"
-            >{{product.rating_result()}}/5.0</span
+            >5.0/5.0</span
           >
+
+        {% else %}
+            <span
+              class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-1"
+              >{{product.rating_result()}}/5.0</span
+            >
+        {% endif %}
         </div>
         <div class="items-center justify-between">
           {% if product.offered_price %}
