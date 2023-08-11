@@ -36,6 +36,7 @@ content %}
       </div>
     </div>
     <form method="POST" action="{{ url_for('management.locked_accounts') }}">
+      {{ form.csrf_token }}
       <table
         id="users-table"
         class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
@@ -67,15 +68,8 @@ content %}
           >
             <td class="w-4 p-4">
               <div class="flex items-center">
-                <input
-                  id="checkbox-table-{{ loop.index }}"
-                  type="checkbox"
-                  name="unlock_account"
-                  value="{{ account.id }}"
-                />
-                <label for="checkbox-table-{{ loop.index }}" class="sr-only"
-                  >checkbox</label
-                >
+                {{ form.unlock_account(id="checkbox-table-" + loop.index|string, value=account.id) }}
+                <label for="checkbox-table-{{ loop.index }}" class="sr-only">checkbox</label>
               </div>
             </td>
             <th
@@ -93,17 +87,16 @@ content %}
           {% endfor %}
         </tbody>
       </table>
-    </form>
+      
   </div>
-</div>
-
-<div class="mt-6 text-center">
-  <button
-    type="submit"
-    class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-  >
-    Unlock Selected Accounts
-  </button>
+  <div class="mt-6 text-center">
+    <button
+      type="submit"
+      class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+    >
+      Unlock Selected Accounts
+    </button>
+  </div>
 </form>
 </div>
 

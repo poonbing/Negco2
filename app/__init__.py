@@ -18,7 +18,7 @@ def create_app(config_class=Config):
     # Whose is this??
     key = secrets.token_urlsafe(16)
     app.config["SECRET_KEY"] = key
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1000 * 1000
     app.config.from_object(config_class)
     stripe_keys = {
          "secret_key": os.environ["STRIPE_SECRET_KEY"],
@@ -33,10 +33,8 @@ def create_app(config_class=Config):
             "Strict-Transport-Security"
         ] = "max-age=31536000; includeSubDomains"
         # response.headers[
-        #      "Content-Security-Policy"
-        #  ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://unpkg.com https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"   
-        
-
+        #     "Content-Security-Policy"
+        # ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://unpkg.com https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"
 
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
@@ -68,18 +66,17 @@ def create_app(config_class=Config):
                 extra_args = record.args
                 log_text = record.msg.format(*extra_args)
                 log_entry = Log(
-                    source = record.__dict__.get('page', None),
-                    logged_user = record.__dict__.get('user_id', None),
-                    address = record.__dict__.get('address', None),
-                    category = record.__dict__.get('category', None),
-                    log_text = log_text
+                    source=record.__dict__.get("page", None),
+                    logged_user=record.__dict__.get("user_id", None),
+                    address=record.__dict__.get("address", None),
+                    category=record.__dict__.get("category", None),
+                    log_text=log_text,
                 )
                 print(log_entry.address, log_entry.logged_user)
                 db.session.add(log_entry)
                 db.session.commit()
             except Exception:
                 self.handleError(record)
-
 
     handler = SQLAlchemyHandler()
     app.logger.addHandler(handler)

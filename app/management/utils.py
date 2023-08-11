@@ -5,6 +5,14 @@ from functools import wraps
 from PIL import Image
 from io import BytesIO
 import re
+import string
+import secrets
+
+
+def generate_api_key(length=60):
+    alphabet = string.ascii_letters + string.digits
+    api_key = "".join(secrets.choice(alphabet) for _ in range(length))
+    return api_key
 
 
 def role_required(required_role):
@@ -22,46 +30,19 @@ def role_required(required_role):
     return decorator
 
 
-def update_password(user, form):
-    new_password = form.password.data
-    confirm_password = form.confirm_password.data
+def compress_and_resize(image_bytes, max_size=(300, 300), quality=85):
+    try:
+        image = Image.open(BytesIO(image_bytes))
 
-    if new_password and new_password == confirm_password:
-        user.password = new_password
-        return True
-    else:
-        return False
+        image.thumbnail(max_size)
 
+        compressed_image_buffer = BytesIO()
 
-def resize(image_input, width=30, height=30, keep_aspect_ratio=False):
-    if isinstance(image_input, str):
-        with open(image_input, "rb") as file:
-            image_bytes = file.read()
-    elif isinstance(image_input, bytes):
-        image_bytes = image_input
-    else:
-        raise ValueError(
-            "Invalid image_input type. It should be either a file path (str) or image bytes (bytes)."
-        )
+        image.save(compressed_image_buffer, format=image.format, quality=quality)
 
-    if width is None and height is None:
-        raise ValueError("Either width or height must be provided.")
-    if not keep_aspect_ratio and (width is None or height is None):
-        raise ValueError(
-            "Both width and height must be provided when keep_aspect_ratio is False."
-        )
+        compressed_resized_image_bytes = compressed_image_buffer.getvalue()
 
-    foo = Image.open(BytesIO(image_bytes))
-
-    if keep_aspect_ratio:
-        original_width, original_height = foo.size
-        if width is None:
-            width = int(height * original_width / original_height)
-        elif height is None:
-            height = int(width * original_height / original_width)
-
-        foo = foo.resize((width, height))
-
-    output_bytes = BytesIO()
-    foo.save(output_bytes, format="JPEG")
-    return output_bytes.getvalue()
+        return compressed_resized_image_bytes
+    except Exception as e:
+        print("Error:", e)
+        return None

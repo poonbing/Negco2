@@ -1,0 +1,88 @@
+{% extends "layout.html" %} {% block title %} Home {% endblock %} {% block
+content %}
+<div class="container mx-auto mt-6">
+  <!-- Post -->
+  <div class="bg-white shadow rounded-md p-4 mb-4">
+    <div class="flex items-center mb-2">
+      <img
+        src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+        alt="Profile Picture"
+        class="w-10 h-10 rounded-full mr-4"
+      />
+      <p class="mr-2 font-semibold">Post author</p>
+      <p class="text-gray-500">Posted 2 hours ago</p>
+    </div>
+    <h2 class="text-lg font-bold mt-3 mb-2">Sexy Daddy</h2>
+    <img
+      src="https://theindependent.sg/wp-content/uploads/2020/07/Screenshot-2020-07-01-18.57.15.png"
+      alt="Post Image"
+      class="mb-2 rounded-md"
+    />
+    <p class="mb-4 text-gray-700">Post Content</p>
+    <div class="flex items-center mt-2">
+      <svg
+        class="w-4 h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M17,9H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Zm-4,4H7a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,0-1.41A8,8,0,1,1,12,20Z"
+        />
+      </svg>
+      <span class="ml-2 text-gray-500">12 Comments</span>
+    </div>
+  </div>
+
+  <!-- Comment Form -->
+  <div class="bg-white shadow rounded-md p-4 mb-4">
+    <h3 class="text-lg font-semibold mb-2">Add a Comment</h3>
+    <form>
+      <textarea
+        class="w-full p-2 rounded-md border"
+        rows="4"
+        placeholder="Write your comment here..."
+      ></textarea>
+      <button
+        type="submit"
+        class="mt-2 bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700"
+      >
+        Submit Comment
+      </button>
+    </form>
+  </div>
+
+  <!-- List of All Comments -->
+  <div class="bg-white shadow rounded-md p-4 mb-4">
+    <h2 class="text-xl font-semibold mb-2">Comments</h2>
+
+    <!-- Comment 1 -->
+    <div class="bg-gray-100 p-3 rounded-md mb-2">
+      <div class="flex items-center mb-1">
+        <img
+          src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+          alt="Profile Picture"
+          class="w-8 h-8 rounded-full mr-2"
+        />
+        <p class="mr-2 font-semibold">Comment author</p>
+        <p class="text-gray-500">Posted 1 hour ago</p>
+      </div>
+      <p class="text-gray-700">Why so handsome</p>
+    </div>
+
+    <!-- Comment 2 -->
+    <div class="bg-gray-100 p-3 rounded-md mb-2">
+      <div class="flex items-center mb-1">
+        <img
+          src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+          alt="Profile Picture"
+          class="w-8 h-8 rounded-full mr-2"
+        />
+        <p class="mr-2 font-semibold">Comment author</p>
+        <p class="text-gray-500">Posted 30 minutes ago</p>
+      </div>
+      <p class="text-gray-700">Damn handsome sia</p>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

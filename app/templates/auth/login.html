@@ -52,13 +52,62 @@ content %}
           </div>
           <div>
             {{ form.password.label(class_="block mb-2 text-sm font-medium
-            text-gray-900 dark:text-white") }} {{
-            form.password(class_="bg-gray-50 border border-gray-300
-            text-gray-900 sm:text-sm rounded-lg focus:ring-teal-600
-            focus:border-teal-600 block w-full p-2.5 dark:bg-gray-700
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-            dark:focus:ring-blue-500 dark:focus:border-blue-500",
-            placeholder="••••••••", required=true) }}
+            text-gray-900 dark:text-white") }}
+            <div class="relative">
+              {{ form.password(class_="js-password bg-gray-50 border
+              border-gray-300 text-gray-900 sm:text-sm rounded-lg
+              focus:ring-teal-600 focus:border-teal-600 block w-full p-2.5
+              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+              dark:text-white dark:focus:ring-blue-500
+              dark:focus:border-blue-500", placeholder="••••••••",
+              required=true, type="password") }}
+
+              <label
+                class="bg-gray-300 hover:bg-gray-400 rounded px-2 py-1 text-sm text-gray-600 font-mono cursor-pointer js-password-label absolute right-2 top-2"
+                for="toggle"
+              >
+                <svg
+                  class="h-5 w-5 text-gray-600 js-show-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-eye"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                  />
+                  <path
+                    d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"
+                  />
+                </svg>
+                <svg
+                  class="h-5 w-5 text-gray-600 js-hide-icon hidden"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-eye-slash"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"
+                  />
+                  <path
+                    d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"
+                  />
+                  <path
+                    d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"
+                  />
+                </svg>
+              </label>
+              <input
+                class="hidden js-password-toggle"
+                id="toggle"
+                type="checkbox"
+              />
+            </div>
           </div>
 
           <div class="flex items-center justify-between">
@@ -165,66 +214,22 @@ content %}
               class="flex items-center bg-white border border-gray-300 rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="h-6 w-6 mr-2"
-                viewBox="0 0 256 242"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                class="bi bi-microsoft"
+                viewBox="0 0 16 16"
               >
-                <defs>
-                  <linearGradient
-                    id="logosMicrosoftAzure0"
-                    x1="58.972%"
-                    x2="37.191%"
-                    y1="7.411%"
-                    y2="103.762%"
-                  >
-                    <stop offset="0%" stop-color="#114A8B" />
-                    <stop offset="100%" stop-color="#0669BC" />
-                  </linearGradient>
-                  <linearGradient
-                    id="logosMicrosoftAzure1"
-                    x1="59.719%"
-                    x2="52.691%"
-                    y1="52.313%"
-                    y2="54.864%"
-                  >
-                    <stop offset="0%" stop-opacity=".3" />
-                    <stop offset="7.1%" stop-opacity=".2" />
-                    <stop offset="32.1%" stop-opacity=".1" />
-                    <stop offset="62.3%" stop-opacity=".05" />
-                    <stop offset="100%" stop-opacity="0" />
-                  </linearGradient>
-                  <linearGradient
-                    id="logosMicrosoftAzure2"
-                    x1="37.279%"
-                    x2="62.473%"
-                    y1="4.6%"
-                    y2="99.979%"
-                  >
-                    <stop offset="0%" stop-color="#3CCBF4" />
-                    <stop offset="100%" stop-color="#2892DF" />
-                  </linearGradient>
-                </defs>
-                <path
-                  fill="url(#logosMicrosoftAzure0)"
-                  d="M85.343.003h75.753L82.457 233a12.078 12.078 0 0 1-11.442 8.216H12.06A12.06 12.06 0 0 1 .633 225.303L73.898 8.219A12.08 12.08 0 0 1 85.343 0v.003Z"
-                />
-                <path
-                  fill="#0078D4"
-                  d="M195.423 156.282H75.297a5.56 5.56 0 0 0-3.796 9.627l77.19 72.047a12.138 12.138 0 0 0 8.28 3.26h68.02l-29.568-84.934Z"
-                />
-                <path
-                  fill="url(#logosMicrosoftAzure1)"
-                  d="M85.343.003a11.98 11.98 0 0 0-11.471 8.376L.723 225.105a12.045 12.045 0 0 0 11.37 16.112h60.475a12.926 12.926 0 0 0 9.921-8.437l14.588-42.991l52.105 48.6a12.327 12.327 0 0 0 7.757 2.828h67.766l-29.721-84.935l-86.643.02L161.37.003H85.343Z"
-                />
-                <path
-                  fill="url(#logosMicrosoftAzure2)"
-                  d="M182.098 8.207A12.06 12.06 0 0 0 170.67.003H86.245c5.175 0 9.773 3.301 11.428 8.204L170.94 225.3a12.062 12.062 0 0 1-11.428 15.92h84.429a12.062 12.062 0 0 0 11.425-15.92L182.097 8.207Z"
-                />
+                <path fill="#F05022" d="M7.462 0H0v7.19h7.462V0z" />
+                <path fill="#7FBA00" d="M16 0H8.538v7.19H16V0z" />
+                <path fill="#00A4EF" d="M7.462 8.211H0V16h7.462V8.211z" />
+                <path fill="#FFB900" d="M16 8.211H8.538V16H16V8.211z" />
               </svg>
 
               <span
                 ><a href="{{ url_for('auth.login_with_azure') }}"
-                  >Login with Azure</a
+                  >Login with Microsoft</a
                 ></span
               >
             </button>
@@ -239,9 +244,30 @@ content %}
           </p>
         </form>
       </div>
-
     </div>
   </div>
 </section>
+
+<script>
+  const passwordToggle = document.querySelector(".js-password-toggle");
+  const showIcon = document.querySelector(".js-show-icon");
+  const hideIcon = document.querySelector(".js-hide-icon");
+
+  passwordToggle.addEventListener("change", function () {
+    const password = document.querySelector(".js-password");
+
+    if (password.type === "password") {
+      password.type = "text";
+      showIcon.classList.add("hidden");
+      hideIcon.classList.remove("hidden");
+    } else {
+      password.type = "password";
+      showIcon.classList.remove("hidden");
+      hideIcon.classList.add("hidden");
+    }
+
+    password.focus();
+  });
+</script>
 
 {% endblock %}

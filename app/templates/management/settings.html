@@ -3,7 +3,19 @@ content %}
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
   <h1 class="text-3xl font-bold mt-4">Settings</h1>
   <br />
-
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <p class="text-red-500">{{ message }}</p>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %} {% if form.errors %}
+  <ul class="text-red-400">
+    {% for field, errors in form.errors.items() %} {% for error in errors %}
+    <li>{{ field }}: {{ error }}</li>
+    {% endfor %} {% endfor %}
+  </ul>
+  {% endif %}
   <form
     method="POST"
     action="{{ url_for('management.settings') }}"

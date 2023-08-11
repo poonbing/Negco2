@@ -68,10 +68,11 @@ def login():
         if user:
             if user.is_account_locked():
                 flash("Account locked. Contact the admin for assistance.", "error")
+
                 current_app.logger.info(
                     f"User Login Failed: Locked User",
                     extra={
-                        "user_id": 'null',
+                        "user_id": "null",
                         "address": request.remote_addr,
                         "page": request.path,
                         "category": "Login",
@@ -84,7 +85,7 @@ def login():
                 current_app.logger.info(
                     f"User Login Failed: Incorrect Password",
                     extra={
-                        "user_id": 'null',
+                        "user_id": "null",
                         "address": request.remote_addr,
                         "page": request.path,
                         "category": "Login",

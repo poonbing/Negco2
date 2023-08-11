@@ -1,5 +1,7 @@
 from flask_wtf import FlaskForm
 import re
+
+import magic
 from wtforms.validators import (
     InputRequired,
     Email,
@@ -8,6 +10,7 @@ from wtforms.validators import (
     ValidationError,
     NumberRange,
     DataRequired,
+    Regexp,
 )
 from wtforms import (
     StringField,
@@ -22,11 +25,19 @@ from wtforms import (
     DateField,
 )
 import datetime
-from wtforms_components import DateTimeField, DateRange
+from wtforms_components import DateRange
 from flask_wtf.file import FileRequired, FileAllowed
 
 
-def password_check(form, field):
+def validate_image(_, field):
+    mime = magic.Magic()
+    mime_type = mime.from_buffer(field.data.read(1024))
+
+    if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
+        raise ValidationError("File is not an allowed image type")
+
+
+def validate_password(_, field):
     password = field.data
 
     length_error = len(password) < 8
@@ -47,8 +58,16 @@ def password_check(form, field):
         )
 
 
+class UnlockAccountForm(FlaskForm):
+    unlock_account = BooleanField("Unlock Account")
+    submit = SubmitField("Unlock Selected Accounts")
+
+
 class SettingsForm(FlaskForm):
-    profile_picture = FileField("Profile Picture")
+    profile_picture = FileField(
+        "Profile Picture",
+        validators=[FileAllowed(["jpg", "png"], "Only JPG and PNG images allowed.")],
+    )
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
     phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
@@ -56,7 +75,7 @@ class SettingsForm(FlaskForm):
         "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
     )
     email = StringField("Email", validators=[Email()])
-    password = PasswordField("Password")
+    password = PasswordField("Password", validators=[])
     confirm_password = PasswordField(
         "Confirm Password", validators=[EqualTo("password")]
     )
@@ -130,19 +149,50 @@ class LoginForm(FlaskForm):
 
 
 class SignUpForm(FlaskForm):
-    username = StringField("Username", validators=[InputRequired()])
-    password = PasswordField("Password", validators=[InputRequired(), password_check])
-    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    def validate_phone(form, field):
+        pattern = re.compile(r"^\d{8}$")
+        if not pattern.match(field.data):
+            raise ValidationError("Phone number must be exactly eight digits.")
+
+    username = StringField(
+        "Username",
+        validators=[
+            InputRequired(),
+            Regexp(
+                r"^[a-zA-Z0-9_-]{5,49}$",
+                message="Invalid username format. Only letters, numbers, underscores, and hyphens are allowed.",
+            ),
+        ],
+    )
+    password = PasswordField(
+        "Password", validators=[InputRequired(), validate_password]
+    )
+
+    confirm_password = PasswordField(
+        "Confirm Password", validators=[EqualTo("password")]
+    )
     email = StringField("Email", validators=[InputRequired(), Email()])
     gender = SelectField(
         "Gender",
         choices=[("Male"), ("Female")],
         validators=[InputRequired()],
     )
-    first_name = StringField("First Name", validators=[InputRequired()])
-    last_name = StringField("Last Name", validators=[InputRequired()])
-    age = IntegerField("Age", validators=[InputRequired()])
-    phone = StringField("Phone", validators=[InputRequired()])
+    first_name = StringField(
+        "First Name",
+        validators=[InputRequired(), Length(min=5, max=49, message="Invalid Length")],
+    )
+    last_name = StringField(
+        "Last Name",
+        validators=[InputRequired(), Length(min=5, max=49, message="Invalid Length")],
+    )
+    age = IntegerField(
+        "Age",
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=200, message="Age must be between 0 and 200."),
+        ],
+    )
+    phone = StringField("Phone", validators=[InputRequired(), validate_phone])
 
 
 class ForgotPasswordForm(FlaskForm):
@@ -158,26 +208,12 @@ class AccessCodeForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField("Password", validators=[InputRequired()])
-    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
-    submit = SubmitField("Submit")
-
-
-class ForgotPasswordForm(FlaskForm):
-    email = StringField("Email", validators=[InputRequired(), Email()])
-    submit = SubmitField("Submit")
-
-
-class AccessCodeForm(FlaskForm):
-    access_code = IntegerField(
-        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    password = PasswordField(
+        "Password", validators=[InputRequired(), validate_password]
     )
-    submit = SubmitField("Submit")
-
-
-class ResetPasswordForm(FlaskForm):
-    password = PasswordField("Password", validators=[InputRequired()])
-    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])
+    confirm_password = PasswordField(
+        "Confirm Password", validators=[InputRequired(), EqualTo("password")]
+    )
     submit = SubmitField("Submit")
 
 
