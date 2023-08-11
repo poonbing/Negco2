@@ -2,6 +2,7 @@
 content %}
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
   <h1 class="text-3xl font-bold mt-4">Settings</h1>
+
   <br />
   {% with messages = get_flashed_messages() %} {% if messages %}
   <ul class="messages">
@@ -22,6 +23,7 @@ content %}
     enctype="multipart/form-data"
   >
     {{ form.csrf_token }}
+    <h2 class="text-lg font-semibold mb-2 mt-4">Personal Details</h2>
 
     <div>
       <label
@@ -155,21 +157,73 @@ content %}
     </div>
   </form>
 
-  <h2>Sessions:</h2>
-  {% if sessions %}
-  <ul>
-    {% for session in sessions %}
-    <li>{{ session.user_agent }}</li>
-    <li>{{ session.ip_address }}</li>
-    {% endfor %}
+  <h2 class="text-lg font-semibold mb-2 mt-4">API Key List</h2>
+  <ul class="space-y-2">
+    <li class="flex items-center justify-between">
+      <span id="apiValue">e8deab79-3f7d-4fec-960b-62f105e0fdde</span>
+      <p class="text-sm text-gray-500">2021-07-03</p>
+      <button id="copyButton" class="text-red-500 hover:text-red-700">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 inline-block"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+            clip-rule="evenodd"
+          />
+          <path
+            fill-rule="evenodd"
+            d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    </li>
+    <li class="flex items-center justify-between">
+      <span>Your API Key 2</span>
+      <button class="text-red-500 hover:text-red-700">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 inline-block"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+            clip-rule="evenodd"
+          />
+          <path
+            fill-rule="evenodd"
+            d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    </li>
+    <!-- Add more API keys here -->
   </ul>
-  {% else %}
-  <p>No sessions found.</p>
-  {% endif %} {% with messages = get_flashed_messages() %} {% for message in
-  messages %} {% if message.category == "success" %}
-  <div class="bg-green-200 text-green-800 p-4 mt-4">{{ message }}</div>
-  {% elif message.category == "error" %}
-  <div class="bg-red-200 text-red-800 p-4 mt-4">{{ message }}</div>
-  {% endif %} {% endfor %} {% endwith %}
 </div>
+
+<script>
+  const copyButton = document.getElementById("copyButton");
+  const apiValue = document.getElementById("apiValue");
+
+  copyButton.addEventListener("click", () => {
+    const textToCopy = apiValue.innerText;
+
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        console.log("Text copied to clipboard:", textToCopy);
+      })
+      .catch((error) => {
+        console.error("Error copying text:", error);
+      });
+  });
+</script>
+
 {% endblock %}

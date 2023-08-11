@@ -15,8 +15,8 @@ from io import BytesIO
 # Local Modules
 from app import limiter
 from app.management import bp
-from .utils import role_required, compress_and_resize
-from ..models import User, LockedUser, Session
+from .utils import role_required, compress_and_resize, generate_api_key
+from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
 from ..forms import SettingsForm, UnlockAccountForm
 from ..models import User
@@ -29,6 +29,11 @@ from app import limiter
 def profile_picture():
     user = current_user
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
+
+
+@bp.route("/sexy")
+def sexy():
+    return render_template("management/test.html")
 
 
 @bp.route("/show_users", methods=["GET"])

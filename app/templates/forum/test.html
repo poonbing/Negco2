@@ -1,0 +1,161 @@
+{% extends "layout.html" %} {% block title %} Home {% endblock %} {% block
+content %}
+
+<main class="container mx-auto mt-6">
+  <div class="flex space-x-4 mb-4 p-4 bg-white shadow rounded-md">
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+      class="text-teal-600 hover:underline"
+      >Rules</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+      class="text-teal-600 hover:underline"
+      >General</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+      class="text-teal-600 hover:underline"
+      >Bug Reports</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=4) }}"
+      class="text-teal-600 hover:underline"
+      >Suggestions</a
+    >
+  </div>
+
+  <div class="flex md:flex-row flex-col">
+    <div class="md:w-3/4 pr-4">
+      <div class="flex items-center space-x-2 mb-4">
+        <button
+          id="create-post-btn"
+          class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-600"
+        >
+          Create New Post
+        </button>
+
+        <select class="border rounded-md px-2 py-1">
+          <option class="bg-white">Sort by: Newest</option>
+          <option class="bg-white">Sort by: Popular</option>
+        </select>
+      </div>
+
+      <div class="bg-white shadow rounded-md p-4 mb-4">
+        <div class="flex items-center mb-2">
+          <img
+            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+            alt="Profile Picture"
+            class="w-10 h-10 rounded-full mr-4"
+          />
+          <p class="mr-2 font-semibold">Post author</p>
+          <p class="text-gray-500">Posted 2 hours ago</p>
+        </div>
+
+        <h2 class="text-lg font-bold mt-3 mb-2">Post title</h2>
+
+        <p class="mb-4 text-gray-700">Post Content</p>
+
+        <div class="flex items-center mt-2">
+          <svg
+            class="w-4 h-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M17,9H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Zm-4,4H7a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,0-1.41A8,8,0,1,1,12,20Z"
+            />
+          </svg>
+          <span class="ml-2 text-gray-500"> 12 Comments</span>
+        </div>
+      </div>
+
+      <div class="bg-white shadow rounded-md p-4 mb-4">
+        <div class="flex items-center mb-2">
+          <img
+            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+            alt="Profile Picture"
+            class="w-10 h-10 rounded-full mr-4"
+          />
+          <p class="mr-2 font-semibold">Post author</p>
+          <p class="text-gray-500">Posted 2 hours ago</p>
+        </div>
+
+        <h2 class="text-lg font-bold mt-3 mb-2">Esta es para vosotros</h2>
+        <img
+          src="https://static1.straitstimes.com.sg/s3fs-public/styles/large30x20/public/articles/2023/06/02/photo2023-06-0218-47-30_12.jpg?VersionId=BRhRJfK2sDfsm9S3JdSI3eBI5jLPqamz&itok=B-PE0_Pr"
+          alt="Post Image"
+          class="mb-2 rounded-md"
+        />
+        <p class="mb-4 text-gray-700">SIUUUUUUUUUUUUUUU</p>
+
+        <div class="flex items-center mt-2">
+          <svg
+            class="w-4 h-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M17,9H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Zm-4,4H7a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,0-1.41A8,8,0,1,1,12,20Z"
+            />
+          </svg>
+          <span class="ml-2 text-gray-500"> 12 Comments</span>
+        </div>
+      </div>
+
+      <div class="bg-white shadow rounded-md p-4 mb-4">
+        <div class="flex items-center mb-2">
+          <img
+            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+            alt="Profile Picture"
+            class="w-10 h-10 rounded-full mr-4"
+          />
+          <p class="mr-2 font-semibold">Post author</p>
+          <p class="text-gray-500">Posted 2 hours ago</p>
+        </div>
+
+        <h2 class="text-lg font-bold mt-3 mb-2">Post title</h2>
+        <img
+          src="https://theindependent.sg/wp-content/uploads/2020/07/Screenshot-2020-07-01-18.57.15.png"
+          alt="Post Image"
+          class="mb-2 rounded-md"
+        />
+        <p class="mb-4 text-gray-700">Post Content</p>
+
+        <div class="flex items-center mt-2">
+          <svg
+            class="w-4 h-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M17,9H7a1,1,0,0,0,0,2H17a1,1,0,0,0,0-2Zm-4,4H7a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,0-1.41A8,8,0,1,1,12,20Z"
+            />
+          </svg>
+          <span class="ml-2 text-gray-500"> 12 Comments</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="md:w-1/4">
+      <div class="top-4">
+        <div class="bg-white shadow rounded-md p-4 mb-4">
+          <h2 class="text-xl font-semibold mb-2">Latest Discussions</h2>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="text-teal-600 hover:underline">Discussion 1</a>
+            </li>
+            <li>
+              <a href="#" class="text-teal-600 hover:underline">Discussion 2</a>
+            </li>
+            <li>
+              <a href="#" class="text-teal-600 hover:underline">Discussion 3</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock content %}

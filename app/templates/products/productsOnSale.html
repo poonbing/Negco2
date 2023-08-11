@@ -1,31 +1,38 @@
 {% extends 'layout.html' %} {% block content %}
 
 <!-----product on sale cataloge-->
-<div class="mt-16">
-    <p class="text-center text-2xl text-gray-600 font-semibold">SALE CORNER</p>
+<div class="bg-gray-50">
+  <p class="text-3xl text-center text-gray-800 p-20">
+    Sale Corner ({{products_on_sale.total}})
+  </p>
 </div>
 
 <div class="flex items-center justify-center py-4 md:py-8 flex-wrap">
-    <a
-      href="{{url_for('products.allProducts')}}"
-      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
-      >All</a
-    >
-    <a
-      href="{{url_for('products.filterProducts', category='On-the-go')}}"
-      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
-      >On-the-go</a
-    >
-    <a
-      href="{{url_for('products.filterProducts', category='Kitchen')}}"
-      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
-      >Kitchen</a
-    >
-    <a
-      href="{{url_for('products.filterProducts', category='Bathroom')}}"
-      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
-      >Bathroom</a
-    >
+  <a
+    href="{{url_for('products.allProducts')}}"
+    class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+    >All</a
+  >
+  <a
+    href="/productsOnSale"
+    class="text-gray-700 hover:text-white border border-teal-600 bg-white hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:bg-gray-900 dark:focus:ring-blue-800 duration-300"
+    >Sale Corner</a
+  >
+  <a
+    href="{{url_for('products.filterProducts', category='On-the-go')}}"
+    class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+    >On-the-go</a
+  >
+  <a
+    href="{{url_for('products.filterProducts', category='Kitchen')}}"
+    class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+    >Kitchen</a
+  >
+  <a
+    href="{{url_for('products.filterProducts', category='Bathroom')}}"
+    class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+    >Bathroom</a
+  >
 </div>
   
   <div class="lg:grid grid-cols-4 mb-6">
@@ -87,6 +94,26 @@
       </div>
     </div>
     {% endfor %}
+  </div>
+
+  <div
+    class="flex items-center justify-center border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+  >
+    {% for page_num in products_on_sale.iter_pages(left_edge=1, right_edge=1,
+    left_current=1, right_current=2) %} {% if page_num %} {% if products_on_sale.page ==
+    page_num %}
+    <a
+      class="px-3 py-2 text-green-600 border border-gray-300 bg-green-50 hover:bg-green-100 hover:text-green-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+      href="{{ url_for('products.productsOnSale', page=page_num)}}"
+      >{{ page_num }}</a
+    >
+    {% else %}
+    <a
+      class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+      href="{{ url_for('products.productsOnSale', page=page_num)}}"
+      >{{ page_num }}</a
+    >
+    {% endif %} {% else %} ... {% endif %} {% endfor %}
   </div>
 
 {% endblock %}

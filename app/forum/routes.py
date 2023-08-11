@@ -16,8 +16,18 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@bp.route("/test")
+def test():
+    return render_template("forum/test.html")
+
+
+@bp.route("/test1")
+def test2():
+    return render_template("forum/test1.html")
+
+
 @bp.route("/forum")
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def home():
     topics = Topic.query.all()
     return render_template("forum/Home.html", topic=topics)
@@ -25,7 +35,7 @@ def home():
 
 @bp.route("/topics/<int:topic_id>/posts", methods=["GET", "POST"])
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def topic_posts(topic_id):
     print("Topic ID:", topic_id)
 
@@ -64,7 +74,7 @@ def topic_posts(topic_id):
 
 @bp.route("/post/<int:id>/", methods=["GET", "POST"])
 @login_required
-@limiter.limit('4/second')
+@limiter.limit("4/second")
 def post(id):
     db.session.rollback()
     comment_list = Comment.query.filter_by(post_id=id).all()

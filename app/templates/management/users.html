@@ -1,17 +1,6 @@
 {% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
 content %}
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
-  <div
-    class="loading-screen fixed inset-0 flex items-center justify-center z-50 bg-white dark:bg-gray-900"
-    id="loading-screen"
-  >
-    <div class="w-full h-15 text-center loader">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-  </div>
-
   <h1 class="text-3xl font-bold mt-4">Users List</h1>
   <br />
 
@@ -111,9 +100,10 @@ content %}
         />
       </div>
     </div>
+
     <table
       id="users-table"
-      class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+      class="w-full text-sm text-left text-gray-500 dark:text-gray-400 shadow animate-pulse dark:divide-gray-700"
     >
       <thead
         class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
@@ -136,7 +126,88 @@ content %}
           <th scope="col" class="px-6 py-3">Action</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-4">
+            <div class="w-4 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
+        </tr>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-4">
+            <div class="w-4 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
+        </tr>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-4">
+            <div class="w-4 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
+        </tr>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-4">
+            <div class="w-4 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-16 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>
@@ -185,10 +256,11 @@ content %}
   fetch("/get_users_data")
     .then((response) => response.json())
     .then((data) => {
-      const loadingScreen = document.getElementById("loading-screen");
-      loadingScreen.classList.add("hidden");
-      const users = data;
       const tbody = table.querySelector("tbody");
+      table.classList.remove("shadow");
+      table.classList.remove("animate-pulse");
+      tbody.textContent = "";
+      const users = data;
 
       users.forEach((user) => {
         const row = document.createElement("tr");
