@@ -36,7 +36,7 @@
   <div
     class="max-w-md bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mx-auto mt-4"
   >
-    <a href="#">
+    <a href="{{url_for('articles.articlePage', id=article.id)}}">
       <img class="rounded-t-lg" src="/static/images/{{article.image}}" alt="" />
     </a>
     <div class="p-5">

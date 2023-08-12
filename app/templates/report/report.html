@@ -8,9 +8,18 @@
     type="module"
     src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
   ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow&family=Poppins:wght@300&family=Roboto&display=swap" rel="stylesheet">
   </head>
   <body>
     {% include 'navbar.html' %}
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
 <script>
     function createChart() {
         const height = 800;
