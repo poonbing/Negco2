@@ -12,7 +12,7 @@ from ..forms import TrackerInteract
 
 @bp.route("/track", methods=["GET", "POST"])
 @login_required
-@limiter.limit('4/second')
+@limiter.limit('2/second')
 def track():
     tracker = TrackerFunctions()
     user_id = current_user.id

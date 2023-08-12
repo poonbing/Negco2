@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 import re
 
-import magic
+#import magic
 from wtforms.validators import (
     InputRequired,
     Email,
@@ -29,12 +29,12 @@ from wtforms_components import DateRange
 from flask_wtf.file import FileRequired, FileAllowed
 
 
-def validate_image(_, field):
-    mime = magic.Magic()
-    mime_type = mime.from_buffer(field.data.read(1024))
+# def validate_image(_, field):
+#      mime = magic.Magic()
+#      mime_type = mime.from_buffer(field.data.read(1024))
 
-    if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
-        raise ValidationError("File is not an allowed image type")
+#      if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
+#          raise ValidationError("File is not an allowed image type")
 
 
 def validate_password(_, field):
