@@ -2,8 +2,8 @@
 
 <!-----product on sale cataloge-->
 <div class="bg-gray-50">
-  <p class="text-3xl text-center text-gray-800 p-20">
-    Sale Corner ({{products_on_sale.total}})
+  <p class="text-3xl text-center bg-gray-800 text-white p-20">
+    Sale Corner
   </p>
 </div>
 
@@ -114,6 +114,7 @@
       >{{ page_num }}</a
     >
     {% endif %} {% else %} ... {% endif %} {% endfor %}
+    <span class="text-gray-700 ml-2 font-semibold">({{products_on_sale.total}})</span>
   </div>
 
 {% endblock %}
