@@ -8,6 +8,47 @@
     type="module"
     src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
   ></script>
+  <style>
+    .oval-radio-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .oval-radio-label {
+      padding: 5px 20px;
+      background-color: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      color: black;
+    }
+
+    .oval-radio:checked + .oval-radio-label {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .oval-radio {
+      appearance: none;
+      opacity: 0;
+    }
+
+    .oval-radio-indicator {
+      width: 15px;
+      height: 15px;
+      background-color: white;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .oval-radio:checked + .oval-radio-label .oval-radio-indicator {
+      background-color: #f1f1f1;
+    }
+  </style>
   </head>
   <body>
     {% include 'navbar.html' %}
@@ -87,9 +128,7 @@
 
             for (let j = 0; j < item.length; j++) {
                 const dividedValue = item[j] / (divisor/{{ num_days }});
-                console.log(dividedValue)
                 yz_array[i][j] = dividedValue;
-                console.log(yz_array)
             }
         }
 
@@ -101,9 +140,6 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
     // Data
     let xz = d3.range(m);
     let yz = resultArray;
-    console.log(xz)
-    console.log(yz)
-    console.log({{ datapoints }})
 
     // Layout
     let layout = "stacked";  // or "grouped"
@@ -113,11 +149,21 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
     // Update
     let update = chart.update(layout);
 </script>
+
 <div>
-    <input type="radio" id="grouped" name="layout" value="grouped">
-    <label for="grouped">Grouped</label><br>
-    <input type="radio" id="stacked" name="layout" value="stacked" checked>
-    <label for="stacked">Stacked</label>
+    <label for="stacked" class="oval-radio-container">
+        <input type="radio" id="stacked" name="layout" value="stacked" checked class="oval-radio hidden">
+        <span class="oval-radio-label"> 
+            Total
+        </span>
+    </label>
+    <label for="grouped" class="oval-radio-container mt-2">
+        <input type="radio" id="grouped" name="layout" value="grouped" class="oval-radio hidden" >
+        <span class="oval-radio-label"> 
+            Individual
+        </span>
+    </label>
+    <br>
 </div>
 <script>
     // Function to change layout mode
@@ -135,16 +181,133 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
 </script>
 <br>
 <div>
+    <form method="POST" id="trackerRecordEditForm" style="display: none;">
+        {{ form.hidden_tag() }}
+        <div>{{ form.name.label }} {{ form.name(id='name', readonly='readonly') }}</div>
+        <div> {{ form.item.label }} {{ form.item(id='item', readonly='readonly') }}</div>
+        <div>{{ form.starttime.label }} {{ form.starttime(id='starttime', readonly='readonly') }}</div>
+        <div>{{ form.newendtime.label }} {{ form.newendtime(id='newendtime') }}</div>
+        <div>
+            <button type="submit" id="SubmitEditForm">Submit</button>
+            <button type="button" onclick="closeForm()">Close</button>
+        </div>
+    </form>
+    <select id="itemFilter" onchange="filterByItem(this.value)">
+        <option value="">All Items</option>
+        {% for name in names %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+    </select>
     {% for records in trackers['total'] %}
+    <div class="record" data-item="{{ records['name'] }}">
         <div style="border:2px; width: 50px;"></div>
-        <div>{{ loop.index }}) {{ records['name'] }}</div>
-        <div>Total Use Time: {{ records['use_time'] }}</div>
+        <span class="record-index"></span><span> {{ records['name'] }}</span>
+        {% if records['edit_token'] == 1 %}
+        <button onclick="toggleForm('{{ records['name'] }}','{{ records['item'] }}','{{ records['start_time'] }}', '{{ records['end_time'] }}')"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                         Edit </button>
+        {% endif %}
+        <div>Total Use Time: {{ records['use_time'] }} Minutes</div>
         <div>Power Rate (Watt/Minute): {{ records['rate'] }}</div>
         <div>Total Power Usage: {{ records['total_usage'] }}</div>
+        <div>Date: {{ records['start_time'][0:10] }}</div>
         <br>
+    </div>
     {% endfor %}
     <div style="border:2px; width: 50px;"></div>
 </div>
 {% include 'footer.html' %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var nameInput = document.getElementById('name');
+            var itemInput = document.getElementById('item');
+            var starttimeInput = document.getElementById('starttime');
+            var newendtimeInput = document.getElementById('newendtime');
+            var submitButton = document.getElementById('SubmitEditForm');
+
+            function validateForm() {
+                var namePattern = /^[a-zA-Z0-9\s]+$/; // Only allow letters, numbers, and spaces
+                var itemPattern = /^[a-zA-Z0-9\s]+$/; // Only allow alphanumeric characters and spaces
+                var timePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/; // Only allow a specific time format
+
+                var nameIsValid = namePattern.test(nameInput.value);
+                var itemIsValid = itemPattern.test(itemInput.value);
+                var starttimeIsValid = timePattern.test(starttimeInput.value);
+                var newendtimeIsValid = timePattern.test(newendtimeInput.value);
+
+                var timeDifferenceIsValid = false;
+                if(starttimeIsValid && newendtimeIsValid) {
+                    var start = new Date(starttimeInput.value);
+                    var end = new Date(newendtimeInput.value);
+                    var differenceInMilliseconds = end - start;
+                    var oneMinuteInMilliseconds = 60 * 1000; // 60 seconds * 1000 milliseconds per second
+                    timeDifferenceIsValid = differenceInMilliseconds >= oneMinuteInMilliseconds;
+                }
+
+                var isValid = nameIsValid && itemIsValid && starttimeIsValid && newendtimeIsValid && timeDifferenceIsValid;
+                submitButton.disabled = !isValid;
+            }
+
+            nameInput.addEventListener('input', validateForm);
+            itemInput.addEventListener('input', validateForm);
+            starttimeInput.addEventListener('input', validateForm);
+            newendtimeInput.addEventListener('input', validateForm);
+
+            updateIndexes();
+            validateForm(); // Call once on page load to set the initial state
+            formContainer.style.display = 'none'; // Hide the form on page load
+            });
+
+
+        function toggleForm(defaultName, defaultItem, defaultStartTime, defaultEndTime) {
+            var formContainer = document.getElementById('trackerRecordEditForm');
+            var nameInput = document.getElementById('name');
+            var itemInput = document.getElementById('item');
+            var starttimeInput = document.getElementById('starttime');
+            var newendtimeInput = document.getElementById('newendtime');
+            if (formContainer.style.display === 'none' || formContainer.style.display === '') {
+            // Set default values from arguments
+            nameInput.value = defaultName;
+            itemInput.value = defaultItem;
+            starttimeInput.value = defaultStartTime;
+            newendtimeInput.value = defaultEndTime;
+            
+            formContainer.style.display = 'block';
+            } else {
+            formContainer.style.display = 'none';
+            }
+
+            validateForm(); // Revalidate the form whenever it is shown
+        }
+
+        function updateIndexes() {
+            var records = document.getElementsByClassName('record');
+            var index = 1;
+            for (var i = 0; i < records.length; i++) {
+                if (records[i].style.display !== 'none') {
+                    records[i].getElementsByClassName('record-index')[0].innerText = index + ')';
+                    index++;
+                }
+            }
+        }
+
+        function filterByItem(item) {
+            var records = document.getElementsByClassName('record');
+            var index = 1;
+            for (var i = 0; i < records.length; i++) {
+                var recordItem = records[i].getAttribute('data-item');
+                if (item === "" || recordItem === item) {
+                    records[i].style.display = 'block'; // Show record if it matches the filter or if the filter is empty
+                } else {
+                    records[i].style.display = 'none';
+                }
+            }
+            updateIndexes();
+        }
+
+        function closeForm() {
+            document.getElementById('trackerRecordEditForm').style.display = 'none';
+        }
+    </script>
   </body>
 </html>

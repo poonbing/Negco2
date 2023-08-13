@@ -31,24 +31,40 @@ content %}
           }, 1000);
       }
 
-      function fillAndSubmitForm(formname, name, item, rate, action) {
-      document.getElementById('nameField').value = name;
-      document.getElementById('itemField').value = item;
-      document.getElementById('rateField').value = rate;
-      document.getElementById('actionField').value = action;
-      document.getElementById('oldnameField').value = name;
-      document.getElementById('olditemField').value = item;
+    function fillAndSubmitForm(formname, name, item, rate, action) {
+        document.getElementById('nameField').value = name;
+        document.getElementById('rateField').value = parseFloat(rate);
+        document.getElementById('actionField').value = action;
+        document.getElementById('oldnameField').value = name;
+        document.getElementById('olditemField').value = item;
 
-      document.getElementById(formname).submit();
+
+        console.log(item)
+        var radioButton = document.querySelector('input[name="item"][value="' + item + '"]');
+            if (radioButton) {
+                radioButton.checked = true;
+            } else {
+                console.error('Radio button with value '+item+' not found!');
+            }
+
+        document.getElementById(formname).submit();
       }
 
+
+      
       function fillAndShowForm(formname, name, item, rate, action){
-          document.getElementById('nameField').value = name;
-          document.getElementById('itemField').value = item;
-          document.getElementById('rateField').value = rate;
-          document.getElementById('actionField').value = action;
-          document.getElementById('oldnameField').value = name;
-          document.getElementById('olditemField').value = item;
+        document.getElementById('nameField').value = name;
+        document.getElementById('rateField').value = rate;
+        document.getElementById('actionField').value = action;
+        document.getElementById('oldnameField').value = name;
+        document.getElementById('olditemField').value = name;
+
+        var radioButton = document.querySelector('input[name="item"][value="' + item + '"]');
+            if (radioButton) {
+                radioButton.checked = true;
+            } else {
+                console.error('Radio button with value ' + item + ' not found!');
+            }
 
           document.getElementById(formname).style = "display: inherit;";
       }
@@ -61,9 +77,9 @@ content %}
                     <div class="text-xl"><h2 id="key">{{ key.name }}</h2></div>
                     <div class="ml-3 text-xs">{{ key.item }}</div>
                 </div>
-                <div>
-                    <button onclick="fillAndShowForm('trackerForm','{{ key.name }}', ' {{ key.item }} ', ' {{key.rate}} ', 'edit' )">Edit</button> <!-- to be created -->
-                    <button onclick="fillAndSubmitForm('trackerForm','{{ key.name }}', ' {{ key.item }} ', ' {{key.rate}} ', 'delete')">Delete</button> <!-- to be created -->
+                <div
+                    <button onclick="fillAndShowForm('trackerForm','{{key.name}}', '{{key.item}}', '{{key.rate}}', 'edit')">Edit</button> <!-- to be created -->
+                    <button onclick="fillAndSubmitForm('trackerForm','{{key.name}}', '{{key.item}}', '{{key.rate}}', 'delete')">Delete</button> <!-- to be created -->
                 </div>
             </div>
             <span id="timer-{{ key.name }}" class="ml-5">00:00:00</span>
@@ -72,11 +88,11 @@ content %}
                 startTimer("{{ key.session_start }}", "timer-{{ key.name }}");
             }
             </script>
-            <button id="" onclick="fillAndSubmitForm('trackerForm','{{ key.name }}', ' {{ key.item }} ', ' {{key.rate}} ', 'start')"> Start </button>
+            <button id="" onclick="fillAndSubmitForm('trackerForm','{{key.name}}', '{{key.item}}', '{{key.rate}}', 'start')"> Start </button>
         </div>
     {% endfor %}
     </div>
-    <div id="edit actions" onclick="fillAndShowForm('trackerForm',' ', ' ', ' ', 'create' )">
+    <div id="edit actions" onclick="fillAndShowForm('trackerForm','', '', '', 'create' )">
         <button> Create New Tracker </button>
     </div>
     <div id="redirect to report">
@@ -90,9 +106,9 @@ content %}
         <div>{{ form.name.label }} {{ form.name(id='nameField', value='None') }}</div>
         <div> {{ form.item.label }} {{ form.item(id='itemField', value='None') }}</div>
         <div>{{ form.rate.label }} {{ form.rate(id='rateField', value='None') }}</div>
-        <div>{{ form.action(id='actionField', value='None', style='display: none;') }}</div>
-        <div>{{ form.old_name(id='oldnameField', value='None', style='display: none;') }}</div>
-        <div>{{ form.old_item(id='olditemField', value='None', style='display: none;') }}</div>
+        <div>{{ form.action(id='actionField', value='None', style='display:none;') }}</div>
+        <div>{{ form.old_name(id='oldnameField', value='None', style='display:none;') }}</div>
+        <div>{{ form.old_item(id='olditemField', value='None', style='display:none;') }}</div>
         <div><button type="submit">Submit</button></div>
     </form>
     <script>

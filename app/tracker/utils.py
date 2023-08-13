@@ -1,5 +1,5 @@
 # Python Modules
-from sqlalchemy import and_
+from sqlalchemy import desc, and_
 from collections import defaultdict
 from datetime import datetime
 import uuid
@@ -110,6 +110,9 @@ class TrackerFunctions:
         return dictionary
 
     def start_tracker(self, user_id, name, item, rate):
+        old_tracker = Tracker.query.filter(and_(Tracker.user_id==user_id, Tracker.name==name, Tracker.item==item)).order_by(desc(Tracker.start_time)).first()
+        if old_tracker != None:
+            old_tracker.edit_token = 0
         id = str(uuid.uuid4())
         current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         new_tracker = Tracker(
@@ -129,13 +132,11 @@ class TrackerFunctions:
         try:
             tracker = Tracker.query.get(id)
             report = self.check_report(user_id, tracker.name)
-            print(tracker.name)
-            print(report)
             start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
             current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             tracker.end_time = current_time
             current_time = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%S")
-            total_usage = int(tracker.rate) * int(round((current_time - start_time).total_seconds() / 60))
+            total_usage = float(float(tracker.rate)/60) * float(round((current_time - start_time).total_seconds() / 60))
             if report:
                 self.update_report(user_id, tracker.name, total_usage)
             else:
@@ -166,7 +167,7 @@ class TrackerFunctions:
         current_year = datetime.now().year
         datapoints = [0] * int(datetime.now().day)
         datapoints[int(datetime.now().day) - 1] = total_usage
-        new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=600000, datapoint=datapoints)
+        new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=550, datapoint=datapoints)
         db.session.add(new_report)
 
     def delete_tracker_record(self, user_id, tracker):
@@ -174,7 +175,7 @@ class TrackerFunctions:
         total_report = self.check_report(user_id, 'Total')
         try:
             end_time = datetime.strptime(tracker.end_time, "%Y-%m-%dT%H:%M:%S")
-            total_usage = int(tracker.rate)*int(round((end_time - datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
+            total_usage = (float(tracker.rate)/60)*int(round((end_time - datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
             end_date = end_time.day
             report.total_usage -= total_usage
             list = ast.literal_eval(report.datapoint)
