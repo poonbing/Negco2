@@ -21,7 +21,7 @@ def track():
     try:
         if form.action.data == 'start':
             name = form.name.data
-            item = form.item.data[1:-1]
+            item = form.item.data
             rate = form.rate.data
             key = tracker.get_session_information(user_id, name).session_id
             if key == "None":
@@ -33,7 +33,7 @@ def track():
             return redirect(url_for('tracker.track'))
         elif form.action.data == 'edit':
             name = form.name.data
-            item = form.item.data[1:-1]
+            item = form.item.data
             rate = form.rate.data
             old_name = form.old_name.data
             old_item = form.old_item.data
@@ -41,13 +41,13 @@ def track():
             return redirect(url_for('tracker.track'))
         elif form.action.data == 'create':
             name = form.name.data
-            item = form.item.data[1:-1]
+            item = form.item.data
             rate = form.rate.data
             tracker.create_session_information(user_id, name, item, rate)
             return redirect(url_for('tracker.track'))
         elif form.action.data == 'delete':
             name = form.name.data
-            item = form.item.data[1:-1]
+            item = form.item.data
             tracker.delete_session_information(user_id, name)
             return redirect(url_for('tracker.track'))
         else:

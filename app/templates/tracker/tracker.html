@@ -38,8 +38,6 @@ content %}
         document.getElementById('oldnameField').value = name;
         document.getElementById('olditemField').value = item;
 
-
-        console.log(item)
         var radioButton = document.querySelector('input[name="item"][value="' + item + '"]');
             if (radioButton) {
                 radioButton.checked = true;
@@ -54,7 +52,7 @@ content %}
       
       function fillAndShowForm(formname, name, item, rate, action){
         document.getElementById('nameField').value = name;
-        document.getElementById('rateField').value = rate;
+        document.getElementById('rateField').value = parseFloat(rate);
         document.getElementById('actionField').value = action;
         document.getElementById('oldnameField').value = name;
         document.getElementById('olditemField').value = name;
@@ -92,7 +90,7 @@ content %}
         </div>
     {% endfor %}
     </div>
-    <div id="edit actions" onclick="fillAndShowForm('trackerForm','', '', '', 'create' )">
+    <div id="edit actions" onclick="fillAndShowForm('trackerForm','', '', '0', 'create' )">
         <button> Create New Tracker </button>
     </div>
     <div id="redirect to report">

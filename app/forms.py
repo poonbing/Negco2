@@ -277,8 +277,8 @@ class TrackerInteract(FlaskForm):
     ], validators=[InputRequired(), tracker_item_validator])
     rate = FloatField("Rate: ", validators=[InputRequired(), NumberRange(min=2, max=4)])
     action = StringField("action", validators=[InputRequired(), alphanumeric_validator])
-    old_name = StringField("old name", validators=[InputRequired(), alphanumeric_validator])
-    old_item = StringField("old item", validators=[InputRequired(), alphanumeric_validator])
+    old_name = StringField("old name", validators=[alphanumeric_validator])
+    old_item = StringField("old item", validators=[alphanumeric_validator])
 
 class TrackerRecordEdit(FlaskForm):
     name = StringField("Name: ", validators=[InputRequired()])
