@@ -249,6 +249,7 @@ def signup():
                     "category": "Signup",
                 },
             )
+            flash("Passwords do not match. Please try again.", "success")
             return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)

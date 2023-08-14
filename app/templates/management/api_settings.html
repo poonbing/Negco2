@@ -1,0 +1,179 @@
+{% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
+content %}
+
+<div class="py-8 mx-auto max-w-4xl lg:py-16">
+  <h1 class="text-3xl font-bold mt-4">Settings</h1>
+
+  <br />
+
+
+    <ul
+      class=" mb-4 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400"
+    >
+      <li class="mr-2">
+        <a
+          href="{{url_for("management.settings")}}"
+          class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+          >General</a
+        >
+      </li>
+      <li class="mr-2">
+        <a
+          href="{{url_for("management.api_settings")}}"
+          aria-current="page"
+          class="inline-block p-4 text-teal-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+          >API Key</a
+        >
+      </li>
+    </ul>
+
+    <table
+      id="users-table"
+      class="w-full text-sm text-left text-gray-500 dark:text-gray-400 dark:divide-gray-700"
+    >
+      <thead
+        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+
+        <tr>
+          <th scope="col" class="px-6 py-3">API Key</th>
+          <th scope="col" class="px-6 py-3">Expiration Date</th>
+          <th scope="col" class="px-6 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-3">
+            <div class="relative flex items-center copy_div">
+                <input
+                  type="text"
+                  class="py-2 bg-gray-100 pr-3 copy_text w-full"
+                  value="e8deab79-3f7d-4fec-960b-62f105e0fdde"
+                  readonly
+                />
+                <button
+                  class="bg-neutral-300 hover:bg-neutral-400 rounded px-2 py-1 text-sm text-white font-mono cursor-pointer copy_button absolute right-2 top-1"
+                >
+                  <svg
+                    class="w-5 h-5 inline-block align-middle"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                  >
+                    <polygon
+                      fill="var(--ci-primary-color, currentColor)"
+                      points="408 432 376 432 376 464 112 464 112 136 144 136 144 104 80 104 80 496 408 496 408 432"
+                      class="ci-primary"
+                    />
+                    <path
+                      fill="var(--ci-primary-color, currentColor)"
+                      d="M176,16V400H496V153.373L358.627,16ZM464,368H208V48H312V200H464Zm0-200H344V48h1.372L464,166.627Z"
+                      class="ci-primary"
+                    />
+                  </svg>
+                </button>
+              </div>
+          </td>
+          <td class="px-6 py-3">
+            2021-07-03
+
+          </td>
+          <td class="px-6 py-3">
+            <button class="text-red-500 hover:text-red-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 inline-block"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+                    clip-rule="evenodd"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+          </td>
+        </tr>
+        <tr class="bg-gray-100">
+          <td class="px-6 py-4">
+            <div class="relative flex items-center copy_div">
+                <input
+                  type="text"
+                  class="py-2 bg-gray-100 pr-3 copy_text w-full"
+                  value="s3xy boy"
+                  readonly
+                />
+                <button
+                  class="bg-neutral-300 hover:bg-neutral-400 rounded px-2 py-1 text-sm text-white font-mono cursor-pointer copy_button absolute right-2 top-1"
+                >
+                  <svg
+                    class="w-5 h-5 inline-block align-middle"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                  >
+                    <polygon
+                      fill="var(--ci-primary-color, currentColor)"
+                      points="408 432 376 432 376 464 112 464 112 136 144 136 144 104 80 104 80 496 408 496 408 432"
+                      class="ci-primary"
+                    />
+                    <path
+                      fill="var(--ci-primary-color, currentColor)"
+                      d="M176,16V400H496V153.373L358.627,16ZM464,368H208V48H312V200H464Zm0-200H344V48h1.372L464,166.627Z"
+                      class="ci-primary"
+                    />
+                  </svg>
+                </button>
+              </div>
+          </td>
+          <td class="px-6 py-4">
+            2021-07-03
+          </td>
+          <td class="px-6 py-4">
+            <button class="text-red-500 hover:text-red-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 inline-block"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+                    clip-rule="evenodd"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+
+<script>
+    let copyDivs = document.querySelectorAll(".copy_div");
+
+    copyDivs.forEach(copyDiv => {
+        let copyButton = copyDiv.querySelector(".copy_button");
+        copyButton.addEventListener("click", function () {
+            let input = copyDiv.querySelector(".copy_text");
+            input.select();
+            document.execCommand("copy");
+            setTimeout(function () {
+                window.getSelection().removeAllRanges();
+            }, 2500);
+        });
+    });
+</script>
+
+
+{% endblock %}

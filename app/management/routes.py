@@ -31,11 +31,6 @@ def profile_picture():
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
 
 
-@bp.route("/sexy")
-def sexy():
-    return render_template("management/test.html")
-
-
 @bp.route("/show_users", methods=["GET"])
 @login_required
 @role_required("admin")
@@ -101,7 +96,20 @@ def delete_user(user_id):
     return redirect(url_for("management.show_users"))
 
 
-@bp.route("/settings", methods=["GET", "POST"])
+@bp.route("/sexy", methods=["GET", "POST"])
+def sexy():
+    return render_template("management/test.html")
+
+
+@bp.route("/settings/api", methods=["GET", "POST"])
+@login_required
+@limiter.limit("4/second")
+def api_settings():
+    api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
+    return render_template("management/api_settings.html", api_keys=api_keys)
+
+
+@bp.route("/settings/general", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
 def settings():

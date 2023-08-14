@@ -6,7 +6,6 @@ class Config:
     # Security configuration
     DEBUG = True
     SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
-    SECURITY_PASSWORD_SALT = b"$2b$12$qdiRLBGdVc2t0LrfuINFqO"
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
