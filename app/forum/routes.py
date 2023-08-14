@@ -1,5 +1,5 @@
 # Python Modules
-from flask import render_template, redirect, url_for, request, current_app, jsonify
+from flask import render_template, redirect, url_for, request, current_app, jsonify, flash
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 from config import Config
@@ -142,4 +142,24 @@ def edit_comment(comment_id):
     return render_template(
         "forum/Comments.html", post=post, form=form, comment_list=comment_list
     )
+
+
+@bp.route("/delete_comment/<int:comment_id>", methods=["DELETE"])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Check if the current user is the commenter and has permission to delete the comment
+    if current_user.id != comment.commenter:
+        flash("Permission denied", "error")
+    else:
+        # Perform the actual deletion
+        db.session.delete(comment)
+        db.session.commit()
+        flash("Comment deleted successfully", "success")
+
+    # Redirect back to the post's comment page
+    return redirect(url_for("forum.post", id=comment.post_id))
+
+
 
