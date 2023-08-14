@@ -241,9 +241,13 @@ def deleteProduct(id):
 
 @bp.route("/productPage/<string:id>", methods=["GET", "POST"])
 def productPage(id):
-    product_to_view = Products.query.get_or_404(id)
-    user = current_user
-    user_info = User.query.filter_by(id=user.id).first()
+    try:
+        product_to_view = Products.query.get_or_404(id)
+        user = current_user
+        user_info = User.query.filter_by(id=user.id).first()
+    except:
+        product_to_view = Products.query.get_or_404(id)
+
     
     if request.method == "POST":
         if not product_to_view.rating_score:
