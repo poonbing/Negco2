@@ -22,6 +22,16 @@ class ReportFunctions:
             return "Failed"
         return report
     
+    def find_report(self, user_id, item_name):
+        month = datetime.now().month
+        year = datetime.now().year
+        report = Report.query.filter(
+            and_(Report.related_user == user_id, Report.item_name == item_name, Report.month == month, Report.year == year)
+        ).first()
+        if report is None:
+            return False
+        return report
+    
     def retrieve_data_points(self, user_id):
         list = []
         list2 = []
@@ -45,13 +55,53 @@ class ReportFunctions:
         tracker = Tracker.query.filter(and_(Tracker.user_id==user_id, func.substring(Tracker.end_time, 1, 4)==year, func.substring(Tracker.end_time, 6, 2) == month)).all()
         for entry in tracker:
             timer = int(round((datetime.strptime(entry.end_time, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(entry.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
-            total_usage = int(entry.rate)*timer
+            total_usage = (float(entry.rate)/60)*timer
             try:
-                dict[entry.name].append({'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage})
+                dict[entry.name].append({'id': entry.id, 'name':entry.name, 'item':entry.item, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage, 'start_time':entry.start_time, 'end_time':entry.end_time, 'edit_token':entry.edit_token})
             except:
-                dict[entry.name] = [{'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage}]
+                dict[entry.name] = [{'id': entry.id, 'name':entry.name, 'item':entry.item, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage, 'start_time':entry.start_time, 'end_time':entry.end_time, 'edit_token':entry.edit_token}]
             try:
-                dict['total'].append({'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage})
+                dict['total'].append({'id': entry.id, 'name':entry.name, 'item':entry.item, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage, 'start_time':entry.start_time, 'end_time':entry.end_time, 'edit_token':entry.edit_token})
             except:
-                dict['total'] = [{'id': entry.id, 'name':entry.name, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage}]
+                dict['total'] = [{'id': entry.id, 'name':entry.name, 'item':entry.item, 'use_time':timer, 'rate':entry.rate, 'total_usage':total_usage, 'start_time':entry.start_time, 'end_time':entry.end_time, 'edit_token':entry.edit_token}]
         return dict
+    
+    def edit_tracker_record(self, user, name, item, start_time, new_end_time):
+        tracker_record = Tracker.query.filter(and_(Tracker.user_id==user, Tracker.name==name, Tracker.item==item, Tracker.start_time==start_time)).first()
+        if tracker_record is None:
+            return 'Failed'
+        elif tracker_record.edit_token == 0:
+            return 'Failed'
+        tracker_record.edit_token = 0
+        old_end_time = datetime.strptime(tracker_record.end_time, "%Y-%m-%dT%H:%M:%S")
+        tracker_record.end_time = new_end_time
+        new_end_time = datetime.strptime(new_end_time, "%Y-%m-%dT%H:%M:%S")
+        start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
+        print(old_end_time)
+        old_usage = (float(tracker_record.rate)/60)*int(round((old_end_time - start_time).total_seconds()/60))
+        new_usage = (float(tracker_record.rate)/60)*int(round((new_end_time - start_time).total_seconds()/60))
+        print(old_usage, new_usage)
+        self.update_old_report(user, name, old_usage, old_end_time.day)
+        self.update_new_report(user, name, new_usage, new_end_time.day)
+        db.session.commit()
+        return tracker_record.id
+    
+    def update_old_report(self, user_id, name, total_usage, date):
+        report = self.find_report(user_id, name)
+        total_usage2 = total_usage + report.total_usage
+        report.total_usage = total_usage2
+        datapoint = list(report.datapoint)
+        datapoint += [0] * (int(date) - len(datapoint))
+        datapoint[int(datetime.now().day) - 1] -= total_usage
+        report.datapoint = datapoint
+        db.session.commit()
+    
+    def update_new_report(self, user_id, name, total_usage, date):
+        report = self.find_report(user_id, name)
+        total_usage2 = total_usage + report.total_usage
+        report.total_usage = total_usage2
+        datapoint = list(report.datapoint)
+        datapoint += [0] * (int(date) - len(datapoint))
+        datapoint[int(datetime.now().day) - 1] += total_usage
+        report.datapoint = datapoint
+        db.session.commit()

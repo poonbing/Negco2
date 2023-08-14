@@ -248,9 +248,10 @@ class Tracker(db.Model):
     )
     name = db.Column(db.String(45), nullable=False)
     item = db.Column(db.String(45), nullable=False)
-    rate = db.Column(db.INTEGER, nullable=False)
+    rate = db.Column(db.Float, nullable=False)
     start_time = db.Column(db.String(20), nullable=False)
-    end_time = db.Column(db.String(20))
+    end_time = db.Column(db.String(20), nullable=False)
+    edit_token = db.Column(db.SmallInteger, nullable=False)
 
     def __init__(self, id, user_id, name, item, rate, start_time, end_time):
         self.id = id
@@ -260,6 +261,7 @@ class Tracker(db.Model):
         self.rate = rate
         self.start_time = start_time
         self.end_time = end_time
+        self.edit_token = 1
 
     def to_dict(self):
         return {

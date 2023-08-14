@@ -23,6 +23,8 @@ from wtforms import (
     PasswordField,
     BooleanField,
     DateField,
+    RadioField,
+    FloatField
 )
 import datetime
 from wtforms_components import DateRange
@@ -247,11 +249,39 @@ class PaymentForm(FlaskForm):
     amount = DecimalField("Subtotal")
     submit = SubmitField("Place Order")
 
+def alphanumeric_validator(form, field):
+    if not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
+        raise ValidationError('Field must only contain alphanumeric characters and spaces')
+
+def rate_validator(form, field):
+    if not re.match(r'^[1-5]$', field.data):
+        raise ValidationError('Rate must be between 1 and 5')
+
+def datetime_validator(form, field):
+    if not re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$', field.data):
+        raise ValidationError('Time must be in the format YYYY-MM-DDTHH:MM:SS')
+
+def tracker_item_validator(form, field):
+    valid_items = [' Shower ', ' Air Conditioning ', ' Lighting ', ' Laundry ', ' Cooking ']
+    if field.data not in valid_items:
+        raise ValidationError('Item must be one of: ' + ', '.join(valid_items))
 
 class TrackerInteract(FlaskForm):
+    name = StringField("Name: ", validators=[InputRequired(), alphanumeric_validator])
+    item = item = RadioField("Item: ", choices=[
+        ('Shower', 'Shower'),
+        ('Air Conditioning', 'Air Conditioning'),
+        ('Lighting', 'Lighting'),
+        ('Laundry', 'Laundry'),
+        ('Cooking', 'Cooking')
+    ], validators=[InputRequired(), tracker_item_validator])
+    rate = FloatField("Rate: ", validators=[InputRequired(), NumberRange(min=2, max=4)])
+    action = StringField("action", validators=[InputRequired(), alphanumeric_validator])
+    old_name = StringField("old name", validators=[alphanumeric_validator])
+    old_item = StringField("old item", validators=[alphanumeric_validator])
+
+class TrackerRecordEdit(FlaskForm):
     name = StringField("Name: ", validators=[InputRequired()])
     item = StringField("Item: ", validators=[InputRequired()])
-    rate = StringField("Rate: ", validators=[InputRequired(), Length(min=1, max=5)])
-    action = StringField("action", validators=[InputRequired()])
-    old_name = StringField("old name", validators=[InputRequired()])
-    old_item = StringField("old item", validators=[InputRequired()])
+    starttime = StringField("Start Time: ", validators=[InputRequired(), datetime_validator])
+    newendtime = StringField("New End Time: ", validators=[InputRequired(), datetime_validator])
