@@ -12,7 +12,7 @@ from .utils import not_logged_in_required
 from ..models import User, Session, OAuthUser
 from ..forms import LoginForm, SignUpForm
 from ..extensions import login_manager, oauth, db
-
+import bleach
 
 @login_manager.user_loader
 @limiter.limit("4/second")
@@ -49,8 +49,8 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+        username = bleach.clean(form.username.data)
+        password = bleach.clean(form.password.data)
         user = User.query.filter(
             or_(User.username == username, User.email == username)
         ).first()
@@ -210,15 +210,15 @@ def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        username = form.username.data
-        gender = form.gender.data
-        email = form.email.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
-        age = form.age.data
-        phone = form.phone.data
+        first_name = bleach.clean(form.first_name.data)
+        last_name = bleach.clean(form.last_name.data)
+        username = bleach.clean(form.username.data)
+        gender = bleach.clean(form.gender.data)
+        email = bleach.clean(form.email.data)
+        password = bleach.clean(form.password.data)
+        confirm_password = bleach.clean(form.confirm_password.data)
+        age = bleach.clean(form.age.data)
+        phone = bleach.clean(form.phone.data)
 
         existing_user = User.query.filter(
             or_(User.username == username, User.email == email)

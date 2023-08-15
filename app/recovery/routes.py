@@ -9,7 +9,7 @@ from .utils import access_codes, generate_access_code, send_recovery_email
 from ..models import User
 from ..extensions import db
 from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
-
+import bleach
 
 @bp.route("/forgot_password", methods=["GET", "POST"])
 @limiter.limit("50 per hour")
@@ -17,7 +17,7 @@ def forgot_password():
     form = ForgotPasswordForm()
 
     if form.validate_on_submit():
-        email = form.email.data
+        email = bleach.clean(form.email.data)
         user = User.query.filter_by(email=email).first()
         print(user)
 
@@ -52,7 +52,7 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
-        entered_code = form.access_code.data
+        entered_code = bleach.clean(form.access_code.data)
         correct_code = access_codes[email]
         if entered_code == correct_code:
             del access_codes[email]
@@ -86,7 +86,7 @@ def reset_password(token):
     form = ResetPasswordForm()
 
     if form.validate_on_submit():
-        new_password = form.password.data
+        new_password = bleach.clean(form.password.data)
         user.password = user.hash_password(new_password)
         db.session.commit()
         current_app.logger.info(

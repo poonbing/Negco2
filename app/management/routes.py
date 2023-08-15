@@ -23,7 +23,7 @@ from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm, Questio
 from ..models import User
 from app import limiter
 from config import Config
-
+import bleach
 
 @bp.route("/profile_picture")
 @login_required
@@ -135,11 +135,11 @@ def question_settings():
     form = QuestionForm()
     if form.validate_on_submit():
         if form.question_one.data:
-            user.question_one = form.question_one.data
+            user.question_one = bleach.clean(form.question_one.data)
         if form.question_two.data:
-            user.question_two = form.question_two.data
+            user.question_two = bleach.clean(form.question_two.data)
         if form.question_three.data:
-            user.question_three = form.question_three.data
+            user.question_three = bleach.clean(form.question_three.data)
 
         db.session.commit()
         flash("Setting Questions changes successful", "success")
@@ -163,11 +163,11 @@ def settings():
         if form.profile_picture.data:
             user.profile_picture = compress_and_resize(form.profile_picture.data.read())
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
+        user.first_name = bleach.clean(form.first_name.data)
+        user.last_name = bleach.clean(form.last_name.data)
+        user.phone = bleach.clean(form.phone.data)
+        user.gender = bleach.clean(form.gender.data)
+        user.email = bleach.clean(form.email.data)
         if form.password.data:
             if form.password.data != form.confirm_password.data:
                 flash("Password and Confirm Password must be the same", "error")
@@ -198,11 +198,11 @@ def admin_settings(user_id):
         if form.profile_picture.data:
             user.profile_picture = compress_and_resize(form.profile_picture.data.read())
 
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.phone = form.phone.data
-        user.gender = form.gender.data
-        user.email = form.email.data
+        user.first_name = bleach.clean(form.first_name.data)
+        user.last_name = bleach.clean(form.last_name.data)
+        user.phone = bleach.clean(form.phone.data)
+        user.gender = bleach.clean(form.gender.data)
+        user.email = bleach.clean(form.email.data)
         if form.password.data:
             if form.password.data != form.confirm_password.data:
                 flash("Password and Confirm Password must be the same", "error")

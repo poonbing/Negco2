@@ -108,42 +108,36 @@ block content %}
         let isValid = true;
         let errorMsg = "";
 
-        // Validate brand
         let brand = document.getElementById("brand");
         if (brand.value.length < 2 || brand.value.length > 50 || /[^a-zA-Z0-9\s]/.test(brand.value)) {
             isValid = false;
             errorMsg += "Brand should be 2-50 characters long and contain no special characters.\n";
         }
 
-        // Validate name
         let name = document.getElementById("name");
         if (name.value.length < 3 || name.value.length > 50 || /[^a-zA-Z0-9\s]/.test(name.value)) {
             isValid = false;
             errorMsg += "Name should be 3-50 characters long and contain no special characters.\n";
         }
 
-        // Validate description
         let description = document.getElementById("description");
         if (description.value.length < 10 || description.value.length > 2000) {
             isValid = false;
             errorMsg += "Description should be 10-2000 characters long.\n";
         }
 
-        // Validate price
         let price = document.getElementById("price");
         if (price.value < 0 || price.value > 999) {
             isValid = false;
             errorMsg += "Price should be between 0 and 999.\n";
         }
 
-        // Validate offer
         let offer = document.getElementById("offer");
         if (offer.value < 0 || offer.value > 100) {
             isValid = false;
             errorMsg += "Offer should be between 0% and 100%.\n";
         }
 
-        // Validate image
         let image = document.getElementById("image");
         if (image.value) {
             let allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
@@ -156,7 +150,6 @@ block content %}
             errorMsg += "Image is required.\n";
         }
 
-        // If validation failed, prevent form submission and alert user
         if (!isValid) {
             e.preventDefault();
             alert(errorMsg);

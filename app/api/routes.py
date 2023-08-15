@@ -8,15 +8,16 @@ from config import Config
 from .utils import is_valid_username
 from datetime import datetime
 from sqlalchemy import func
+import bleach
 
 
 @bp.route("/token", methods=["POST"])
 @csrf.exempt
 @limiter.limit("100/day")
 def get_token():
-    data = request.get_json()
-    username = data.get("username")
-    api_key = data.get("api_key")
+    data = bleach.clean(request.get_json())
+    username = bleach.clean(data.get("username"))
+    api_key = bleach.clean(data.get("api_key"))
     if not username or not api_key:
         current_app.logger.info(
             "Invalid Credentials",
