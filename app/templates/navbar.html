@@ -38,7 +38,13 @@
         data-dropdown-placement="bottom"
       >
         <span class="sr-only">Open user menu</span>
-        <img class="w-10 h-10 rounded-full" src="{% if current_user.provider %}{{ current_user.profile_picture_url }}{% else %}{{ url_for('management.profile_picture') }}{% endif %}" alt="Profile Picture">
+
+        {% if current_user.profile_picture %}
+        <img class="w-10 h-10 rounded-full" src="{{ url_for('management.profile_picture') }}" alt="Profile Picture">
+        {% else %}
+        <img class="w-10 h-10 rounded-full" src="https://static.vecteezy.com/system/resources/thumbnails/009/734/564/small/default-avatar-profile-icon-of-social-media-user-vector.jpg" alt="Profile Picture">
+
+        {% endif %}
 
       </button>
       <!-- Dropdown menu -->
@@ -69,6 +75,16 @@
               >Settings</a
             >
           </li>
+          {% if current_user.role == 'editor' %}
+          <li>
+            <a
+              href="{{url_for("articles.viewArticle")}}"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+              >Show All Articles</a
+            >
+          </li>
+
+          {% endif %}
           {% if current_user.role == 'admin' %}
           <li>
             <a

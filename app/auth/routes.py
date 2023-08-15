@@ -19,20 +19,10 @@ from ..extensions import login_manager, oauth, db
 def user_loader(user_id):
     user = User.query.get(user_id)
 
-    if not user:
-        oauth_user_google = OAuthUser.query.get((user_id, "google"))
-        if oauth_user_google:
-            return oauth_user_google
-
-        oauth_user_azure = OAuthUser.query.get((user_id, "azure"))
-        if oauth_user_azure:
-            return oauth_user_azure
-
     return user
 
 
 @login_manager.unauthorized_handler
-@limiter.limit("4/second")
 def unauthorized():
     return redirect(url_for("auth.login"))
 
@@ -150,7 +140,7 @@ def auth(provider):
         token = oauth.azure.authorize_access_token()
         user_info = oauth.azure.get("userinfo").json()
 
-    user_id = user_info.get("sub") if provider == "google" else user_info.get("id")
+    provider_id = user_info.get("sub") if provider == "google" else user_info.get("id")
     email = user_info.get("email")
     print(user_info)
     username = user_info.get("name")
@@ -162,23 +152,37 @@ def auth(provider):
     )
 
     oauth_user = OAuthUser.query.filter_by(
-        provider_id=user_id, provider=provider
+        provider_id=provider_id, provider=provider
     ).first()
 
     if not oauth_user:
+        user = User(
+            username=username,
+            password="",
+            role="oauth",
+            email=email,
+            gender="",
+            first_name="",
+            last_name="",
+            age=0,
+            phone="",
+        )
+
         oauth_user = OAuthUser(
             provider=provider,
-            provider_id=user_id,
+            provider_id=provider_id,
             username=username,
+            user_id=user.id,
             email=email,
             access_token=access_token,
             profile_picture_url=profile_picture_url,
         )
 
         db.session.add(oauth_user)
+        db.session.add(user)
         db.session.commit()
 
-    login_user(oauth_user)
+    login_user(oauth_user.user)
     return redirect(url_for("management.dashboard"))
 
 
@@ -206,17 +210,19 @@ def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
-        email = form.email.data
-        gender = form.gender.data
         first_name = form.first_name.data
         last_name = form.last_name.data
+        username = form.username.data
+        gender = form.gender.data
+        email = form.email.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
         age = form.age.data
         phone = form.phone.data
 
-        existing_user = User.query.filter_by(username=username).first()
+        existing_user = User.query.filter(
+            or_(User.username == username, User.email == email)
+        ).first()
 
         if existing_user:
             flash(
@@ -249,6 +255,7 @@ def signup():
                     "category": "Signup",
                 },
             )
+            flash("User created successfully", "success")
             return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)

@@ -1,14 +1,13 @@
 from flask import jsonify, request, current_app
 from app.api import bp
-from ..models import User, Report, APIKey
+from ..models import User, Report, APIKey, Articles
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from ..extensions import csrf
 from app import limiter
-import re
-
-
-def is_valid_username(username):
-    return re.match(r"^[a-zA-Z0-9_]+$", username)
+from config import Config
+from .utils import is_valid_username
+from datetime import datetime
+from sqlalchemy import func
 
 
 @bp.route("/token", methods=["POST"])
@@ -33,30 +32,60 @@ def get_token():
     if is_valid_username(username):
         user = User.query.filter_by(username=username).first()
         if user:
-            api_key_obj = APIKey.query.filter_by(user_id=user.id, key=api_key).first()
-            if api_key_obj is None:
-                current_app.logger.info(
-                    "Invalid Credentials",
-                    extra={
-                        "user_id": username,
-                        "address": request.remote_addr,
-                        "page": request.path,
-                        "category": "API",
-                    },
-                )
-                return jsonify({"message": "Invalid credentials"}), 401
-            else:
-                access_token = create_access_token(identity=username)
-                current_app.logger.info(
-                    f"API Key Created {access_token}",
-                    extra={
-                        "user_id": username,
-                        "address": request.remote_addr,
-                        "page": request.path,
-                        "category": "API",
-                    },
-                )
-                return jsonify({"access_token": access_token}), 200
+            api_key_objs = APIKey.query.filter_by(user_id=user.id).all()
+            for api_key_obj in api_key_objs:
+                if api_key_obj.decrypt_key(Config.ENCRYPTION_KEY) == api_key:
+                    access_token = create_access_token(identity=username)
+                    current_app.logger.info(
+                        f"API Key Created {access_token}",
+                        extra={
+                            "user_id": username,
+                            "address": request.remote_addr,
+                            "page": request.path,
+                            "category": "API",
+                        },
+                    )
+                    return jsonify({"access_token": access_token}), 200
+
+            current_app.logger.info(
+                "Invalid Credentials",
+                extra={
+                    "user_id": username,
+                    "address": request.remote_addr,
+                    "page": request.path,
+                    "category": "API",
+                },
+            )
+            return jsonify({"message": "Invalid credentials"}), 401
+
+    return jsonify({"message": "Invalid credentials"}), 401
+
+
+@bp.route("/articles", methods=["GET"])
+@limiter.limit("100/day")
+def get_articles_of_the_day():
+    today = datetime.today().date()
+    articles = Articles.query.filter(func.DATE(Articles.date_added) == today).all()
+
+    if not articles:
+        return jsonify({"message": "No articles published today."}), 200
+
+    serialized_articles = []
+    for article in articles:
+        serialized_articles.append(
+            {
+                "id": article.id,
+                "title": article.title,
+                "description": article.description,
+                "date_added": article.date_added,
+                "writer": article.writer,
+                "image": article.image,
+                "paragraph": article.paragraph,
+                "time_ago": article.time_ago(),
+            }
+        )
+
+    return jsonify(serialized_articles)
 
 
 @bp.route("/user_info", methods=["GET"])

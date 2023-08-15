@@ -1,12 +1,16 @@
 import os
-import logging, stripe
+import logging
+import secrets, os
 
 
 class Config:
     # Security configuration
     DEBUG = True
     SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
-    SECURITY_PASSWORD_SALT = b"$2b$12$qdiRLBGdVc2t0LrfuINFqO"
+    key = secrets.token_urlsafe(16)
+    SECRET_KEY = key
+    MAX_CONTENT_LENGTH = 16 * 1000 * 1000
+    ENCRYPTION_KEY = b"hRqDT_oQOosfS5GZHd8-C7hfo4jClUyn7kdZT-HBt6I="
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
@@ -20,7 +24,7 @@ class Config:
     XCAPTCHA_DIV_CLASS = "h-captcha"
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://general_user:53115e3d-bc98-46bf-9130-b6f24a705302@it2555.mysql.database.azure.com/neggo2"
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2"
 
     # Flask-Mail configuration
     MAIL_SERVER = "smtp.gmail.com"

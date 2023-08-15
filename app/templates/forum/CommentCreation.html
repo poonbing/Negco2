@@ -37,9 +37,10 @@
     <div class="flex justify-end mt-4">
       <button
         id="create-post-btn"
-        class="bg-blue-500 text-white px-4 py-2 rounded"
+        class="bg-green-700 text-white text-lg px-2 py-2.5 rounded-xl hover:bg-green-800 duration-300 transition-all"
+        style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);"
       >
-        Create New Comment
+      <span class="text-2xl px-1">+</span></ion-icon>New comment
       </button>
     </div>
 
@@ -59,6 +60,9 @@
           <div id="editor" class="w-full h-64"></div>
           {{ form.content(id="content", class="hidden", required="required") }}
         </div>
+        <div class="flex items-center">
+          <input type="file" id="file-input" name="image" accept="image/*" onchange="handleFile(this.files[0])" />
+        </div>
         {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
       </form>
     </div>

@@ -7,6 +7,7 @@ from flask import (
     flash,
     jsonify,
     send_file,
+    session,
 )
 from flask_login import current_user, login_required
 from io import BytesIO
@@ -18,9 +19,10 @@ from app.management import bp
 from .utils import role_required, compress_and_resize, generate_api_key
 from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
-from ..forms import SettingsForm, UnlockAccountForm
+from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm, QuestionForm
 from ..models import User
 from app import limiter
+from config import Config
 
 
 @bp.route("/profile_picture")
@@ -29,11 +31,6 @@ from app import limiter
 def profile_picture():
     user = current_user
     return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
-
-
-@bp.route("/sexy")
-def sexy():
-    return render_template("management/test.html")
 
 
 @bp.route("/show_users", methods=["GET"])
@@ -97,11 +94,64 @@ def delete_user(user_id):
     user_to_delete = User.query.get_or_404(user_id)
     db.session.delete(user_to_delete)
     db.session.commit()
-    flash("User deleted succesfully!")
+    flash("User deleted succesfully!", "success")
     return redirect(url_for("management.show_users"))
 
 
-@bp.route("/settings", methods=["GET", "POST"])
+@bp.route("/settings/api", methods=["GET", "POST"])
+@login_required
+@limiter.limit("4/second")
+def api_settings():
+    form = GenerateApiKeyForm()
+    if form.validate_on_submit():
+        api_key = APIKey(current_user.id, Config.ENCRYPTION_KEY)
+        db.session.add(api_key)
+        db.session.commit()
+
+    api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
+    decrypted_key_info = []
+    for api_key in api_keys:
+        if not api_key.has_expired:
+            decrypted_key = api_key.decrypt_key(Config.ENCRYPTION_KEY)
+            decrypted_key_info.append((decrypted_key, api_key.expiration_time))
+        else:
+            db.session.delete(api_key)
+
+    db.session.commit()
+
+    return render_template(
+        "management/api_settings.html",
+        decrypted_key_info=decrypted_key_info,
+        form=form,
+    )
+
+
+@bp.route("/settings/questions", methods=["GET", "POST"])
+@login_required
+@limiter.limit("4/second")
+def question_settings():
+    user = current_user
+
+    form = QuestionForm()
+    if form.validate_on_submit():
+        if form.question_one.data:
+            user.question_one = form.question_one.data
+        if form.question_two.data:
+            user.question_two = form.question_two.data
+        if form.question_three.data:
+            user.question_three = form.question_three.data
+
+        db.session.commit()
+        flash("Setting Questions changes successful", "success")
+
+    return render_template(
+        "management/question_settings.html",
+        form=form,
+    )
+
+
+@bp.route("/")
+@bp.route("/settings/general", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
 def settings():
@@ -160,6 +210,7 @@ def admin_settings(user_id):
                 user.password = user.hash_password(form.password.data)
 
         db.session.commit()
+        flash("Setting Information changes successful", "success")
 
     return render_template(
         "management/admin_settings.html",
@@ -175,4 +226,4 @@ def admin_settings(user_id):
 def dashboard():
     user = current_user
 
-    return render_template("management/dashboard.html", username=user.username)
+    return render_template("management/dashboard.html")

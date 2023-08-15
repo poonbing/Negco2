@@ -1,98 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forum</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-gray-100">
-    <div class="bg-gray-900 py-4">
-      <div class="container mx-auto px-4">
-        <h1 class="text-3xl font-bold text-white">
-          Official News and Information
-        </h1>
-      </div>
-    </div>
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Forum</title>
-        <link
-          href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-          rel="stylesheet"
-        />
-      </head>
-      <body class="bg-gray-100">
-        <div class="bg-gray-900 py-4"></div>
-        <div class="container mx-auto px-4 py-8">
-          {% block navbar %} {% include 'forum/PostCreation.html' %} {% endblock
-          %}
-          <div class="max-w-3xl mx-auto">
-            <div class="flex flex-col space-y-6">
-              {% for post in post_list %}
-              <div
-                class="bg-white border border-gray-300 rounded-lg overflow-hidden"
-              >
-                <div class="bg-gray-200 p-4">
-                  <a href="{{ url_for('forum.post', id=post.id) }}"
-                    ><h2 class="text-xl font-bold text-gray-800">
-                      {{ post.title }}
-                    </h2></a
-                  >
-                </div>
-                <div class="p-4">
-                  <p class="text-gray-800">{{ post.content | safe }}</p>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-      </body>
-    </html>
+{% extends "layout.html" %} 
+{% block content %}
 
-    <div class="container mx-auto px-4 py-8">
-      <div class="max-w-3xl mx-auto">
-        <div class="flex flex-col space-y-6">
-          {% for post in Post_list %}
-          <div
-            class="bg-white border border-gray-300 rounded-lg overflow-hidden"
-          >
-            <div class="bg-gray-200 p-4">
-              <a href="{{ url_for('forum.post', id=post.get_post_id()) }}"
-                ><h2 class="text-xl font-bold text-gray-800">
-                  {{ post.title }}
-                </h2></a
-              >
-            </div>
-            <div class="p-4">
-              <p class="text-gray-800">{{ post.content | safe }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
+{% if topic_title == 'Rules and Regulations' %}
+  <div class="flex items-center justify-center py-4 md:py-8 flex-wrap mt-16">
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+      class="text-white border border-white bg-green-700 hover:bg-green-800 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Rules and Regulations</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >General Discussions</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Bug Reports</a
+    >
+    <a
+      href="#"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Suggestions & Feedback</a
+    >
+  </div>
+  {% elif topic_title == 'General Discussions' %}
+  <div class="flex items-center justify-center py-4 md:py-8 flex-wrap mt-16">
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Rules and Regulations</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+      class="text-white border border-white bg-green-700 hover:bg-green-800 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >General Discussions</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Bug Reports</a
+    >
+    <a
+      href="#"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Suggestions & Feedback</a
+    >
+  </div>
+  {% elif topic_title == 'Bug Reports' %}
+  <div class="flex items-center justify-center py-4 md:py-8 flex-wrap mt-16">
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Rules and Regulations</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >General Discussions</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+      class="text-white border border-white bg-green-700 hover:bg-green-800 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Bug Reports</a
+    >
+    <a
+      href="#"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Suggestions & Feedback</a
+    >
+  </div>
+  {% else %}
+  <div class="flex items-center justify-center py-4 md:py-8 flex-wrap mt-16">
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=1) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Rules and Regulations</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=2) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >General Discussions</a
+    >
+    <a
+      href="{{ url_for('forum.topic_posts', topic_id=3) }}"
+      class="text-gray-900 border border-white hover:border-gray-400 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Bug Reports</a
+    >
+    <a
+      href="#"
+      class="text-white border border-white bg-green-700 hover:bg-green-800 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-full text-base font-medium px-5 py-2.5 text-center mr-3 mb-3 dark:text-white dark:focus:ring-gray-800 duration-300"
+      >Suggestions & Feedback</a
+    >
+  </div>
+
+
+
+{% endif %}
+</div>
+
+
+
+<div class="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 mb-6">
+
+  {% for post in post_list %}
+    <div class="mx-auto my-4">
+      <p class="text-gray-800">{{ post.poster_username }}</p>
+      <div class="w-96 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <a href="{{ url_for('forum.post', id=post.id) }}">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ post.title }}</h5>
+        </a>
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ post.content | safe }}</p>
+        <a href="{{ url_for('forum.post', id=post.id) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-400 bg-transparent rounded-lg hover:underline">
+          {% if post.no_of_comments == None %}
+            No comments yet
+          {% else %}
+            View all <span class="px-1">{{post.no_of_comments}}</span> comments
+          {% endif %}
+        </a>
       </div>
     </div>
-    <div>
-      {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
-      left_current = 1, right_current=2) %} {%if page_num%} {% if page ==
-      page_num %}
-      <a
-        href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
-        >{{page_num}}</a
-      >
-      {% else %}
-      <a
-        href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
-        >{{page_num}}
-      </a>
-      {% endif %} {% else %} ... {% endif %} {% endfor %}
-    </div>
-  </body>
-</html>
+  {% endfor %}
+</div>
+
+<!-----Pagination-->
+<div
+  class="flex items-center justify-center border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+>
+{% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
+  left_current = 1, right_current=2) %} {%if page_num%} {% if post_list.page ==
+  page_num %}
+  <a
+    class="px-3 py-2 text-green-600 border border-gray-300 bg-green-50 hover:bg-green-100 hover:text-green-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+    href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
+    >{{page_num}}</a
+  >
+  {% else %}
+  <a
+    class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    href="{{url_for('forum.topic_posts', topic_id = topic_id,page=page_num)}}"
+    >{{page_num}}
+  </a>
+  {% endif %} {% else %} ... {% endif %} {% endfor %}
+  <span class="text-gray-700 ml-2 font-semibold">({{post_list.total}})</span>
+</div>
+
+{% include 'forum/PostCreation.html' %}
+
+{% endblock content %}
+  

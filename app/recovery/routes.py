@@ -12,13 +12,14 @@ from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
 
 
 @bp.route("/forgot_password", methods=["GET", "POST"])
-@limiter.limit("4/second")
+@limiter.limit("50 per hour")
 def forgot_password():
     form = ForgotPasswordForm()
 
     if form.validate_on_submit():
         email = form.email.data
         user = User.query.filter_by(email=email).first()
+        print(user)
 
         if user:
             access_code = generate_access_code()
@@ -42,7 +43,7 @@ def forgot_password():
 
 
 @bp.route("/enter_access_code", methods=["GET", "POST"])
-@limiter.limit("4/second")
+@limiter.limit("50 per hour")
 def enter_access_code():
     email = request.args.get("email")
     if not email or email not in access_codes:
@@ -51,11 +52,9 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
-        print("reached here")
         entered_code = form.access_code.data
         correct_code = access_codes[email]
         if entered_code == correct_code:
-            print("Correct code")
             del access_codes[email]
             user = User.query.filter_by(email=email).first()
             token = user.get_reset_token()
@@ -70,15 +69,6 @@ def enter_access_code():
             )
             return redirect(url_for("recovery.reset_password", token=token))
         else:
-            current_app.logger.info(
-                f"Recovery Access Code: Incorrect",
-                extra={
-                    "user_id": user.id,
-                    "address": request.remote_addr,
-                    "page": request.path,
-                    "category": "Password Recovery",
-                },
-            )
             flash("Invalid access code.", "error")
 
     return render_template("recovery/accessCode.html", email=email, form=form)
@@ -87,9 +77,6 @@ def enter_access_code():
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
 @limiter.limit("4/second")
 def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for("management.dashboard"))
-
     user = User.verify_reset_token(token)
 
     if user is None:
