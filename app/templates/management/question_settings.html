@@ -56,7 +56,7 @@
     >
     <li class="mr-2">
         <a
-          href="{{url_for("management.api_settings")}}"
+          href="{{url_for("management.settings")}}"
           aria-current="page"
           class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
           >General</a
@@ -89,48 +89,43 @@
       {% endif %}
       <form
         method="POST"
-        action="{{ url_for('management.settings') }}"
+        action="{{ url_for('management.question_settings') }}"
         enctype="multipart/form-data"
       >
         {{ form.csrf_token }}
     
     
         <div>
-          <label
-            for="question_one"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Question 1</label
-          >
+
+          {{ form.question_one.label(class_="block mb-2 text-sm font-medium text-gray-900 dark:text-white") }} 
           {{ form.question_one(id="profile_picture", class_="bg-gray-50 border
           border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500
           focus:border-teal-500 block w-full p-2.5 dark:bg-gray-800
           dark:border-teal-400 dark:placeholder-gray-400 dark:text-white
           dark:focus:ring-teal-500 dark:focus:border-teal-500", value=current_user.question_one) }}
+
         </div>
-    
+        <div class="mb-2"></div>
+
         <div>
-          <label
-            for="question_two"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Question 2</label
-          >
+          {{ form.question_two.label(class_="block mb-2 text-sm font-medium text-gray-900 dark:text-white") }} 
           {{ form.question_two(class_="bg-gray-50 border border-teal-300 text-gray-900
           text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
           p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
           dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
           value=current_user.question_two) }}
+
         </div>
+        <div class="mb-2"></div>
+
         <div>
-          <label
-            for="question_three"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Question 3</label
-          >
+          {{ form.question_three.label(class_="block mb-2 text-sm font-medium text-gray-900 dark:text-white") }} 
           {{ form.question_three(class_="bg-gray-50 border border-teal-300 text-gray-900
           text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
           p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
           dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
           value=current_user.question_three) }}
+
         </div>
 
 
