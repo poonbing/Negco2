@@ -135,12 +135,14 @@ class createProduct(FlaskForm):
 
 class Comment_Submission(FlaskForm):
     content = TextAreaField("Content", validators=[InputRequired()])
+    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField("Create Post")
 
 
 class Post_Submission(FlaskForm):
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content", validators=[InputRequired()])
+    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField("Create Post")
 
 

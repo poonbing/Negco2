@@ -431,6 +431,9 @@ class Comment(db.Model):
     commenter = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
+    commenter_username = db.Column(
+        db.String(36), nullable=False, unique=True
+    )
     post = db.relationship("Post", back_populates="comments")
 
 
@@ -443,9 +446,13 @@ class Post(db.Model):
     poster = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
+    poster_username = db.Column(
+        db.String(36), nullable=False, unique=True
+    )
     topic = db.relationship("Topic", back_populates="posts")
     content = db.Column(db.Text(length=1000000), nullable=False)
     comments = db.relationship("Comment", back_populates="post")
+    no_of_comments = db.Column(db.Integer)
     image = db.Column(db.LargeBinary(length=(2**32) - 1), nullable=True)
 
 
