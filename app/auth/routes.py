@@ -210,17 +210,19 @@ def signup():
     form = SignUpForm()
 
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
-        email = form.email.data
-        gender = form.gender.data
         first_name = form.first_name.data
         last_name = form.last_name.data
+        username = form.username.data
+        gender = form.gender.data
+        email = form.email.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
         age = form.age.data
         phone = form.phone.data
 
-        existing_user = User.query.filter_by(username=username).first()
+        existing_user = User.query.filter(
+            or_(User.username == username, User.email == email)
+        ).first()
 
         if existing_user:
             flash(
@@ -253,7 +255,7 @@ def signup():
                     "category": "Signup",
                 },
             )
-            flash("Passwords do not match. Please try again.", "success")
+            flash("User created successfully", "success")
             return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)

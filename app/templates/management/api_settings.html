@@ -27,6 +27,14 @@ content %}
       >API Key</a
     >
   </li>
+  <li class="mr-2">
+    <a
+      href="{{url_for("management.question_settings")}}"
+      aria-current="page"
+      class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+      >Questions</a
+    >
+  </li>
 </ul>
 
     <form method="POST" action="{{ url_for('management.api_settings') }}" class="mb-4">
@@ -49,14 +57,14 @@ content %}
         </tr>
       </thead>
       <tbody>
-        {% for api_key in api_keys %}
+        {% for decrypted_key, expiration_time in decrypted_key_info %}
         <tr class="bg-gray-100">
           <td class="px-6 py-3">
             <div class="relative flex items-center copy_div">
                 <input
                   type="text"
                   class="py-2 bg-gray-100 pr-3 copy_text w-full"
-                  value="{{ api_key.key }}"
+                  value="{{ decrypted_key }}"
                   readonly
                 />
                 <button
@@ -82,7 +90,7 @@ content %}
               </div>
           </td>
           <td class="px-6 py-3">
-            {{ api_key.expiration_time }}
+            {{ expiration_time }}
 
           </td>
           <td class="px-6 py-3">

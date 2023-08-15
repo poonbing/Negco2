@@ -76,3 +76,14 @@ def tracker_item_validator(_, field):
     ]
     if field.data not in valid_items:
         raise ValidationError("Item must be one of: " + ", ".join(valid_items))
+
+
+def valid_jwt(jwt):
+    jwt_pattern = re.compile(r"^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$")
+
+    return bool(jwt_pattern.match(jwt))
+
+
+def valid_email(email):
+    email_pattern = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+    return bool(email_pattern.match(email))

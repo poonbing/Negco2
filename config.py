@@ -1,11 +1,15 @@
 import os
-import logging, stripe
+import logging
+import secrets, os
 
 
 class Config:
     # Security configuration
     DEBUG = True
     SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
+    key = secrets.token_urlsafe(16)
+    SECRET_KEY = key
+    MAX_CONTENT_LENGTH = 16 * 1000 * 1000
     ENCRYPTION_KEY = b"hRqDT_oQOosfS5GZHd8-C7hfo4jClUyn7kdZT-HBt6I="
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True

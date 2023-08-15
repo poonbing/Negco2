@@ -16,14 +16,7 @@ import secrets, stripe, os
 def create_app(config_class=Config):
     app = Flask(__name__)
     # Whose is this??
-    key = secrets.token_urlsafe(16)
-    app.config["SECRET_KEY"] = key
-    app.config["MAX_CONTENT_LENGTH"] = 16 * 1000 * 1000
     app.config.from_object(config_class)
-    # stripe_keys = {
-    #      "secret_key": os.environ["STRIPE_SECRET_KEY"],
-    #      "publishable_key": os.environ["STRIPE_PUBLISHABLE_KEY"]
-    # }
     stripe_keys = {
         "secret_key": "sk_test_51NMQKILNkWku1TleBfxFFaU1PZExG7m5EWksDyd35bjyfoQlr71c0EBrNuD3bHFv37RL6Q0nvVuFbEZdRZ8MCruW00PyWCWL03",
         "publishable_key": "pk_test_51NMQKILNkWku1Tlem8G387xQhuNfG6cHSqzMhbIwLns7fBXX44qYnYyczyOfP7R3HbJE5sULy5kmtPb4PJpQyg0d00TvkHc0n1",
@@ -35,9 +28,9 @@ def create_app(config_class=Config):
         response.headers[
             "Strict-Transport-Security"
         ] = "max-age=31536000; includeSubDomains; preload"
-        # response.headers[
-        #     "Content-Security-Policy"
-        # ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.quilljs.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://unpkg.com https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"
+        response.headers[
+            "Content-Security-Policy"
+        ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://d3js.org/d3.v7.min.js https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.quilljs.com https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"
 
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
@@ -63,8 +56,8 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     oauth.init_app(app)
 
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+    #     db.create_all()
 
     # Two Logging Mechanism
     class SQLAlchemyHandler(logging.Handler):

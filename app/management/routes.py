@@ -19,7 +19,7 @@ from app.management import bp
 from .utils import role_required, compress_and_resize, generate_api_key
 from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
-from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm
+from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm, QuestionForm
 from ..models import User
 from app import limiter
 from config import Config
@@ -109,8 +109,45 @@ def api_settings():
         db.session.commit()
 
     api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
+    decrypted_key_info = []
+    for api_key in api_keys:
+        if not api_key.has_expired:
+            decrypted_key = api_key.decrypt_key(Config.ENCRYPTION_KEY)
+            decrypted_key_info.append((decrypted_key, api_key.expiration_time))
+        else:
+            db.session.delete(api_key)
 
-    return render_template("management/api_settings.html", api_keys=api_keys, form=form)
+    db.session.commit()
+
+    return render_template(
+        "management/api_settings.html",
+        decrypted_key_info=decrypted_key_info,
+        form=form,
+    )
+
+
+@bp.route("/settings/questions", methods=["GET", "POST"])
+@login_required
+@limiter.limit("4/second")
+def question_settings():
+    user = current_user
+
+    form = QuestionForm()
+    if form.validate_on_submit():
+        if form.question_one.data:
+            user.question_one = form.question_one.data
+        if form.question_two.data:
+            user.question_two = form.question_two.data
+        if form.question_three.data:
+            user.question_three = form.question_three.data
+
+        db.session.commit()
+        flash("Setting Questions changes successful", "success")
+
+    return render_template(
+        "management/question_settings.html",
+        form=form,
+    )
 
 
 @bp.route("/")
@@ -189,4 +226,4 @@ def admin_settings(user_id):
 def dashboard():
     user = current_user
 
-    return render_template("management/dashboard.html", username=user.username)
+    return render_template("management/dashboard.html")

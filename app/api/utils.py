@@ -1,6 +1,7 @@
 import jwt
 import datetime
 from config import Config
+import re
 
 
 def create_token(user_id):
@@ -21,3 +22,6 @@ def verify_token(token):
         return "Token has expired. Please log in again."
     except jwt.InvalidTokenError:
         return "Invalid token. Please log in again."
+
+def is_valid_username(username):
+    return re.match(r"^[a-zA-Z0-9_]+$", username)

@@ -255,3 +255,12 @@ class TrackerRecordEdit(FlaskForm):
 
 class GenerateApiKeyForm(FlaskForm):
     generate_key = SubmitField("Generate API Key")
+
+
+class QuestionForm(FlaskForm):
+    question_one = StringField("Question 1: What is name of your mother's pre-school?")
+    question_two = StringField("Question 2: What is the nickname you had?")
+    question_three = StringField(
+        "Question 3: What your favorite food to eat during winter?"
+    )
+    submit = SubmitField("Submit")
