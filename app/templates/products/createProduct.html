@@ -18,7 +18,7 @@ block content %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='brand')}}
         </div>
         <div class="w-full">
           <label
@@ -30,7 +30,7 @@ block content %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='name')}}
         </div>
         <div class="w-full">
           <label
@@ -42,7 +42,7 @@ block content %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='image')}}
         </div>
         <div class="w-full">
           <label
@@ -54,7 +54,7 @@ block content %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='category')}}
         </div>
         <div class="sm:col-span-2">
           <label
@@ -66,7 +66,7 @@ block content %}
           bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
           focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='description')}}
         </div>
         <div class="sm:col-span-2">
           <label
@@ -78,7 +78,7 @@ block content %}
           bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
           focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='price')}}
         </div>
         <div class="sm:col-span-2">
           <label
@@ -90,7 +90,7 @@ block content %}
           bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
           focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='offer')}}
         </div>
       </div>
       {{form.submit(class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6
@@ -100,4 +100,68 @@ block content %}
     </form>
   </div>
 </section>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let form = document.querySelector("form");
+    
+    form.addEventListener("submit", function(e) {
+        let isValid = true;
+        let errorMsg = "";
+
+        // Validate brand
+        let brand = document.getElementById("brand");
+        if (brand.value.length < 2 || brand.value.length > 50 || /[^a-zA-Z0-9\s]/.test(brand.value)) {
+            isValid = false;
+            errorMsg += "Brand should be 2-50 characters long and contain no special characters.\n";
+        }
+
+        // Validate name
+        let name = document.getElementById("name");
+        if (name.value.length < 3 || name.value.length > 50 || /[^a-zA-Z0-9\s]/.test(name.value)) {
+            isValid = false;
+            errorMsg += "Name should be 3-50 characters long and contain no special characters.\n";
+        }
+
+        // Validate description
+        let description = document.getElementById("description");
+        if (description.value.length < 10 || description.value.length > 2000) {
+            isValid = false;
+            errorMsg += "Description should be 10-2000 characters long.\n";
+        }
+
+        // Validate price
+        let price = document.getElementById("price");
+        if (price.value < 0 || price.value > 999) {
+            isValid = false;
+            errorMsg += "Price should be between 0 and 999.\n";
+        }
+
+        // Validate offer
+        let offer = document.getElementById("offer");
+        if (offer.value < 0 || offer.value > 100) {
+            isValid = false;
+            errorMsg += "Offer should be between 0% and 100%.\n";
+        }
+
+        // Validate image
+        let image = document.getElementById("image");
+        if (image.value) {
+            let allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+            if (!allowedExtensions.exec(image.value)) {
+                isValid = false;
+                errorMsg += "Only .jpg, .jpeg, and .png file types are allowed for the image.\n";
+            }
+        } else {
+            isValid = false;
+            errorMsg += "Image is required.\n";
+        }
+
+        // If validation failed, prevent form submission and alert user
+        if (!isValid) {
+            e.preventDefault();
+            alert(errorMsg);
+        }
+    });
+});
+</script>
 {% endblock %}

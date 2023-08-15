@@ -61,7 +61,7 @@ get_flashed_messages() %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='title')}}
         </div>
         <div class="w-full">
           <label
@@ -73,7 +73,7 @@ get_flashed_messages() %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='writer')}}
         </div>
         <div class="w-full">
           <label
@@ -85,7 +85,7 @@ get_flashed_messages() %}
           text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
           block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='image')}}
         </div>
         <div class="sm:col-span-2">
           <label
@@ -97,7 +97,7 @@ get_flashed_messages() %}
           bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
           focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='description')}}
         </div>
         <div class="sm:col-span-2">
           <label
@@ -109,7 +109,7 @@ get_flashed_messages() %}
           bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500
           focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600
           dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500
-          dark:focus:border-primary-500")}}
+          dark:focus:border-primary-500", id='paragraph')}}
         </div>
       </div>
       {{form.submit(class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6
@@ -119,5 +119,52 @@ get_flashed_messages() %}
     </form>
   </div>
 </section>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector("form").addEventListener("submit", function(event) {
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      const writer = document.getElementById("writer").value;
+      const image = document.getElementById("image").files[0];
+      const paragraph = document.getElementById("paragraph").value;
 
+      const blackList = ["'", '"', ";", "--", "/*", "*/", "="];
+      let errorMessages = [];
+
+      function containsBlacklisted(str) {
+          return blackList.some((char) => str.includes(char));
+      }
+
+      if (containsBlacklisted(title) || !title || title.length < 3 || title.length > 100) {
+          errorMessages.push("Title is required and should be between 3 to 100 characters without special characters.");
+      }
+
+      if (containsBlacklisted(description) || !description || description.length < 3 || description.length > 300) {
+          errorMessages.push("Description is required and should be between 3 to 300 characters without special characters.");
+      }
+
+      if (containsBlacklisted(writer) || !writer || writer.length < 3 || writer.length > 50) {
+          errorMessages.push("Writer's name is required and should be between 3 to 50 characters without special characters.");
+      }
+
+      if (image) {
+          const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+          if (!allowedExtensions.exec(image.name)) {
+              errorMessages.push("Invalid image type. Only JPG, JPEG, and PNG images are allowed.");
+          }
+      } else {
+          errorMessages.push("An image is required.");
+      }
+
+      if (containsBlacklisted(paragraph) || !paragraph || paragraph.length < 100 || paragraph.length > 1000000) {
+          errorMessages.push("Paragraph is required and should be between 100 to 1,000,000 characters without special characters.");
+      }
+
+      if (errorMessages.length) {
+          event.preventDefault();
+          alert(errorMessages.join("\n"));
+      }
+    });
+  });
+</script>
 {% endblock %}

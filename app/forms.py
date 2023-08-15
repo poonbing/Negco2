@@ -38,6 +38,9 @@ from flask_wtf.file import FileRequired, FileAllowed
 #      if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
 #          raise ValidationError("File is not an allowed image type")
 
+def no_special_characters(form, field):
+    if re.search(r"[~\!@#$%^&*()_+{}\":;'\[\]]", field.data):
+        raise ValidationError("Special characters are not allowed.")
 
 def validate_password(_, field):
     password = field.data
@@ -106,10 +109,10 @@ class createArticle(FlaskForm):
 
 class createProduct(FlaskForm):
     brand = StringField(
-        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=50)]
+        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=50), no_special_characters]
     )
     name = StringField(
-        "Name of Product:", validators=[InputRequired(), Length(min=3, max=50)]
+        "Name of Product:", validators=[InputRequired(), Length(min=3, max=50), no_special_characters]
     )
     description = TextAreaField(
         "Description:",
