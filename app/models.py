@@ -131,8 +131,12 @@ class User(
     age = db.Column(db.INTEGER, nullable=False)
     phone = db.Column(db.String(15), nullable=False)
     login_attempts = db.Column(db.INTEGER, default=0)
+    question_one = db.Column(db.String(100))
+    question_two = db.Column(db.String(100))
+    question_three = db.Column(db.String(100))
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
+    password_expires = db.Column(db.Date, nullable=True)
 
     oauth_accounts = db.relationship("OAuthUser", back_populates="user")
 
@@ -171,6 +175,11 @@ class User(
 
     def check_password(self, password):
         return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+
+    def password_has_expired(self):
+        if self.password_expires:
+            return self.password_expires < datetime.now().date()
+        return False
 
 
 class OAuthUser(UserMixin, db.Model):
@@ -442,9 +451,7 @@ class Comment(db.Model):
     commenter = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
-    commenter_username = db.Column(
-        db.String(36), nullable=False, unique=True
-    )
+    commenter_username = db.Column(db.String(36), nullable=False, unique=True)
     post = db.relationship("Post", back_populates="comments")
 
 
@@ -457,9 +464,7 @@ class Post(db.Model):
     poster = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
-    poster_username = db.Column(
-        db.String(36), nullable=False, unique=True
-    )
+    poster_username = db.Column(db.String(36), nullable=False, unique=True)
     topic = db.relationship("Topic", back_populates="posts")
     content = db.Column(db.Text(length=1000000), nullable=False)
     comments = db.relationship("Comment", back_populates="post")

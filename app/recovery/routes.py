@@ -2,6 +2,7 @@
 from flask import redirect, url_for, render_template, request, flash, current_app
 from flask_login import current_user, login_required
 from app import limiter
+from datetime import datetime
 
 # Local Modules
 from app.recovery import bp
@@ -19,11 +20,10 @@ def forgot_password():
     if form.validate_on_submit():
         email = form.email.data
         user = User.query.filter_by(email=email).first()
-        print(user)
 
         if user:
-            access_code = generate_access_code()
-            access_codes[email] = access_code
+            access_code, expiration_time = generate_access_code()
+            access_codes[email] = (access_code, expiration_time)
 
             send_recovery_email(email, access_code)
             current_app.logger.info(
@@ -53,21 +53,17 @@ def enter_access_code():
 
     if form.validate_on_submit():
         entered_code = form.access_code.data
-        correct_code = access_codes[email]
-        if entered_code == correct_code:
-            del access_codes[email]
-            user = User.query.filter_by(email=email).first()
-            token = user.get_reset_token()
-            current_app.logger.info(
-                f"Recovery Access Code: Correct",
-                extra={
-                    "user_id": user.id,
-                    "address": request.remote_addr,
-                    "page": request.path,
-                    "category": "Password Recovery",
-                },
-            )
-            return redirect(url_for("recovery.reset_password", token=token))
+        access_code_info = access_codes.get(email)
+        if access_code_info:
+            correct_code, expiration_time = access_code_info
+            if datetime.now() <= expiration_time and entered_code == correct_code:
+                del access_codes[email]
+                user = User.query.filter_by(email=email).first()
+                token = user.get_reset_token()
+                return redirect(url_for("recovery.reset_password", token=token))
+
+            else:
+                flash("Invalid or expired access code.", "error")
         else:
             flash("Invalid access code.", "error")
 
