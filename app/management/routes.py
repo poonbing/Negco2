@@ -7,6 +7,7 @@ from flask import (
     flash,
     jsonify,
     send_file,
+    session,
 )
 from flask_login import current_user, login_required
 from io import BytesIO
@@ -18,9 +19,10 @@ from app.management import bp
 from .utils import role_required, compress_and_resize, generate_api_key
 from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
-from ..forms import SettingsForm, UnlockAccountForm
+from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm
 from ..models import User
 from app import limiter
+from config import Config
 
 
 @bp.route("/profile_picture")
@@ -92,23 +94,26 @@ def delete_user(user_id):
     user_to_delete = User.query.get_or_404(user_id)
     db.session.delete(user_to_delete)
     db.session.commit()
-    flash("User deleted succesfully!")
+    flash("User deleted succesfully!", "success")
     return redirect(url_for("management.show_users"))
-
-
-@bp.route("/sexy", methods=["GET", "POST"])
-def sexy():
-    return render_template("management/test.html")
 
 
 @bp.route("/settings/api", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
 def api_settings():
+    form = GenerateApiKeyForm()
+    if form.validate_on_submit():
+        api_key = APIKey(current_user.id, Config.ENCRYPTION_KEY)
+        db.session.add(api_key)
+        db.session.commit()
+
     api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
-    return render_template("management/api_settings.html", api_keys=api_keys)
+
+    return render_template("management/api_settings.html", api_keys=api_keys, form=form)
 
 
+@bp.route("/")
 @bp.route("/settings/general", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
@@ -168,6 +173,7 @@ def admin_settings(user_id):
                 user.password = user.hash_password(form.password.data)
 
         db.session.commit()
+        flash("Setting Information changes successful", "success")
 
     return render_template(
         "management/admin_settings.html",

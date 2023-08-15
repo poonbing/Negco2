@@ -51,11 +51,9 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
-        print("reached here")
         entered_code = form.access_code.data
         correct_code = access_codes[email]
         if entered_code == correct_code:
-            print("Correct code")
             del access_codes[email]
             user = User.query.filter_by(email=email).first()
             token = user.get_reset_token()

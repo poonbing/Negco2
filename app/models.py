@@ -7,6 +7,7 @@ from uuid import uuid4
 from bcrypt import hashpw, gensalt, checkpw
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask_jwt_extended import create_access_token, decode_token
+from cryptography.fernet import Fernet
 import pickle
 
 # Local Modules
@@ -68,7 +69,6 @@ class RolesAndPermissionsMixin:
 
 class ResetPasswordsMixin:
     def get_reset_token(self, expires_sec=1800):
-        # Replace "user_id" with any additional data you want to include in the token payload.
         access_token = create_access_token(
             identity=self.id, expires_delta=timedelta(seconds=expires_sec)
         )
@@ -77,12 +77,10 @@ class ResetPasswordsMixin:
     @staticmethod
     def verify_reset_token(token):
         try:
-            # Decode the token to retrieve the payload (identity).
             decoded_token = decode_token(token)
             user_id = decoded_token["sub"]
             return User.query.get(user_id)
         except Exception as e:
-            # Handle expired token (optional, based on your requirements).
             return f"Error: {e}"
 
 
@@ -136,6 +134,8 @@ class User(
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
 
+    oauth_accounts = db.relationship("OAuthUser", back_populates="user")
+
     __table_args__ = (
         CheckConstraint(gender.in_(["male", "female"]), name="check_gender"),
         CheckConstraint(
@@ -184,11 +184,15 @@ class OAuthUser(UserMixin, db.Model):
     access_token = db.Column(db.String(256))
     profile_picture_url = db.Column(db.String(256))
 
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"))
+    user = db.relationship("User", back_populates="oauth_accounts")
+
     def __init__(
         self,
         provider,
         provider_id,
         email=None,
+        user_id=None,
         username=None,
         access_token=None,
         profile_picture_url=None,
@@ -197,6 +201,7 @@ class OAuthUser(UserMixin, db.Model):
         self.provider = provider
         self.provider_id = provider_id
         self.email = email
+        self.user_id = user_id
         self.username = username
         self.access_token = access_token
         self.profile_picture_url = profile_picture_url
@@ -222,17 +227,23 @@ class LockedUser(db.Model):
 
 
 class APIKey(db.Model):
+    __tablename__ = "api_keys"
     id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(64), unique=True, nullable=False)
-    user_id = db.Column(
-        db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
-    )
+    key = db.Column(db.String(256), unique=True, nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
     expiration_time = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, user_id):
-        self.key = str(uuid4())
+    def __init__(self, user_id, key):
         self.user_id = user_id
         self.expiration_time = datetime.utcnow() + timedelta(days=365)
+
+        f = Fernet(key)
+        self.key = f.encrypt(str(uuid4()).encode())
+
+    def decrypt_key(self, key):
+        f = Fernet(key)
+        decrypted_key = f.decrypt(self.key).decode()
+        return decrypted_key
 
     @property
     def has_expired(self):

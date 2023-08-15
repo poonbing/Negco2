@@ -1,7 +1,4 @@
 from flask_wtf import FlaskForm
-import re
-
-#import magic
 from wtforms.validators import (
     InputRequired,
     Email,
@@ -24,40 +21,13 @@ from wtforms import (
     BooleanField,
     DateField,
     RadioField,
-    FloatField
+    FloatField,
 )
 import datetime
 from wtforms_components import DateRange
 from flask_wtf.file import FileRequired, FileAllowed
-
-
-# def validate_image(_, field):
-#      mime = magic.Magic()
-#      mime_type = mime.from_buffer(field.data.read(1024))
-
-#      if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
-#          raise ValidationError("File is not an allowed image type")
-
-
-def validate_password(_, field):
-    password = field.data
-
-    length_error = len(password) < 8
-    digit_error = not re.search(r"\d", password)
-    uppercase_error = not re.search(r"[A-Z]", password)
-    lowercase_error = not re.search(r"[a-z]", password)
-    symbol_error = not re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password)
-
-    if (
-        length_error
-        or digit_error
-        or uppercase_error
-        or lowercase_error
-        or symbol_error
-    ):
-        raise ValidationError(
-            "Password must be at least 8 characters long and contain at least one digit, one uppercase letter, one lowercase letter, and one symbol."
-        )
+import re
+from .validators import *
 
 
 class UnlockAccountForm(FlaskForm):
@@ -68,19 +38,28 @@ class UnlockAccountForm(FlaskForm):
 class SettingsForm(FlaskForm):
     profile_picture = FileField(
         "Profile Picture",
-        validators=[FileAllowed(["jpg", "png"], "Only JPG and PNG images allowed.")],
+        validators=[
+            FileAllowed(["jpg", "png"], "Only JPG and PNG images allowed."),
+            validate_image,
+        ],
     )
-    first_name = StringField("First Name", validators=[InputRequired()])
-    last_name = StringField("Last Name", validators=[InputRequired()])
+    first_name = StringField(
+        "First Name",
+        validators=[InputRequired(), Length(min=1, max=100), validate_name],
+    )
+    last_name = StringField(
+        "Last Name", validators=[InputRequired(), Length(min=1, max=100), validate_name]
+    )
     phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
     gender = SelectField(
         "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
     )
-    email = StringField("Email", validators=[Email()])
+    email = StringField("Email", validators=[Length(min=2, max=250), Email()])
     password = PasswordField("Password", validators=[])
     confirm_password = PasswordField(
         "Confirm Password", validators=[EqualTo("password")]
     )
+    submit = SubmitField("Submit")
 
 
 class createArticle(FlaskForm):
@@ -145,26 +124,19 @@ class Post_Submission(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField("Username", validators=[InputRequired()])
+    username = StringField(
+        "Username",
+        validators=[InputRequired(), Length(min=1, max=100)],
+    )
     password = PasswordField("Password", validators=[InputRequired()])
     remember = BooleanField("Remember me")
+    submit = SubmitField("Login")
 
 
 class SignUpForm(FlaskForm):
-    def validate_phone(form, field):
-        pattern = re.compile(r"^\d{8}$")
-        if not pattern.match(field.data):
-            raise ValidationError("Phone number must be exactly eight digits.")
-
     username = StringField(
         "Username",
-        validators=[
-            InputRequired(),
-            Regexp(
-                r"^[a-zA-Z0-9_-]{5,49}$",
-                message="Invalid username format. Only letters, numbers, underscores, and hyphens are allowed.",
-            ),
-        ],
+        validators=[InputRequired(), validate_username],
     )
     password = PasswordField(
         "Password", validators=[InputRequired(), validate_password]
@@ -181,11 +153,11 @@ class SignUpForm(FlaskForm):
     )
     first_name = StringField(
         "First Name",
-        validators=[InputRequired(), Length(min=5, max=49, message="Invalid Length")],
+        validators=[InputRequired(), Length(min=1, max=100), validate_name],
     )
     last_name = StringField(
         "Last Name",
-        validators=[InputRequired(), Length(min=5, max=49, message="Invalid Length")],
+        validators=[InputRequired(), Length(min=1, max=100), validate_name],
     )
     age = IntegerField(
         "Age",
@@ -195,6 +167,7 @@ class SignUpForm(FlaskForm):
         ],
     )
     phone = StringField("Phone", validators=[InputRequired(), validate_phone])
+    submit = SubmitField("Sign Up")
 
 
 class ForgotPasswordForm(FlaskForm):
@@ -249,39 +222,36 @@ class PaymentForm(FlaskForm):
     amount = DecimalField("Subtotal")
     submit = SubmitField("Place Order")
 
-def alphanumeric_validator(form, field):
-    if not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
-        raise ValidationError('Field must only contain alphanumeric characters and spaces')
-
-def rate_validator(form, field):
-    if not re.match(r'^[1-5]$', field.data):
-        raise ValidationError('Rate must be between 1 and 5')
-
-def datetime_validator(form, field):
-    if not re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$', field.data):
-        raise ValidationError('Time must be in the format YYYY-MM-DDTHH:MM:SS')
-
-def tracker_item_validator(form, field):
-    valid_items = [' Shower ', ' Air Conditioning ', ' Lighting ', ' Laundry ', ' Cooking ']
-    if field.data not in valid_items:
-        raise ValidationError('Item must be one of: ' + ', '.join(valid_items))
 
 class TrackerInteract(FlaskForm):
     name = StringField("Name: ", validators=[InputRequired(), alphanumeric_validator])
-    item = item = RadioField("Item: ", choices=[
-        ('Shower', 'Shower'),
-        ('Air Conditioning', 'Air Conditioning'),
-        ('Lighting', 'Lighting'),
-        ('Laundry', 'Laundry'),
-        ('Cooking', 'Cooking')
-    ], validators=[InputRequired(), tracker_item_validator])
+    item = item = RadioField(
+        "Item: ",
+        choices=[
+            ("Shower", "Shower"),
+            ("Air Conditioning", "Air Conditioning"),
+            ("Lighting", "Lighting"),
+            ("Laundry", "Laundry"),
+            ("Cooking", "Cooking"),
+        ],
+        validators=[InputRequired(), tracker_item_validator],
+    )
     rate = FloatField("Rate: ", validators=[InputRequired(), NumberRange(min=2, max=4)])
     action = StringField("action", validators=[InputRequired(), alphanumeric_validator])
     old_name = StringField("old name", validators=[alphanumeric_validator])
     old_item = StringField("old item", validators=[alphanumeric_validator])
 
+
 class TrackerRecordEdit(FlaskForm):
     name = StringField("Name: ", validators=[InputRequired()])
     item = StringField("Item: ", validators=[InputRequired()])
-    starttime = StringField("Start Time: ", validators=[InputRequired(), datetime_validator])
-    newendtime = StringField("New End Time: ", validators=[InputRequired(), datetime_validator])
+    starttime = StringField(
+        "Start Time: ", validators=[InputRequired(), datetime_validator]
+    )
+    newendtime = StringField(
+        "New End Time: ", validators=[InputRequired(), datetime_validator]
+    )
+
+
+class GenerateApiKeyForm(FlaskForm):
+    generate_key = SubmitField("Generate API Key")

@@ -41,6 +41,7 @@ def create_app(config_class=Config):
 
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
 
         return response
 
@@ -61,6 +62,9 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     jwt.init_app(app)
     oauth.init_app(app)
+
+    with app.app_context():
+        db.create_all()
 
     # Two Logging Mechanism
     class SQLAlchemyHandler(logging.Handler):
