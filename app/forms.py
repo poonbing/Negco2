@@ -37,11 +37,9 @@ from .validators import *
 #      if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
 #          raise ValidationError("File is not an allowed image type")
 
-
 def no_special_characters(form, field):
     if re.search(r"[~\!@#$%^&*()_+{}\":;'\[\]]", field.data):
         raise ValidationError("Special characters are not allowed.")
-
 
 def validate_password(_, field):
     password = field.data
@@ -119,12 +117,10 @@ class createArticle(FlaskForm):
 
 class createProduct(FlaskForm):
     brand = StringField(
-        "Brand of Product:",
-        validators=[InputRequired(), Length(min=2, max=50), no_special_characters],
+        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=50), no_special_characters]
     )
     name = StringField(
-        "Name of Product:",
-        validators=[InputRequired(), Length(min=3, max=50), no_special_characters],
+        "Name of Product:", validators=[InputRequired(), Length(min=3, max=50), no_special_characters]
     )
     description = TextAreaField(
         "Description:",
@@ -150,18 +146,14 @@ class createProduct(FlaskForm):
 
 class Comment_Submission(FlaskForm):
     content = TextAreaField("Content", validators=[InputRequired()])
-    image = FileField(
-        "Image", validators=[FileAllowed(["jpg", "png", "jpeg", "gif"], "Images only!")]
-    )
+    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField("Create Post")
 
 
 class Post_Submission(FlaskForm):
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content", validators=[InputRequired()])
-    image = FileField(
-        "Image", validators=[FileAllowed(["jpg", "png", "jpeg", "gif"], "Images only!")]
-    )
+    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField("Create Post")
 
 
@@ -219,14 +211,7 @@ class ForgotPasswordForm(FlaskForm):
 
 class AccessCodeForm(FlaskForm):
     access_code = IntegerField(
-        "Access Code", validators=[InputRequired(), NumberRange(min=000000, max=999999)]
-    )
-    question_one = StringField(
-        "Question 1: What is name of your mother's pre-school?",
-        validators=[InputRequired()],
-    )
-    question_two = StringField(
-        "Question 2: What is the nickname you had?", validators=[InputRequired()]
+        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
     )
     submit = SubmitField("Submit")
 
@@ -314,6 +299,10 @@ class QuestionForm(FlaskForm):
     )
     submit = SubmitField("Submit")
 
+class EditCommentForm(FlaskForm):
+    content = TextAreaField('Edit Content:', validators=[DataRequired()])
+    image = FileField('Upload Image')
+    submit = SubmitField('Save Changes')
 
 class MFAForm(FlaskForm):
     submit = SubmitField("Generate")

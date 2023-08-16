@@ -99,7 +99,7 @@ def post(id):
     print("test2")
 
     if form.validate_on_submit():
-        print("Form image data:", bleach.clean(form.image.data))
+        print("Form image data:", form.image.data.filename)
         print("test3")
         user = current_user
 
@@ -107,14 +107,12 @@ def post(id):
         print("test4")
         new_comment = Comment(commenter=user.id, commenter_username=user.username, post_id=id, content=remove_html_tags(form.content.data))
         if form.image.data:
-            print("Image data:", bleach.clean(form.image.data.filename))
+            print("Image data:", form.image.data.filename)
             # Save the image as a file on the server
             filename = secure_filename(form.image.data.filename)
             print(filename)
-            image = bleach.clean(form.image.data)
-            image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
-            print(current_app)
-            print(image)
+            image = form.image.data
+            image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(filename)))
             new_comment.image = filename
         print("Success")
         print(new_comment)
@@ -139,3 +137,57 @@ def post(id):
         )
     else:
         return render_template("error/404.html")
+
+@bp.route("/edit_comment/<int:comment_id>", methods=["POST"])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Check if the current user is the commenter and has permission to edit the comment
+    if current_user.id != comment.commenter:
+        return jsonify({"success": False, "message": "Permission denied"}), 403
+
+    form = EditCommentForm()
+    if form.validate_on_submit():
+
+
+        comment.content = remove_html_tags(form.content.data)
+
+        # Check if an image is uploaded and save it if necessary
+        if form.image.data:
+            filename = secure_filename(form.image.data.filename)
+            UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'images')
+            image_path = os.path.join(UPLOAD_FOLDER, filename)
+            form.image.data.save(image_path)
+            comment.image = filename
+
+        db.session.commit()
+        return redirect(url_for("forum.post", id=comment.post_id))
+
+    # If the form data is not valid, render the post page with the error messages
+    post = Post.query.get(comment.post_id)
+    comment_list = Comment.query.filter_by(post_id=comment.post_id).all()
+    return render_template(
+        "forum/Comments.html", post=post, form=form, comment_list=comment_list
+    )
+
+
+@bp.route("/delete_comment/<int:comment_id>", methods=["DELETE", "POST"])
+@login_required
+def delete_comment(comment_id):
+    if request.method == "POST" or request.method == "DELETE":
+        comment = Comment.query.get_or_404(comment_id)
+
+        # Check if the current user is the commenter and has permission to delete the comment
+        if current_user.id != comment.commenter:
+            flash("Permission denied", "error")
+        else:
+            # Perform the actual deletion
+            db.session.delete(comment)
+            db.session.commit()
+            flash("Comment deleted successfully", "success")
+
+        # Redirect back to the post's comment page
+        return redirect(url_for("forum.post", id=comment.post_id))
+    else:
+        return jsonify({"message": "Method not allowed"}), 405

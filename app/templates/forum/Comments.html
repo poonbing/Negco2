@@ -5,15 +5,73 @@
     {% for comment in comment_list %}
         <div class="flex flex-col space-y-4">
             <div class="bg-white p-4 rounded-lg shadow-md">
+                {% if current_user.id == comment.commenter %}
+            <!-- Edit button for the comment -->
+                    <button class="text-blue-500 hover:underline mr-2" onclick="openEditForm({{ comment.id }})">Edit</button>
+                    <form class="delete-form" method="POST" action="{{ url_for('forum.delete_comment', comment_id=comment.id) }}">
+                    {{ form.csrf_token }}
+                    <button type="submit" class="delete-comment-btn" onclick="submitDeleteForm(this.form)">Delete</button>
+                     </form>
+                {% endif %}
                 <h3 class="text-lg font-bold">{{ comment.commenter_username }}</h3>
                 
                 <p class="text-gray-700">{{ comment.content | safe }}</p>
-                
+                {% if comment.image %}
+                 <img src="{{ url_for('static', filename='images/' + comment.image) }}" alt="Uploaded Image" class="max-w-xs mb-2">
+                {% endif %}
             </div>
         </div>
+        <form class="edit-form hidden mt-4" id="edit-form-{{ comment.id }}" action="{{ url_for('forum.edit_comment', comment_id=comment.id) }}" method="POST" enctype="multipart/form-data">
+          {{ form.csrf_token }}
+          <label for="content-{{ comment.id }}" class="block font-medium mb-1">Edit Content:</label>
+          <textarea id="content-{{ comment.id }}" name="content" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 mb-2">{{ comment.content }}</textarea>
+          <input type="file" name="image" accept="image/*" class="mb-2">
+          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded-md mr-2">Save</button>
+          <button type="button" onclick="closeEditForm({{ comment.id }})" class="bg-gray-300 text-gray-700 py-1 px-3 rounded-md">Cancel</button>
+        </form>
     {% endfor %}
 </div>
+<script>
+  // Function to open the edit form
+  function openEditForm(commentId) {
+    const form = document.getElementById(`edit-form-${commentId}`);
+    form.classList.remove("hidden");
 
+    // Fill the edit form with the current comment content
+    const contentElem = document.getElementById(`comment-content-${commentId}`);
+    const commentContent = contentElem.innerHTML;
+    const commentImage = contentElem.nextElementSibling?.getAttribute("src");
+
+    form.querySelector(`textarea[name="content"]`).value = commentContent;
+    form.querySelector(`input[name="image"]`).value = commentImage;
+  }
+
+  // Function to close the edit form
+  function closeEditForm(commentId) {
+    const form = document.getElementById(`edit-form-${commentId}`);
+    form.classList.add("hidden");
+  }
+
+  // Function to submit the edit form
+  function submitEditForm(event, commentId) {
+    event.preventDefault();
+
+    const form = document.getElementById(`edit-form-${commentId}`);
+    const formData = new FormData(form);
+
+    // You can optionally perform client-side validation here before submission
+
+    // Submit the form using the standard HTML form submission
+    form.submit();
+  }
+    function submitDeleteForm(form) {
+        const confirmed = confirm("Are you sure you want to delete this comment?");
+        if (confirmed) {
+            form.submit();
+        }
+    }
+  }
+</script>
 {% include 'forum/CommentCreation.html' %}
 {% endblock content %}
   
