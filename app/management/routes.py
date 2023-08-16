@@ -13,7 +13,6 @@ from flask_login import current_user, login_required
 from io import BytesIO
 import pyotp
 import hashlib
-import qrcode
 
 # Local Modules
 from app import limiter
@@ -32,6 +31,7 @@ from ..models import User
 from app import limiter
 from config import Config
 import bleach
+from datetime import date, timedelta
 
 
 @bp.route("/profile_picture")
@@ -231,6 +231,7 @@ def settings():
                 flash("Password and Confirm Password must be the same", "error")
             else:
                 user.password = user.hash_password(form.password.data)
+                user.password_expires = date.today() + timedelta(days=30)
 
         db.session.commit()
         flash("Setting Information changes successful", "success")
@@ -283,5 +284,8 @@ def admin_settings(user_id):
 @limiter.limit("4/second")
 def dashboard():
     user = current_user
+    if user.password_expires == date.today():
+        flash("Please reset your password", "error")
+        return redirect(url_for("management.settings"))
 
     return render_template("management/dashboard.html")

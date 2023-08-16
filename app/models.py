@@ -1,5 +1,5 @@
 # Python Modules
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
@@ -155,7 +155,7 @@ class User(
     question_three = db.Column(db.String(100))
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
-    password_expires = db.Column(db.Date, nullable=True)
+    password_expires = db.Column(db.Date)
     secret = db.Column(db.String(256), unique=True)
 
     oauth_accounts = db.relationship("OAuthUser", back_populates="user")
@@ -189,6 +189,7 @@ class User(
         self.last_name = last_name
         self.age = age
         self.phone = phone
+        self.password_expires = date.today() + timedelta(days=30)
 
     def hash_password(self, password):
         return hashpw(password.encode("utf-8"), gensalt())
@@ -404,7 +405,7 @@ class Report(db.Model):
             "id": self.id,
             "related_user": self.related_user,
             "item_name": self.item_name,
-            "item_type":self.item_type,
+            "item_type": self.item_type,
             "month": self.month,
             "year": self.year,
             "total_usage": self.total_usage,
@@ -542,6 +543,7 @@ class Log(db.Model):
     address = db.Column(db.String(36), nullable=False)
     category = db.Column(db.String(45), nullable=False)
     log_text = db.Column(db.String, nullable=False)
+
 
 class Report_Reviews(db.Model):
     __tablename__ = "report_reviews"
