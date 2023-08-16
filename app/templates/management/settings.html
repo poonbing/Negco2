@@ -105,7 +105,7 @@ content %}
       border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500
       focus:border-teal-500 block w-full p-2.5 dark:bg-gray-800
       dark:border-teal-400 dark:placeholder-gray-400 dark:text-white
-      dark:focus:ring-teal-500 dark:focus:border-teal-500") }}
+      dark:focus:ring-teal-500 dark:focus:border-teal-500", id='profile_picture') }}
     </div>
 
     <div>
@@ -118,7 +118,7 @@ content %}
       text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
       p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
       dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.first_name) }}
+      value=user.first_name, id='first_name') }}
     </div>
     <div>
       <label
@@ -130,7 +130,7 @@ content %}
       text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
       p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
       dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.last_name) }}
+      value=user.last_name, id='last_name') }}
     </div>
     <div>
       <label
@@ -142,7 +142,7 @@ content %}
       text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
       p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
       dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.phone) }}
+      value=user.phone, id='phone') }}
     </div>
     <div>
       <label
@@ -154,7 +154,7 @@ content %}
       text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
       p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
       dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.gender) }}
+      value=user.gender, id='gender') }}
     </div>
 
     <div>
@@ -186,7 +186,7 @@ content %}
         text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block
         w-full pl-10 p-2.5 dark:bg-gray-800 dark:border-teal-400
         dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
-        dark:focus:border-teal-500", value=user.email) }}
+        dark:focus:border-teal-500", value=user.email, id='email') }}
       </div>
     </div>
 
@@ -200,7 +200,7 @@ content %}
       text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
       p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
       dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      placeholder="•••••••••") }}
+      placeholder="•••••••••", id='password') }}
     </div>
 
     <div>
@@ -213,7 +213,7 @@ content %}
       text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500
       block w-full p-2.5 dark:bg-gray-800 dark:border-teal-400
       dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
-      dark:focus:border-teal-500", placeholder="•••••••••") }}
+      dark:focus:border-teal-500", placeholder="•••••••••", id='confirm_password') }}
     </div>
 
     <div>
@@ -224,7 +224,6 @@ content %}
 
 
 </div>
-
 <script src="{{ url_for('static', filename='javascript/settings.js') }}"></script>
 
 
