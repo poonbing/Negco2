@@ -85,7 +85,7 @@ class OTPMixin:
             return f"Error: {e}"
 
 
-class ResetPasswordsMixin:
+class PasswordMixin:
     def get_reset_token(self, expires_sec=1800):
         access_token = create_access_token(
             identity=self.id, expires_delta=timedelta(seconds=expires_sec)
@@ -100,6 +100,39 @@ class ResetPasswordsMixin:
             return user_id
         except Exception as e:
             return f"Error: {e}"
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
+
+    def check_password(self, password):
+        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+
+    def password_has_expired(self):
+        if self.password_expires:
+            return self.password_expires < datetime.now().date()
+        return False
+
+
+class QuestionMixin:
+    def hash_question_one(self, question_one):
+        return hashpw(question_one.encode("utf-8"), gensalt())
+
+    def check_question_one(self, question_one):
+        return checkpw(question_one.encode("utf-8"), self.question_one.encode("utf-8"))
+
+    def hash_question_two(self, question_two):
+        return hashpw(question_two.encode("utf-8"), gensalt())
+
+    def check_question_two(self, question_two):
+        return checkpw(question_two.encode("utf-8"), self.question_two.encode("utf-8"))
+
+    def hash_question_three(self, question_three):
+        return hashpw(question_three.encode("utf-8"), gensalt())
+
+    def check_question_three(self, question_three):
+        return checkpw(
+            question_three.encode("utf-8"), self.question_three.encode("utf-8")
+        )
 
 
 # Relations
@@ -133,8 +166,9 @@ class User(
     UserMixin,
     AccountManagementMixin,
     RolesAndPermissionsMixin,
-    ResetPasswordsMixin,
+    PasswordMixin,
     OTPMixin,
+    QuestionMixin,
 ):
     __tablename__ = "users"
 
@@ -190,17 +224,6 @@ class User(
         self.age = age
         self.phone = phone
         self.password_expires = date.today() + timedelta(days=30)
-
-    def hash_password(self, password):
-        return hashpw(password.encode("utf-8"), gensalt())
-
-    def check_password(self, password):
-        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
-
-    def password_has_expired(self):
-        if self.password_expires:
-            return self.password_expires < datetime.now().date()
-        return False
 
     # def set_secret(self, key):
     #     f = Fernet(key)

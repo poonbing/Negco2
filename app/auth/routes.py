@@ -47,7 +47,7 @@ def login_with_azure():
 
 @bp.route("/login", methods=["GET", "POST"])
 @not_logged_in_required
-@limiter.limit("4/second")
+@limiter.limit("20/day")
 def login():
     xcaptcha = bp.xcaptcha
     form = LoginForm()

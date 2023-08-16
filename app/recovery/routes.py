@@ -78,7 +78,7 @@ def enter_access_code():
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
-@limiter.limit("4/second")
+@limiter.limit("50 per hour")
 def reset_password(token):
     user_id = User.verify_reset_token(token)
     user = User.query.get(user_id)
