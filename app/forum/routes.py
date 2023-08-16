@@ -60,10 +60,10 @@ def topic_posts(topic_id):
         )
         if form.image.data:
             # Save the image as a file on the server
-            file = bleach.clean(form.image.data)
+            file = form.image.data
             filename = secure_filename(file.filename)
             print(filename)
-            image = bleach.clean(form.image.data)
+            image = form.image.data
             image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
             print(current_app)
             print(image)
@@ -99,7 +99,7 @@ def post(id):
     print("test2")
 
     if form.validate_on_submit():
-        print("Form image data:", bleach.clean(form.image.data))
+        print("Form image data:", form.image.data)
         print("test3")
         user = current_user
 
@@ -111,7 +111,7 @@ def post(id):
             # Save the image as a file on the server
             filename = secure_filename(form.image.data.filename)
             print(filename)
-            image = bleach.clean(form.image.data)
+            image = form.image.data
             image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
             print(current_app)
             print(image)
