@@ -15,7 +15,6 @@ import secrets, stripe, os
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-    # Whose is this??
     app.config.from_object(config_class)
     stripe_keys = {
         "secret_key": "sk_test_51NMQKILNkWku1TleBfxFFaU1PZExG7m5EWksDyd35bjyfoQlr71c0EBrNuD3bHFv37RL6Q0nvVuFbEZdRZ8MCruW00PyWCWL03",
