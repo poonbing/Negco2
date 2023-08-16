@@ -11,7 +11,7 @@ from ..forms import Comment_Submission, Post_Submission
 from ..extensions import db
 from werkzeug.utils import secure_filename
 from config import Config
-
+import bleach
 
 
 def allowed_file(filename):
@@ -54,16 +54,16 @@ def topic_posts(topic_id):
         new_post = Post(
             poster=user.id,
             poster_username=user.username,
-            title=form.title.data,
-            content=remove_html_tags(form.content.data),
+            title=bleach.clean(form.title.data),
+            content=remove_html_tags(bleach.clean(form.content.data)),
             topic_id=topic_id
         )
         if form.image.data:
             # Save the image as a file on the server
-            file = form.image.data
+            file = bleach.clean(form.image.data)
             filename = secure_filename(file.filename)
             print(filename)
-            image = form.image.data
+            image = bleach.clean(form.image.data)
             image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
             print(current_app)
             print(image)
@@ -99,7 +99,7 @@ def post(id):
     print("test2")
 
     if form.validate_on_submit():
-        print("Form image data:", form.image.data)
+        print("Form image data:", bleach.clean(form.image.data))
         print("test3")
         user = current_user
 
@@ -107,11 +107,11 @@ def post(id):
         print("test4")
         new_comment = Comment(commenter=user.id, commenter_username=user.username, post_id=id, content=remove_html_tags(form.content.data))
         if form.image.data:
-            print("Image data:", form.image.data.filename)
+            print("Image data:", bleach.clean(form.image.data.filename))
             # Save the image as a file on the server
             filename = secure_filename(form.image.data.filename)
             print(filename)
-            image = form.image.data
+            image = bleach.clean(form.image.data)
             image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
             print(current_app)
             print(image)

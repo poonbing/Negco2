@@ -11,7 +11,7 @@ from flask_login import current_user, login_required
 import json
 from datetime import datetime
 import calendar
-
+import bleach
 
 
 @bp.route("/tracker_report", methods=['GET', 'POST'])
@@ -23,10 +23,10 @@ def report():
     report_util = ReportFunctions()
     user = current_user.id
     if form.validate_on_submit():
-        name = form.name.data
-        item = form.item.data
-        start_time = form.starttime.data
-        new_end_time = form.newendtime.data
+        name = bleach.clean(form.name.data)
+        item = bleach.clean(form.item.data)
+        start_time = bleach.clean(form.starttime.data)
+        new_end_time = bleach.clean(form.newendtime.data)
         reply = report_util.edit_tracker_record(user, name, item, start_time, new_end_time)
         if reply == 'Failed':
             flash('Tracker Record cannot be edited!', 'error')

@@ -32,7 +32,7 @@ from app.management.utils import role_required
 from ..models import Products, CartItem, Checkout, User
 from ..forms import createProduct, PaymentForm
 from ..extensions import db, mail
-
+import bleach
 
 def check_splcharacter(test): 
   
@@ -60,13 +60,13 @@ def check_splcharacter(test):
 def publishProduct():
     form = createProduct()
     if form.validate_on_submit():
-        brand = form.brand.data
-        name = form.name.data
-        description = form.description.data
-        category = form.category.data
-        price = form.price.data
-        offer = form.offer.data
-        image = form.image.data
+        brand = bleach.clean(form.brand.data)
+        name = bleach.clean(form.name.data)
+        description = bleach.clean(form.description.data)
+        category = bleach.clean(form.category.data)
+        price = bleach.clean(form.price.data)
+        offer = bleach.clean(form.offer.data)
+        image = bleach.clean(form.image.data)
         image.save(
             os.path.join(
                 os.path.abspath(os.path.dirname(__file__)),
@@ -157,13 +157,13 @@ def updateProduct(id):
     form = createProduct()
     product_to_update = Products.query.get_or_404(id)
     if request.method == 'POST':
-        product_to_update.brand = form.brand.data
-        product_to_update.name = form.name.data
-        product_to_update.description = form.description.data
-        product_to_update.price = form.price.data
-        product_to_update.image = form.image.data
-        product_to_update.offer = form.offer.data
-        product_to_update.category = form.category.data
+        product_to_update.brand = bleach.clean(form.brand.data)
+        product_to_update.name = bleach.clean(form.name.data)
+        product_to_update.description = bleach.clean(form.description.data)
+        product_to_update.price = bleach.clean(form.price.data)
+        product_to_update.image = bleach.clean(form.image.data)
+        product_to_update.offer = bleach.clean(form.offer.data)
+        product_to_update.category = bleach.clean(form.category.data)
         verify_characters = check_splcharacter(product_to_update.description)
         if verify_characters:
             if product_to_update.offer > 0:

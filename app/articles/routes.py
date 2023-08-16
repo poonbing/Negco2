@@ -14,6 +14,7 @@ from ..forms import createArticle
 from ..extensions import db
 from app import limiter
 import re
+import bleach
 
 
 def check_splcharacter(test): 
@@ -65,11 +66,11 @@ def articlePage(id):
 def publishArticle():
     form = createArticle()
     if form.validate_on_submit():
-        title = form.title.data
-        description = form.description.data
-        writer = form.writer.data
-        paragraph = form.paragraph.data
-        image = form.image.data
+        title = bleach.clean(form.title.data)
+        description = bleach.clean(form.description.data)
+        writer = bleach.clean(form.writer.data)
+        paragraph = bleach.clean(form.paragraph.data)
+        image = bleach.clean(form.image.data)
         image.save(
             os.path.join(
                 os.path.abspath(os.path.dirname(__file__)),
