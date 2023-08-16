@@ -63,7 +63,7 @@
     </style>
 <script>
     function createChart() {
-        const height = 400;
+        const height = 600;
         const marginTop = 100;
         const marginRight = 0;
         const marginBottom = 10;
@@ -190,6 +190,13 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
     });
 </script>
 <br>
+<div class="absolute top-0 right-0 mr-4 space-y-4" style="margin-top: 68px;">
+    {% for review in reviews %}
+        <div class="bg-white p-4 rounded-lg shadow-md max-w-md">
+            {{ review|safe }}
+        </div>
+    {% endfor %}
+</div>
 <div>
     <form method="POST" id="trackerRecordEditForm" style="display: none;">
         {{ form.hidden_tag() }}
@@ -218,8 +225,8 @@ const resultArray = divideAndUpdateValues({{ datapoints }}, {{ target }});
                          Edit </button>
         {% endif %}
         <div>Total Use Time: {{ records['use_time'] }} Minutes</div>
-        <div>Power Rate (Watt/Minute): {{ records['rate'] }}</div>
-        <div>Total Power Usage: {{ records['total_usage'] }}</div>
+        <div>Power Rate (Watt/Minute): {{ "{:.4f}".format(records['rate']|round(4)) }}</div>
+        <div>Total Power Usage: {{ "{:.4f}".format(records['total_usage']|round(4)) }}</div>
         <div>Date: {{ records['start_time'][0:10] }}</div>
         <br>
     </div>

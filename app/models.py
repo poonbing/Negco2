@@ -337,6 +337,7 @@ class Report(db.Model):
     id = id = db.Column(db.String(36), primary_key=True, unique=True)
     related_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
     item_name = db.Column(db.String(45), nullable=False)
+    item_type = db.Column(db.String(45), nullable=False)
     month = db.Column(db.String(2), nullable=False)
     year = db.Column(db.String(4), nullable=False)
     total_usage = db.Column(db.INTEGER)
@@ -348,6 +349,7 @@ class Report(db.Model):
         id,
         related_user,
         item_name,
+        item_type,
         month,
         year,
         total_usage,
@@ -357,6 +359,7 @@ class Report(db.Model):
         self.id = id
         self.related_user = related_user
         self.item_name = item_name
+        self.item_type = item_type
         self.month = month
         self.year = year
         self.total_usage = total_usage
@@ -368,6 +371,7 @@ class Report(db.Model):
             "id": self.id,
             "related_user": self.related_user,
             "item_name": self.item_name,
+            "item_type":self.item_type,
             "month": self.month,
             "year": self.year,
             "total_usage": self.total_usage,
@@ -505,3 +509,11 @@ class Log(db.Model):
     address = db.Column(db.String(36), nullable=False)
     category = db.Column(db.String(45), nullable=False)
     log_text = db.Column(db.String, nullable=False)
+
+class Report_Reviews(db.Model):
+    __tablename__ = "report_reviews"
+    item_type = db.Column(db.String(30), primary_key=True, nullable=False)
+    critical_point = db.Column(db.Float, nullable=False)
+    suggestion1 = db.Column(db.String, nullable=False)
+    suggestion2 = db.Column(db.String, nullable=False)
+    suggestion3 = db.Column(db.String, nullable=False)

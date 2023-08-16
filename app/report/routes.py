@@ -46,7 +46,7 @@ def report():
             nested_json_name = json.dumps(list_names)
             num_days = calendar.monthrange(datetime.now().year, datetime.now().month)[1]
             trackers = report_util.retrieve_all_tracker_records(user)
-            print(list_names)
+            output = report_util.generate_review(user)
             return render_template('report/report.html',
                                     form=form,
                                     csrf_token=csrf_token,
@@ -56,4 +56,5 @@ def report():
                                     n=len(list_names),
                                     trackers=trackers,
                                     num_days=num_days,
-                                    target=report.energy_goals)
+                                    target=report.energy_goals,
+                                    reviews=output)
