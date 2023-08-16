@@ -122,7 +122,7 @@ class ReportFunctions:
             review = Report_Reviews.query.filter(Report_Reviews.item_type==item[0]).first()
             if review:
                 suggestions = [review.suggestion1, review.suggestion2, review.suggestion3]
-                del suggestions[random.randint(0, 2)]
+                suggestions.pop(random.randint(0, 2))
                 review_text = f"""Item {item[0]}'s Energy Usage Currently is the {ordinal[index]} highest, at {item[1]} kWh (KiloWatt/Hour). 
                                 <br>Here are some ways to improve on your energy usage:
                                 <br>1. {suggestions[0]}
