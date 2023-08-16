@@ -131,21 +131,23 @@ class TrackerFunctions:
     def end_tracker(self, id, user_id):
         try:
             tracker = Tracker.query.get(id)
+            if not tracker:
+                print("Tracker not found!")
+                return
             report = self.check_report(user_id, tracker.name)
             start_time = datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")
-            current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-            tracker.end_time = current_time
-            current_time = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%S")
-            total_usage = float(float(tracker.rate)/60) * float(round((current_time - start_time).total_seconds() / 60))
+            current_time = datetime.now()
+            tracker.end_time = current_time.strftime("%Y-%m-%dT%H:%M:%S")
+            total_usage = round(float(tracker.rate) / 60 * (current_time - start_time).total_seconds() / 60, 5)           
             if report:
                 self.update_report(user_id, tracker.name, total_usage)
             else:
-                self.create_new_report(user_id, tracker.name, total_usage)
+                self.create_new_report(user_id, tracker.name, tracker.item, total_usage)
             total_report = self.check_report(user_id, 'Total')
             if total_report:
                 self.update_report(user_id, 'Total', total_usage)
             else:
-                self.create_new_report(user_id, 'Total', total_usage)  
+                self.create_new_report(user_id, 'Total', 'Total', total_usage)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -154,20 +156,38 @@ class TrackerFunctions:
 
     def update_report(self, user_id, name, total_usage):
         report = self.check_report(user_id, name)
-        total_usage2 = total_usage + report.total_usage
-        report.total_usage = total_usage2
+        report.total_usage += total_usage
+        current_day = datetime.now().day
         datapoint = list(report.datapoint)
-        datapoint += [0] * (int(datetime.now().day) - len(datapoint))
-        datapoint[int(datetime.now().day) - 1] += total_usage
+        datapoint += [0] * (current_day - len(datapoint))
+        datapoint[current_day - 1] += total_usage
         report.datapoint = datapoint
-        db.session.commit()
 
-    def create_new_report(self, user_id, name, total_usage):
+    def create_new_report(self, user_id, name, item, total_usage):
         current_month = datetime.now().strftime('%m')
         current_year = datetime.now().year
-        datapoints = [0] * int(datetime.now().day)
-        datapoints[int(datetime.now().day) - 1] = total_usage
-        new_report = Report(id=str(uuid.uuid4()), related_user=user_id, item_name=name, month=current_month, year=current_year, total_usage=total_usage, energy_goals=550, datapoint=datapoints)
+        current_day = datetime.now().day
+        datapoints = [0] * current_day
+        datapoints[current_day - 1] = total_usage
+        goals = {
+            'Total': 927.5,
+            'Air Conditioning': 630,
+            'Shower': 180,
+            'Laundry': 20,
+            'Cooking': 90,
+            'Lighting': 7.5
+        }
+        new_report = Report(
+            id=str(uuid.uuid4()),
+            related_user=user_id,
+            item_name=name,
+            item_type=item,
+            month=current_month,
+            year=current_year,
+            total_usage=total_usage,
+            energy_goals=goals[item],
+            datapoint=datapoints
+        )
         db.session.add(new_report)
 
     def delete_tracker_record(self, user_id, tracker):
@@ -175,7 +195,7 @@ class TrackerFunctions:
         total_report = self.check_report(user_id, 'Total')
         try:
             end_time = datetime.strptime(tracker.end_time, "%Y-%m-%dT%H:%M:%S")
-            total_usage = (float(tracker.rate)/60)*int(round((end_time - datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60))
+            total_usage = round((float(tracker.rate)/60)*int(round((end_time - datetime.strptime(tracker.start_time, "%Y-%m-%dT%H:%M:%S")).total_seconds()/60)),5)
             end_date = end_time.day
             report.total_usage -= total_usage
             list = ast.literal_eval(report.datapoint)

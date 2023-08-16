@@ -70,7 +70,7 @@ def publishArticle():
         description = bleach.clean(form.description.data)
         writer = bleach.clean(form.writer.data)
         paragraph = bleach.clean(form.paragraph.data)
-        image = bleach.clean(form.image.data)
+        image = form.image.data
         image.save(
             os.path.join(
                 os.path.abspath(os.path.dirname(__file__)),
@@ -127,10 +127,10 @@ def updateArticle(id):
     article_to_update = Articles.query.get_or_404(id)
     if request.method == "POST":
         # Update the article with the form data
-        article_to_update.title = form.title.data
-        article_to_update.description = form.description.data
-        article_to_update.writer = form.writer.data
-        article_to_update.paragraph = form.paragraph.data
+        article_to_update.title = bleach.clean(form.title.data)
+        article_to_update.description = bleach.clean(form.description.data)
+        article_to_update.writer = bleach.clean(form.writer.data)
+        article_to_update.paragraph = bleach.clean(form.paragraph.data)
         article_to_update.image = form.image.data
         verify_characters = check_splcharacter(article_to_update.description)
         verify_characters2 = check_splcharacter(article_to_update.paragraph)

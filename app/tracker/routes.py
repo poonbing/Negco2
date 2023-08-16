@@ -36,7 +36,6 @@ def track():
             item = form.item.data
             rate = form.rate.data
             old_name = form.old_name.data
-            old_item = form.old_item.data
             tracker.update_session_information(user_id, old_name, name, item, rate)
             return redirect(url_for('tracker.track'))
         elif form.action.data == 'create':
@@ -52,11 +51,11 @@ def track():
             return redirect(url_for('tracker.track'))
         else:
             if tracker.check_user_tracker_existence(user_id) is False:
-                tracker.create_session_information(user_id, "Shower", "Shower", 0.1250)
-                tracker.create_session_information(user_id, "Air Conditioning", "Air Conditioning", 0.4167)
-                tracker.create_session_information(user_id, "Lighting", "Lighting", 0.0104)
-                tracker.create_session_information(user_id, "Washing Machine", "Laundry", 0.1042)
-                tracker.create_session_information(user_id, "Electric Stove", "Cooking", 0.1042)
+                tracker.create_session_information(user_id, "Shower", "Shower", 6)
+                tracker.create_session_information(user_id, "Air Conditioning", "Air Conditioning", 3.5)
+                tracker.create_session_information(user_id, "Lighting", "Lighting", 0.01)
+                tracker.create_session_information(user_id, "Washing Machine", "Laundry", 1)
+                tracker.create_session_information(user_id, "Electric Stove", "Cooking", 2)
             timers = tracker.get_all_session_of_tracker(user_id)
             return render_template("tracker/tracker.html", keylist=timers, form=form, csrf_token=csrf_token)
     except:
