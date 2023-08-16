@@ -298,3 +298,8 @@ class QuestionForm(FlaskForm):
         "Question 3: What your favorite food to eat during winter?"
     )
     submit = SubmitField("Submit")
+
+class EditCommentForm(FlaskForm):
+    content = TextAreaField('Edit Content:', validators=[DataRequired()])
+    image = FileField('Upload Image')
+    submit = SubmitField('Save Changes')

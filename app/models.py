@@ -451,6 +451,7 @@ class Comment(db.Model):
     commenter = db.Column(
         db.String(36), db.ForeignKey("users.id"), nullable=False, unique=True
     )
+    image = db.Column(db.String(255), nullable=False)
     commenter_username = db.Column(db.String(36), nullable=False, unique=True)
     post = db.relationship("Post", back_populates="comments")
 
