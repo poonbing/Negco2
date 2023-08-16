@@ -18,7 +18,7 @@ import qrcode
 # Local Modules
 from app import limiter
 from app.management import bp
-from .utils import role_required, compress_and_resize, generate_api_key
+from .utils import role_required, compress_and_resize, check_image_format
 from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
 from ..forms import (
@@ -39,7 +39,18 @@ import bleach
 @limiter.limit("4/second")
 def profile_picture():
     user = current_user
-    return send_file(BytesIO(user.profile_picture), mimetype="image/jpeg")
+    profile_picture_bytes = user.profile_picture
+
+    image_format = check_image_format(profile_picture_bytes)
+
+    if image_format == "JPG":
+        mimetype = "image/jpeg"
+    elif image_format == "PNG":
+        mimetype = "image/png"
+    else:
+        return "Invalid image format"
+
+    return send_file(BytesIO(profile_picture_bytes), mimetype=mimetype)
 
 
 @bp.route("/show_users", methods=["GET"])
