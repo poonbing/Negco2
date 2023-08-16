@@ -9,6 +9,15 @@ import string
 import secrets
 
 
+def check_image_format(image_bytes):
+    if image_bytes[:3] == b"\xff\xd8\xff":
+        return "JPG"
+    elif image_bytes[:8] == b"\x89PNG\r\n\x1a\n":
+        return "PNG"
+    else:
+        return "Unknown"
+
+
 def generate_api_key(length=60):
     alphabet = string.ascii_letters + string.digits
     api_key = "".join(secrets.choice(alphabet) for _ in range(length))

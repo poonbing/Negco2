@@ -219,7 +219,14 @@ class ForgotPasswordForm(FlaskForm):
 
 class AccessCodeForm(FlaskForm):
     access_code = IntegerField(
-        "Access Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+        "Access Code", validators=[InputRequired(), NumberRange(min=000000, max=999999)]
+    )
+    question_one = StringField(
+        "Question 1: What is name of your mother's pre-school?",
+        validators=[InputRequired()],
+    )
+    question_two = StringField(
+        "Question 2: What is the nickname you had?", validators=[InputRequired()]
     )
     submit = SubmitField("Submit")
 
@@ -310,3 +317,10 @@ class QuestionForm(FlaskForm):
 
 class MFAForm(FlaskForm):
     submit = SubmitField("Generate")
+
+
+class OTPForm(FlaskForm):
+    otp = IntegerField(
+        "OTP Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")

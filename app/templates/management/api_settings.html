@@ -1,6 +1,51 @@
 {% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
 content %}
 
+{% for message in
+  get_flashed_messages() %}
+  <div
+    id="alert-1"
+    class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-blue-400 mt-2.5"
+    role="alert"
+  >
+    <svg
+      aria-hidden="true"
+      class="flex-shrink-0 w-5 h-5"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+        clip-rule="evenodd"
+      ></path>
+    </svg>
+    <span class="sr-only">Info</span>
+    <div class="ml-3 text-sm font-medium">{{message}}</div>
+    <button
+      type="button"
+      class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-green-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+      data-dismiss-target="#alert-1"
+      aria-label="Close"
+    >
+      <span class="sr-only">Close</span>
+      <svg
+        aria-hidden="true"
+        class="w-5 h-5"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+  </div>
+  {% endfor %}
 
 
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
@@ -95,24 +140,29 @@ content %}
           </td>
           <td class="px-6 py-3">
             <button class="text-red-500 hover:text-red-700">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 inline-block"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
-                    clip-rule="evenodd"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
+              <a href="{{ url_for('management.delete_api_key', api_key=decrypted_key) }}" class="flex items-center">
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5 inline-block"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                  >
+                      <path
+                          fill-rule="evenodd"
+                          d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+                          clip-rule="evenodd"
+                      />
+                      <path
+                          fill-rule="evenodd"
+                          d="M14.5 3a1 1 0 011 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4 4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                          clip-rule="evenodd"
+                      />
+                  </svg>
+                  Delete
+              </a>
+          </button>
+          
+          
           </td>
         </tr>
         {% endfor %}

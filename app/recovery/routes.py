@@ -12,6 +12,7 @@ from ..extensions import db
 from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
 import bleach
 
+
 @bp.route("/forgot_password", methods=["GET", "POST"])
 @limiter.limit("50 per hour")
 def forgot_password():
@@ -52,15 +53,21 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
-        entered_code = bleach.clean(form.access_code.data)
+        entered_code = form.access_code.data
+        user_question_one = form.question_one.data
+        user_question_two = form.question_two.data
         access_code_info = access_codes.get(email)
         if access_code_info:
             correct_code, expiration_time = access_code_info
             if datetime.now() <= expiration_time and entered_code == correct_code:
                 del access_codes[email]
                 user = User.query.filter_by(email=email).first()
-                token = user.get_reset_token()
-                return redirect(url_for("recovery.reset_password", token=token))
+                if (
+                    user.question_one == user_question_one
+                    and user.question_two == user_question_two
+                ):
+                    token = user.get_reset_token()
+                    return redirect(url_for("recovery.reset_password", token=token))
 
             else:
                 flash("Invalid or expired access code.", "error")
@@ -71,9 +78,10 @@ def enter_access_code():
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
-@limiter.limit("4/second")
+@limiter.limit("50 per hour")
 def reset_password(token):
-    user = User.verify_reset_token(token)
+    user_id = User.verify_reset_token(token)
+    user = User.query.get(user_id)
 
     if user is None:
         flash("That is an invalid or expired token", "error")

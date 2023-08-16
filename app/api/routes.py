@@ -15,7 +15,7 @@ import bleach
 @csrf.exempt
 @limiter.limit("100/day")
 def get_token():
-    data = bleach.clean(request.get_json())
+    data = request.get_json()
     username = bleach.clean(data.get("username"))
     api_key = bleach.clean(data.get("api_key"))
     if not username or not api_key:
@@ -93,6 +93,7 @@ def get_articles_of_the_day():
 def get_user_data():
     username = get_jwt_identity()
     user = User.query.filter_by(username=username).first()
+    print(f"The user is {user}")
 
     if user:
         user_data = Report.query.filter_by(
@@ -109,5 +110,7 @@ def get_user_data():
                 "energy_goals": user_data.energy_goals,
             }
             return jsonify({"user_data": user_data_dict})
+        else:
+            return jsonify({"message": "User data not found"}), 404
     else:
         return jsonify({"message": "User data not found"}), 404

@@ -1,5 +1,5 @@
 # Python Modules
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
@@ -68,7 +68,24 @@ class RolesAndPermissionsMixin:
         return self.role == required_role
 
 
-class ResetPasswordsMixin:
+class OTPMixin:
+    def get_otp_token(self, expires_sec=1800):
+        access_token = create_access_token(
+            identity=self.id, expires_delta=timedelta(seconds=expires_sec)
+        )
+        return access_token
+
+    @staticmethod
+    def verify_otp_token(token):
+        try:
+            decoded_token = decode_token(token)
+            user_id = decoded_token["sub"]
+            return user_id
+        except Exception as e:
+            return f"Error: {e}"
+
+
+class PasswordMixin:
     def get_reset_token(self, expires_sec=1800):
         access_token = create_access_token(
             identity=self.id, expires_delta=timedelta(seconds=expires_sec)
@@ -80,9 +97,42 @@ class ResetPasswordsMixin:
         try:
             decoded_token = decode_token(token)
             user_id = decoded_token["sub"]
-            return User.query.get(user_id)
+            return user_id
         except Exception as e:
             return f"Error: {e}"
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
+
+    def check_password(self, password):
+        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+
+    def password_has_expired(self):
+        if self.password_expires:
+            return self.password_expires < datetime.now().date()
+        return False
+
+
+class QuestionMixin:
+    def hash_question_one(self, question_one):
+        return hashpw(question_one.encode("utf-8"), gensalt())
+
+    def check_question_one(self, question_one):
+        return checkpw(question_one.encode("utf-8"), self.question_one.encode("utf-8"))
+
+    def hash_question_two(self, question_two):
+        return hashpw(question_two.encode("utf-8"), gensalt())
+
+    def check_question_two(self, question_two):
+        return checkpw(question_two.encode("utf-8"), self.question_two.encode("utf-8"))
+
+    def hash_question_three(self, question_three):
+        return hashpw(question_three.encode("utf-8"), gensalt())
+
+    def check_question_three(self, question_three):
+        return checkpw(
+            question_three.encode("utf-8"), self.question_three.encode("utf-8")
+        )
 
 
 # Relations
@@ -116,7 +166,9 @@ class User(
     UserMixin,
     AccountManagementMixin,
     RolesAndPermissionsMixin,
-    ResetPasswordsMixin,
+    PasswordMixin,
+    OTPMixin,
+    QuestionMixin,
 ):
     __tablename__ = "users"
 
@@ -137,7 +189,7 @@ class User(
     question_three = db.Column(db.String(100))
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
-    password_expires = db.Column(db.Date, nullable=True)
+    password_expires = db.Column(db.Date)
     secret = db.Column(db.String(256), unique=True)
 
     oauth_accounts = db.relationship("OAuthUser", back_populates="user")
@@ -171,17 +223,7 @@ class User(
         self.last_name = last_name
         self.age = age
         self.phone = phone
-
-    def hash_password(self, password):
-        return hashpw(password.encode("utf-8"), gensalt())
-
-    def check_password(self, password):
-        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
-
-    def password_has_expired(self):
-        if self.password_expires:
-            return self.password_expires < datetime.now().date()
-        return False
+        self.password_expires = date.today() + timedelta(days=30)
 
     # def set_secret(self, key):
     #     f = Fernet(key)
@@ -386,7 +428,7 @@ class Report(db.Model):
             "id": self.id,
             "related_user": self.related_user,
             "item_name": self.item_name,
-            "item_type":self.item_type,
+            "item_type": self.item_type,
             "month": self.month,
             "year": self.year,
             "total_usage": self.total_usage,
@@ -524,6 +566,7 @@ class Log(db.Model):
     address = db.Column(db.String(36), nullable=False)
     category = db.Column(db.String(45), nullable=False)
     log_text = db.Column(db.String, nullable=False)
+
 
 class Report_Reviews(db.Model):
     __tablename__ = "report_reviews"
