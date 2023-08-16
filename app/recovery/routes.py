@@ -54,14 +54,20 @@ def enter_access_code():
 
     if form.validate_on_submit():
         entered_code = form.access_code.data
+        user_question_one = form.question_one.data
+        user_question_two = form.question_two.data
         access_code_info = access_codes.get(email)
         if access_code_info:
             correct_code, expiration_time = access_code_info
             if datetime.now() <= expiration_time and entered_code == correct_code:
                 del access_codes[email]
                 user = User.query.filter_by(email=email).first()
-                token = user.get_reset_token()
-                return redirect(url_for("recovery.reset_password", token=token))
+                if (
+                    user.question_one == user_question_one
+                    and user.question_two == user_question_two
+                ):
+                    token = user.get_reset_token()
+                    return redirect(url_for("recovery.reset_password", token=token))
 
             else:
                 flash("Invalid or expired access code.", "error")
