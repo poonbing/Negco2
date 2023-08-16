@@ -107,12 +107,12 @@ def post(id):
         print("test4")
         new_comment = Comment(commenter=user.id, commenter_username=user.username, post_id=id, content=remove_html_tags(form.content.data))
         if form.image.data:
-            print("Image data:", bleach.clean(form.image.data.filename))
+            print("Image data:", form.image.data)
             # Save the image as a file on the server
-            filename = secure_filename(form.image.data.filename)
-            print(filename)
             image = form.image.data
-            image.save(os.path.join(Config.UPLOAD_FOLDER,secure_filename(image.filename)))
+            filename = secure_filename(image.filename)
+            print(filename)
+            image.save(os.path.join(Config.UPLOAD_FOLDER, filename))
             print(current_app)
             print(image)
             new_comment.image = filename
