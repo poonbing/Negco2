@@ -74,12 +74,10 @@ def get_articles_of_the_day():
     for article in articles:
         serialized_articles.append(
             {
-                "id": article.id,
                 "title": article.title,
                 "description": article.description,
                 "date_added": article.date_added,
                 "writer": article.writer,
-                "image": article.image,
                 "paragraph": article.paragraph,
                 "time_ago": article.time_ago(),
             }

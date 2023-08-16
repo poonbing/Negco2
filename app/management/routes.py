@@ -11,7 +11,9 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from io import BytesIO
-
+import pyotp
+import hashlib
+import qrcode
 
 # Local Modules
 from app import limiter
@@ -19,7 +21,13 @@ from app.management import bp
 from .utils import role_required, compress_and_resize, generate_api_key
 from ..models import User, LockedUser, Session, APIKey
 from ..extensions import db
-from ..forms import SettingsForm, UnlockAccountForm, GenerateApiKeyForm, QuestionForm
+from ..forms import (
+    SettingsForm,
+    UnlockAccountForm,
+    GenerateApiKeyForm,
+    QuestionForm,
+    MFAForm,
+)
 from ..models import User
 from app import limiter
 from config import Config
@@ -126,13 +134,31 @@ def api_settings():
     )
 
 
-@bp.route("/settings/questions", methods=["GET", "POST"])
+@bp.route("/settings/security", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
-def question_settings():
+def security_settings():
     user = current_user
 
     form = QuestionForm()
+    form1 = MFAForm()
+    user = User.query.filter_by(id=user.id).first()
+    # decrypted_secret = user.decrypt_secret(Config.ENCRYPTION_KEY)
+    if user.secret:
+        uri = pyotp.totp.TOTP(user.secret).provisioning_uri(
+            name=user.username, issuer_name="NEGCO2"
+        )
+    else:
+        uri = ""
+    print(f"URI: {uri}")
+
+    if form1.validate_on_submit():
+        if user.is_secret_empty():
+            user.secret = pyotp.random_base32()
+
+            db.session.commit()
+            flash("MultiFactor Authentication added successfully", "success")
+
     if form.validate_on_submit():
         if form.question_one.data:
             user.question_one = form.question_one.data
@@ -142,11 +168,10 @@ def question_settings():
             user.question_three = form.question_three.data
 
         db.session.commit()
-        flash("Setting Questions changes successful", "success")
+        flash("Security Setting changes successful", "success")
 
     return render_template(
-        "management/question_settings.html",
-        form=form,
+        "management/security_settings.html", form=form, form1=form1, uri=uri
     )
 
 

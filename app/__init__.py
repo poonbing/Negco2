@@ -28,9 +28,9 @@ def create_app(config_class=Config):
         response.headers[
             "Strict-Transport-Security"
         ] = "max-age=31536000; includeSubDomains; preload"
-        response.headers[
-            "Content-Security-Policy"
-        ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://d3js.org/d3.v7.min.js https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.quilljs.com https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"
+        # response.headers[
+        #     "Content-Security-Policy"
+        # ] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://d3js.org/d3.v7.min.js https://cdn.quilljs.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://unpkg.com/ https://cdn.quilljs.com https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css https://cdnjs.cloudflare.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; frame-src 'self' https://assets.hcaptcha.com https://hcaptcha.com https://*.hcaptcha.com; img-src 'self' https://lh3.googleusercontent.com;"
 
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
