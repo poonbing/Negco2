@@ -1,4 +1,4 @@
-{% extends 'layout.html' %} {% block title %}Security Questions {% endblock %} {% block
+{% extends 'layout.html' %} {% block title %}API {% endblock %} {% block
     content %}
     {% for message in
       get_flashed_messages() %}
@@ -47,7 +47,7 @@
       {% endfor %}
     
     <div class="py-8 mx-auto max-w-4xl lg:py-16">
-      <h1 class="text-3xl font-bold mt-4">Security Questions</h1>
+      <h1 class="text-3xl font-bold mt-4">Security</h1>
     
       <br />
       
@@ -67,15 +67,15 @@
           href="{{url_for("management.api_settings")}}"
           aria-current="page"
           class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-          >API Key</a
+          >API</a
         >
       </li>
       <li class="mr-2">
         <a
-          href="{{url_for("management.question_settings")}}"
+          href="{{url_for("management.security_settings")}}"
           class="inline-block p-4 text-teal-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
     
-          >Questions</a
+          >Security</a
         >
       </li>
     </ul>
@@ -89,12 +89,13 @@
       {% endif %}
       <form
         method="POST"
-        action="{{ url_for('management.question_settings') }}"
+        action="{{ url_for('management.security_settings') }}"
         enctype="multipart/form-data"
       >
         {{ form.csrf_token }}
     
     
+        <h2 class="text-lg font-semibold mb-2 mt-4">Questions</h2>
         <div>
 
           {{ form.question_one.label(class_="block mb-2 text-sm font-medium text-gray-900 dark:text-white") }} 
@@ -135,9 +136,45 @@
           {{ form.submit(class_="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800")}}
         </div>
       </form>
-    
+
+      <h2 class="text-lg font-semibold mb-2 mt-10">Mult-Factor Authentication</h2>
+
+      <div class="flex justify-between items-center p-4">
+
+
+        {% if uri %}
+        <div id="qrcode"></div>
+      {% else %}
+
+      <div class="text-left">
+        Generate a QR Code for Multi-Factor Authentication
+      </div>
+
+      <form
+      method="POST"
+      action="{{ url_for('management.security_settings') }}"
+      enctype="multipart/form-data"
+    >
+      {{ form1.csrf_token }}
+  
+      <div>
+        <div class="mb-2"></div>
+        {{ form1.submit(class_="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")}}
+      </div>
+
+    </form>
+
+      {% endif %}
+
+      </div> 
+
     </div>
-    
+
+
+      <script type="text/javascript">
+      new QRCode(document.getElementById("qrcode"), "{{ uri }}");
+      </script>
+
 
     {% endblock %}
     

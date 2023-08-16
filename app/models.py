@@ -9,6 +9,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask_jwt_extended import create_access_token, decode_token
 from cryptography.fernet import Fernet
 import pickle
+import pyotp
 
 # Local Modules
 from .extensions import db
@@ -137,6 +138,7 @@ class User(
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
     password_expires = db.Column(db.Date, nullable=True)
+    secret = db.Column(db.String(256), unique=True)
 
     oauth_accounts = db.relationship("OAuthUser", back_populates="user")
 
@@ -180,6 +182,19 @@ class User(
         if self.password_expires:
             return self.password_expires < datetime.now().date()
         return False
+
+    # def set_secret(self, key):
+    #     f = Fernet(key)
+    #     self.secret = f.encrypt(str(pyotp.random_base32()).encode())
+    #     print(f"The type of secret IS {type(self.secret)}!!!!!!!!")
+
+    # def decrypt_secret(self, key):
+    #     f = Fernet(key)
+    #     decrypted_secret = f.decrypt(self.secret).decode()
+    #     return decrypted_secret
+
+    def is_secret_empty(self):
+        return not bool(self.secret)
 
 
 class OAuthUser(UserMixin, db.Model):
