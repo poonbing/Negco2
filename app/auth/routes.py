@@ -3,16 +3,20 @@ from flask import render_template, request, redirect, url_for, flash, current_ap
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import or_
 from datetime import datetime
-
+import pyotp
+import hashlib
 
 # Local Modules
 from app import limiter
 from app.auth import bp
 from .utils import not_logged_in_required
 from ..models import User, Session, OAuthUser
-from ..forms import LoginForm, SignUpForm
+from ..forms import LoginForm, SignUpForm, OTPForm
 from ..extensions import login_manager, oauth, db
+from config import Config
+
 import bleach
+
 
 @login_manager.user_loader
 @limiter.limit("4/second")
@@ -43,7 +47,7 @@ def login_with_azure():
 
 @bp.route("/login", methods=["GET", "POST"])
 @not_logged_in_required
-@limiter.limit("4/second")
+@limiter.limit("20/day")
 def login():
     xcaptcha = bp.xcaptcha
     form = LoginForm()
@@ -68,8 +72,8 @@ def login():
                         "category": "Login",
                     },
                 )
-            elif not xcaptcha.verify():
-                flash("xCaptcha verification failed. Please try again.", "error")
+            # elif not xcaptcha.verify():
+            #     flash("xCaptcha verification failed. Please try again.", "error")
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 current_app.logger.info(
@@ -110,10 +114,15 @@ def login():
                 db.session.add(sess)
                 db.session.commit()
 
-                user.reset_login_attempts()
-                login_user(user)
+                if user.is_secret_empty():
+                    user.reset_login_attempts()
+                    login_user(user)
+                    return redirect(url_for("management.dashboard"))
 
-                return redirect(url_for("management.dashboard"))
+                else:
+                    token = user.get_otp_token()
+                    return redirect(url_for("auth.otp", token=token))
+
         else:
             flash("Invalid username or password.", "error")
             current_app.logger.info(
@@ -128,7 +137,29 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
-@bp.route("/auth/<provider>")
+@bp.route("/otp/<string:token>", methods=["GET", "POST"])
+@limiter.limit("4/second")
+def otp(token):
+    user_id = User.verify_otp_token(token)
+    user = User.query.get(user_id)
+
+    if user is None:
+        return redirect(url_for("auth.login"))
+
+    form = OTPForm()
+
+    if form.validate_on_submit():
+        otp = str(form.otp.data)
+        print(type(otp))
+        totp = pyotp.TOTP(user.secret)
+        if totp.verify(otp):
+            login_user(user)
+            return redirect(url_for("management.dashboard"))
+
+    return render_template("auth/otp.html", form=form)
+
+
+@bp.route("/auth/<string:provider>")
 @limiter.limit("4/second")
 def auth(provider):
     if provider == "google":
@@ -142,7 +173,6 @@ def auth(provider):
 
     provider_id = user_info.get("sub") if provider == "google" else user_info.get("id")
     email = user_info.get("email")
-    print(user_info)
     username = user_info.get("name")
     access_token = token.get("access_token")
     profile_picture_url = (
@@ -213,11 +243,11 @@ def signup():
         first_name = bleach.clean(form.first_name.data)
         last_name = bleach.clean(form.last_name.data)
         username = bleach.clean(form.username.data)
-        gender = bleach.clean(form.gender.data)
+        gender = form.gender.data
         email = bleach.clean(form.email.data)
         password = bleach.clean(form.password.data)
         confirm_password = bleach.clean(form.confirm_password.data)
-        age = bleach.clean(form.age.data)
+        age = form.age.data
         phone = bleach.clean(form.phone.data)
 
         existing_user = User.query.filter(

@@ -303,3 +303,13 @@ class EditCommentForm(FlaskForm):
     content = TextAreaField('Edit Content:', validators=[DataRequired()])
     image = FileField('Upload Image')
     submit = SubmitField('Save Changes')
+
+class MFAForm(FlaskForm):
+    submit = SubmitField("Generate")
+
+
+class OTPForm(FlaskForm):
+    otp = IntegerField(
+        "OTP Code", validators=[InputRequired(), NumberRange(min=100000, max=999999)]
+    )
+    submit = SubmitField("Submit")

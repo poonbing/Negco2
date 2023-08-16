@@ -1,5 +1,5 @@
 # Python Modules
-from flask import render_template, redirect, url_for, request, current_app, flash
+from flask import render_template, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
 import os
 # Local Modules
@@ -7,7 +7,7 @@ from app import limiter
 from app.forum import bp
 from .utils import remove_html_tags
 from ..models import Comment, Post, Topic
-from ..forms import Comment_Submission, Post_Submission, EditCommentForm
+from ..forms import Comment_Submission, Post_Submission
 from ..extensions import db
 from werkzeug.utils import secure_filename
 from config import Config

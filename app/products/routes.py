@@ -66,7 +66,7 @@ def publishProduct():
         category = bleach.clean(form.category.data)
         price = bleach.clean(form.price.data)
         offer = bleach.clean(form.offer.data)
-        image = bleach.clean(form.image.data)
+        image = form.image.data
         image.save(
             os.path.join(
                 os.path.abspath(os.path.dirname(__file__)),
@@ -161,7 +161,7 @@ def updateProduct(id):
         product_to_update.name = bleach.clean(form.name.data)
         product_to_update.description = bleach.clean(form.description.data)
         product_to_update.price = bleach.clean(form.price.data)
-        product_to_update.image = bleach.clean(form.image.data)
+        product_to_update.image = form.image.data
         product_to_update.offer = bleach.clean(form.offer.data)
         product_to_update.category = bleach.clean(form.category.data)
         verify_characters = check_splcharacter(product_to_update.description)

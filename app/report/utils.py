@@ -1,12 +1,10 @@
 from sqlalchemy import and_
 from sqlalchemy.sql import func
-from collections import defaultdict
 from datetime import datetime
-import uuid
-
+import random
 # Local Modules
 from ..extensions import db
-from ..models import Tracker, Report
+from ..models import Tracker, Report, Report_Reviews
 
 class ReportFunctions:
     def __init__(self):
@@ -105,3 +103,30 @@ class ReportFunctions:
         datapoint[int(datetime.now().day) - 1] += total_usage
         report.datapoint = datapoint
         db.session.commit()
+
+    def replace_position(self, items, item):
+        items.append(item)
+        items.sort(key=lambda x: x[1], reverse=True)
+        return items[:3]
+
+    def generate_review(self, user_id):
+        all_reports = Report.query.filter(Report.related_user==user_id).all()
+        top_items = []
+        for report in all_reports:
+            if report.item_type != 'Total':
+                item = [report.item_type, report.total_usage]
+                top_items = self.replace_position(top_items, item)
+        ordinal = {0: '', 1: 'second', 2: 'third'}
+        output = []
+        for index, item in enumerate(top_items):
+            review = Report_Reviews.query.filter(Report_Reviews.item_type==item[0]).first()
+            if review:
+                suggestions = [review.suggestion1, review.suggestion2, review.suggestion3]
+                suggestions.pop(random.randint(0, 2))
+                review_text = f"""Item {item[0]}'s Energy Usage Currently is the {ordinal[index]} highest, at {item[1]} kWh (KiloWatt/Hour). 
+                                <br>Here are some ways to improve on your energy usage:
+                                <br>1. {suggestions[0]}
+                                <br>2. {suggestions[1]}"""
+                output.append(review_text)
+        return output
+                

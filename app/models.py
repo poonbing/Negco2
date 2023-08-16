@@ -1,5 +1,5 @@
 # Python Modules
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint
 from secrets import token_hex
@@ -9,6 +9,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask_jwt_extended import create_access_token, decode_token
 from cryptography.fernet import Fernet
 import pickle
+import pyotp
 
 # Local Modules
 from .extensions import db
@@ -67,7 +68,24 @@ class RolesAndPermissionsMixin:
         return self.role == required_role
 
 
-class ResetPasswordsMixin:
+class OTPMixin:
+    def get_otp_token(self, expires_sec=1800):
+        access_token = create_access_token(
+            identity=self.id, expires_delta=timedelta(seconds=expires_sec)
+        )
+        return access_token
+
+    @staticmethod
+    def verify_otp_token(token):
+        try:
+            decoded_token = decode_token(token)
+            user_id = decoded_token["sub"]
+            return user_id
+        except Exception as e:
+            return f"Error: {e}"
+
+
+class PasswordMixin:
     def get_reset_token(self, expires_sec=1800):
         access_token = create_access_token(
             identity=self.id, expires_delta=timedelta(seconds=expires_sec)
@@ -79,9 +97,42 @@ class ResetPasswordsMixin:
         try:
             decoded_token = decode_token(token)
             user_id = decoded_token["sub"]
-            return User.query.get(user_id)
+            return user_id
         except Exception as e:
             return f"Error: {e}"
+
+    def hash_password(self, password):
+        return hashpw(password.encode("utf-8"), gensalt())
+
+    def check_password(self, password):
+        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+
+    def password_has_expired(self):
+        if self.password_expires:
+            return self.password_expires < datetime.now().date()
+        return False
+
+
+class QuestionMixin:
+    def hash_question_one(self, question_one):
+        return hashpw(question_one.encode("utf-8"), gensalt())
+
+    def check_question_one(self, question_one):
+        return checkpw(question_one.encode("utf-8"), self.question_one.encode("utf-8"))
+
+    def hash_question_two(self, question_two):
+        return hashpw(question_two.encode("utf-8"), gensalt())
+
+    def check_question_two(self, question_two):
+        return checkpw(question_two.encode("utf-8"), self.question_two.encode("utf-8"))
+
+    def hash_question_three(self, question_three):
+        return hashpw(question_three.encode("utf-8"), gensalt())
+
+    def check_question_three(self, question_three):
+        return checkpw(
+            question_three.encode("utf-8"), self.question_three.encode("utf-8")
+        )
 
 
 # Relations
@@ -115,7 +166,9 @@ class User(
     UserMixin,
     AccountManagementMixin,
     RolesAndPermissionsMixin,
-    ResetPasswordsMixin,
+    PasswordMixin,
+    OTPMixin,
+    QuestionMixin,
 ):
     __tablename__ = "users"
 
@@ -136,7 +189,8 @@ class User(
     question_three = db.Column(db.String(100))
     locked = db.relationship("LockedUser", backref="user", uselist=False)
     rating_token = db.Column(db.String(500))
-    password_expires = db.Column(db.Date, nullable=True)
+    password_expires = db.Column(db.Date)
+    secret = db.Column(db.String(256), unique=True)
 
     oauth_accounts = db.relationship("OAuthUser", back_populates="user")
 
@@ -169,17 +223,20 @@ class User(
         self.last_name = last_name
         self.age = age
         self.phone = phone
+        self.password_expires = date.today() + timedelta(days=30)
 
-    def hash_password(self, password):
-        return hashpw(password.encode("utf-8"), gensalt())
+    # def set_secret(self, key):
+    #     f = Fernet(key)
+    #     self.secret = f.encrypt(str(pyotp.random_base32()).encode())
+    #     print(f"The type of secret IS {type(self.secret)}!!!!!!!!")
 
-    def check_password(self, password):
-        return checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
+    # def decrypt_secret(self, key):
+    #     f = Fernet(key)
+    #     decrypted_secret = f.decrypt(self.secret).decode()
+    #     return decrypted_secret
 
-    def password_has_expired(self):
-        if self.password_expires:
-            return self.password_expires < datetime.now().date()
-        return False
+    def is_secret_empty(self):
+        return not bool(self.secret)
 
 
 class OAuthUser(UserMixin, db.Model):
@@ -337,6 +394,7 @@ class Report(db.Model):
     id = id = db.Column(db.String(36), primary_key=True, unique=True)
     related_user = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
     item_name = db.Column(db.String(45), nullable=False)
+    item_type = db.Column(db.String(45), nullable=False)
     month = db.Column(db.String(2), nullable=False)
     year = db.Column(db.String(4), nullable=False)
     total_usage = db.Column(db.INTEGER)
@@ -348,6 +406,7 @@ class Report(db.Model):
         id,
         related_user,
         item_name,
+        item_type,
         month,
         year,
         total_usage,
@@ -357,6 +416,7 @@ class Report(db.Model):
         self.id = id
         self.related_user = related_user
         self.item_name = item_name
+        self.item_type = item_type
         self.month = month
         self.year = year
         self.total_usage = total_usage
@@ -368,6 +428,7 @@ class Report(db.Model):
             "id": self.id,
             "related_user": self.related_user,
             "item_name": self.item_name,
+            "item_type": self.item_type,
             "month": self.month,
             "year": self.year,
             "total_usage": self.total_usage,
@@ -506,3 +567,12 @@ class Log(db.Model):
     address = db.Column(db.String(36), nullable=False)
     category = db.Column(db.String(45), nullable=False)
     log_text = db.Column(db.String, nullable=False)
+
+
+class Report_Reviews(db.Model):
+    __tablename__ = "report_reviews"
+    item_type = db.Column(db.String(30), primary_key=True, nullable=False)
+    critical_point = db.Column(db.Float, nullable=False)
+    suggestion1 = db.Column(db.String, nullable=False)
+    suggestion2 = db.Column(db.String, nullable=False)
+    suggestion3 = db.Column(db.String, nullable=False)
