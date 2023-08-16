@@ -72,8 +72,8 @@ def login():
                         "category": "Login",
                     },
                 )
-            # elif not xcaptcha.verify():
-            #     flash("xCaptcha verification failed. Please try again.", "error")
+            elif not xcaptcha.verify():
+                flash("xCaptcha verification failed. Please try again.", "error")
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 current_app.logger.info(
@@ -255,11 +255,14 @@ def signup():
         ).first()
 
         if existing_user:
+            print("Reached Here")
             flash(
-                "Username already exists. Please choose a different username.", "error"
+                "Username or email already exists. Please choose a different username or email.",
+                "error",
             )
 
         elif password != confirm_password:
+            print("Reached Here")
             flash("Passwords do not match. Please try again.", "error")
 
         else:
@@ -274,6 +277,7 @@ def signup():
                 age,
                 phone,
             )
+            print("Hello I am Here")
             db.session.add(user)
             db.session.commit()
             current_app.logger.info(
