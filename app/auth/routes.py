@@ -137,7 +137,7 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
-@bp.route("/otp/<token>", methods=["GET", "POST"])
+@bp.route("/otp/<string:token>", methods=["GET", "POST"])
 @limiter.limit("4/second")
 def otp(token):
     user_id = User.verify_otp_token(token)
@@ -159,7 +159,7 @@ def otp(token):
     return render_template("auth/otp.html", form=form)
 
 
-@bp.route("/auth/<provider>")
+@bp.route("/auth/<string:provider>")
 @limiter.limit("4/second")
 def auth(provider):
     if provider == "google":

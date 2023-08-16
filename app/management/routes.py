@@ -108,6 +108,27 @@ def locked_accounts():
     )
 
 
+@bp.route("/deletekey/<string:api_key>")
+@login_required
+@limiter.limit("2/second")
+def delete_api_key(api_key):
+    api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
+    decrypted_key_info = []
+
+    for api_key_obj in api_keys:
+        decrypted_key = api_key_obj.decrypt_key(Config.ENCRYPTION_KEY)
+        decrypted_key_info.append((api_key_obj, decrypted_key))
+
+    for api_key_obj, decrypted_key in decrypted_key_info:
+        if decrypted_key == api_key:
+            db.session.delete(api_key_obj)
+            db.session.commit()
+            flash("API Key deleted successfully!", "success")
+            break
+
+    return redirect(url_for("management.api_settings"))
+
+
 @bp.route("/delete/<string:user_id>")
 @limiter.limit("2/second")
 def delete_user(user_id):
