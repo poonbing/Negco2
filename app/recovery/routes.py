@@ -12,6 +12,7 @@ from ..extensions import db
 from ..forms import ForgotPasswordForm, AccessCodeForm, ResetPasswordForm
 import bleach
 
+
 @bp.route("/forgot_password", methods=["GET", "POST"])
 @limiter.limit("50 per hour")
 def forgot_password():
@@ -52,7 +53,7 @@ def enter_access_code():
     form = AccessCodeForm()
 
     if form.validate_on_submit():
-        entered_code = bleach.clean(form.access_code.data)
+        entered_code = form.access_code.data
         access_code_info = access_codes.get(email)
         if access_code_info:
             correct_code, expiration_time = access_code_info
@@ -73,7 +74,8 @@ def enter_access_code():
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
 @limiter.limit("4/second")
 def reset_password(token):
-    user = User.verify_reset_token(token)
+    user_id = User.verify_reset_token(token)
+    user = User.query.get(user_id)
 
     if user is None:
         flash("That is an invalid or expired token", "error")

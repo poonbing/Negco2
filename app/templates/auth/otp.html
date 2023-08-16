@@ -1,0 +1,61 @@
+{% extends 'full_layout.html' %} {% block title %}Enter OTP{% endblock %} {%
+block content %}
+<section
+  class="bg-cover bg-center h-full"
+  style="background-image: url('{{ url_for('static', filename='images/bg.jpg') }}')"
+>
+  <div
+    class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
+  >
+    <div
+      class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-900 dark:border-gray-900"
+    >
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <div class="text-center">
+          <a
+            href="{{ url_for('main.index') }}"
+            class="flex mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+          >
+            <ion-icon
+              class="text-3xl text-teal-700 pr-2"
+              name="planet-outline"
+            ></ion-icon>
+            <span
+              class="self-center text-2xl font-semibold whitespace-nowrap text-gray-800"
+              >NEG'CO<span class="text-sm">2</span></span
+            >
+          </a>
+        </div>
+        <h1
+          class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
+        >
+          Enter OTP
+        </h1>
+        <p class="dark:text-white text-gray-900">Please enter OTP:</p>
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %} {% if category ==
+        "error" %}
+        <p class="text-red-500">{{ message }}</p>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+        <form method="POST">
+          {{ form.csrf_token }}
+
+          <div>
+            {{ form.otp.label(class="block mb-2 text-sm font-medium
+            text-gray-900 dark:text-white") }} {{ form.otp(class="bg-gray-50
+            border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-600
+            focus:border-teal-600 block w-full p-2.5 dark:bg-gray-700
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+            dark:focus:ring-blue-500 dark:focus:border-blue-500",
+            placeholder="123456", required=true) }}
+          </div>
+          {{ form.submit(class="w-full mt-4 text-white bg-teal-600
+          hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300
+          font-medium rounded-lg text-sm px-5 py-2.5 text-center
+          dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

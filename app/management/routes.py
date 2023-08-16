@@ -33,6 +33,7 @@ from app import limiter
 from config import Config
 import bleach
 
+
 @bp.route("/profile_picture")
 @login_required
 @limiter.limit("4/second")
@@ -145,7 +146,7 @@ def security_settings():
     user = User.query.filter_by(id=user.id).first()
     # decrypted_secret = user.decrypt_secret(Config.ENCRYPTION_KEY)
     if user.secret:
-        uri = pyotp.totp.TOTP(user.secret).provisioning_uri(
+        uri = pyotp.totp.TOTP(user.secret, digest=hashlib.sha256).provisioning_uri(
             name=user.username, issuer_name="NEGCO2"
         )
     else:

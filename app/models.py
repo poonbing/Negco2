@@ -68,6 +68,23 @@ class RolesAndPermissionsMixin:
         return self.role == required_role
 
 
+class OTPMixin:
+    def get_otp_token(self, expires_sec=1800):
+        access_token = create_access_token(
+            identity=self.id, expires_delta=timedelta(seconds=expires_sec)
+        )
+        return access_token
+
+    @staticmethod
+    def verify_otp_token(token):
+        try:
+            decoded_token = decode_token(token)
+            user_id = decoded_token["sub"]
+            return user_id
+        except Exception as e:
+            return f"Error: {e}"
+
+
 class ResetPasswordsMixin:
     def get_reset_token(self, expires_sec=1800):
         access_token = create_access_token(
@@ -80,7 +97,7 @@ class ResetPasswordsMixin:
         try:
             decoded_token = decode_token(token)
             user_id = decoded_token["sub"]
-            return User.query.get(user_id)
+            return user_id
         except Exception as e:
             return f"Error: {e}"
 
@@ -117,6 +134,7 @@ class User(
     AccountManagementMixin,
     RolesAndPermissionsMixin,
     ResetPasswordsMixin,
+    OTPMixin,
 ):
     __tablename__ = "users"
 
