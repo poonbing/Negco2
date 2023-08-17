@@ -1,230 +1,231 @@
 {% extends 'layout.html' %} {% block title %}Settings {% endblock %} {% block
-content %}
-{% for message in
-  get_flashed_messages() %}
-  <div
-    id="alert-1"
-    class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-blue-400 mt-2.5"
-    role="alert"
-  >
-    <svg
-      aria-hidden="true"
-      class="flex-shrink-0 w-5 h-5"
-      fill="currentColor"
-      viewBox="0 0 20 20"
-      xmlns="http://www.w3.org/2000/svg"
+  content %}
+  {% for message in
+    get_flashed_messages() %}
+    <div
+      id="alert-1"
+      class="flex p-4 mb-4 text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-blue-400 mt-2.5"
+      role="alert"
     >
-      <path
-        fill-rule="evenodd"
-        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-        clip-rule="evenodd"
-      ></path>
-    </svg>
-    <span class="sr-only">Info</span>
-    <div class="ml-3 text-sm font-medium">{{message}}</div>
-    <button
-      type="button"
-      class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-green-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
-      data-dismiss-target="#alert-1"
-      aria-label="Close"
-    >
-      <span class="sr-only">Close</span>
       <svg
         aria-hidden="true"
-        class="w-5 h-5"
+        class="flex-shrink-0 w-5 h-5"
         fill="currentColor"
         viewBox="0 0 20 20"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           fill-rule="evenodd"
-          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
           clip-rule="evenodd"
         ></path>
       </svg>
-    </button>
-  </div>
-  {% endfor %}
-
-<div class="py-8 mx-auto max-w-4xl lg:py-16">
-  <h1 class="text-3xl font-bold mt-4">Settings</h1>
-
-  <br />
-  
-  <ul
-  class="mb-4 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400"
->
-  <li class="mr-2">
-    <a
-      href="{{url_for("management.settings")}}"
-      class="inline-block p-4 text-teal-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
-
-      >General</a
-    >
-  </li>
-  <li class="mr-2">
-    <a
-      href="{{url_for("management.api_settings")}}"
-      aria-current="page"
-      class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-      >API</a
-    >
-  </li>
-  <li class="mr-2">
-    <a
-      href="{{url_for("management.security_settings")}}"
-      aria-current="page"
-      class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-      >Security</a
-    >
-  </li>
-</ul>
-
-  {% if form.errors %}
-  <ul class="text-red-400">
-    {% for field, errors in form.errors.items() %} {% for error in errors %}
-    <li>{{ error }}</li>
-    {% endfor %} {% endfor %}
-  </ul>
-  {% endif %}
-  <form
-    method="POST"
-    action="{{ url_for('management.settings') }}"
-    enctype="multipart/form-data"
-  >
-    {{ form.csrf_token }}
-
-
-    <div>
-      <label
-        for="profile_picture"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Profile Picture</label
+      <span class="sr-only">Info</span>
+      <div class="ml-3 text-sm font-medium">{{message}}</div>
+      <button
+        type="button"
+        class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-green-200 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+        data-dismiss-target="#alert-1"
+        aria-label="Close"
       >
-      {{ form.profile_picture(id="profile_picture", class_="bg-gray-50 border
-      border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500
-      focus:border-teal-500 block w-full p-2.5 dark:bg-gray-800
-      dark:border-teal-400 dark:placeholder-gray-400 dark:text-white
-      dark:focus:ring-teal-500 dark:focus:border-teal-500", id='profile_picture') }}
-    </div>
-
-    <div>
-      <label
-        for="first_name"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >First name</label
-      >
-      {{ form.first_name(class_="bg-gray-50 border border-teal-300 text-gray-900
-      text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
-      p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
-      dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.first_name, id='first_name') }}
-    </div>
-    <div>
-      <label
-        for="last_name"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Last name</label
-      >
-      {{ form.last_name(class_="bg-gray-50 border border-teal-300 text-gray-900
-      text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
-      p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
-      dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.last_name, id='last_name') }}
-    </div>
-    <div>
-      <label
-        for="phone"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Phone number</label
-      >
-      {{ form.phone(class_="bg-gray-50 border border-teal-300 text-gray-900
-      text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
-      p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
-      dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.phone, id='phone') }}
-    </div>
-    <div>
-      <label
-        for="gender"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Gender</label
-      >
-      {{ form.gender(class_="bg-gray-50 border border-teal-300 text-gray-900
-      text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
-      p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
-      dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      value=user.gender, id='gender') }}
-    </div>
-
-    <div>
-      <label
-        for="email"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Your Email</label
-      >
-      <div class="relative">
-        <div
-          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+        <span class="sr-only">Close</span>
+        <svg
+          aria-hidden="true"
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <svg
-            aria-hidden="true"
-            class="w-5 h-5 text-gray-500 dark:text-gray-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-            ></path>
-            <path
-              d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-            ></path>
-          </svg>
-        </div>
-        {{ form.email(class_="bg-gray-50 border border-teal-300 text-gray-900
-        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block
-        w-full pl-10 p-2.5 dark:bg-gray-800 dark:border-teal-400
-        dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
-        dark:focus:border-teal-500", value=user.email, id='email') }}
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    {% endfor %}
+  
+  <div class="py-8 mx-auto max-w-4xl lg:py-16">
+    <h1 class="text-3xl font-bold mt-4">Settings</h1>
+  
+    <br />
+    
+    <ul
+    class="mb-4 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400"
+  >
+    <li class="mr-2">
+      <a
+        href="{{url_for("management.settings")}}"
+        class="inline-block p-4 text-teal-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500"
+  
+        >General</a
+      >
+    </li>
+    <li class="mr-2">
+      <a
+        href="{{url_for("management.api_settings")}}"
+        aria-current="page"
+        class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+        >API</a
+      >
+    </li>
+    <li class="mr-2">
+      <a
+        href="{{url_for("management.security_settings")}}"
+        aria-current="page"
+        class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+        >Security</a
+      >
+    </li>
+  </ul>
+  
+    {% if form.errors %}
+    <ul class="text-red-400">
+      {% for field, errors in form.errors.items() %} {% for error in errors %}
+      <li>{{ error }}</li>
+      {% endfor %} {% endfor %}
+    </ul>
+    {% endif %}
+    <form
+      method="POST"
+      action="{{ url_for('management.settings') }}"
+      enctype="multipart/form-data"
+    >
+      {{ form.csrf_token }}
+  
+  
+      <div>
+        <label
+          for="profile_picture"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Profile Picture</label
+        >
+        {{ form.profile_picture(id="profile_picture", class_="bg-gray-50 border
+        border-teal-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500
+        focus:border-teal-500 block w-full p-2.5 dark:bg-gray-800
+        dark:border-teal-400 dark:placeholder-gray-400 dark:text-white
+        dark:focus:ring-teal-500 dark:focus:border-teal-500") }}
       </div>
-    </div>
-
-    <div>
-      <label
-        for="password"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Password</label
-      >
-      {{ form.password(class_="bg-gray-50 border border-teal-300 text-gray-900
-      text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
-      p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
-      dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
-      placeholder="•••••••••", id='password') }}
-    </div>
-
-    <div>
-      <label
-        for="confirm_password"
-        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Confirm password</label
-      >
-      {{ form.confirm_password(class_="bg-gray-50 border border-teal-300
-      text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500
-      block w-full p-2.5 dark:bg-gray-800 dark:border-teal-400
-      dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
-      dark:focus:border-teal-500", placeholder="•••••••••", id='confirm_password') }}
-    </div>
-
-    <div>
-      <div class="mb-2"></div>
-      {{ form.submit(class_="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800")}}
-    </div>
-  </form>
-
-
-</div>
-<script src="{{ url_for('static', filename='javascript/settings.js') }}"></script>
-
-
-{% endblock %}
+  
+      <div>
+        <label
+          for="first_name"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >First name</label
+        >
+        {{ form.first_name(class_="bg-gray-50 border border-teal-300 text-gray-900
+        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
+        p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
+        dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
+        value=user.first_name) }}
+      </div>
+      <div>
+        <label
+          for="last_name"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Last name</label
+        >
+        {{ form.last_name(class_="bg-gray-50 border border-teal-300 text-gray-900
+        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
+        p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
+        dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
+        value=user.last_name) }}
+      </div>
+      <div>
+        <label
+          for="phone"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Phone number</label
+        >
+        {{ form.phone(class_="bg-gray-50 border border-teal-300 text-gray-900
+        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
+        p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
+        dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
+        value=user.phone) }}
+      </div>
+      <div>
+        <label
+          for="gender"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Gender</label
+        >
+        {{ form.gender(class_="bg-gray-50 border border-teal-300 text-gray-900
+        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
+        p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
+        dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
+        value=user.gender) }}
+      </div>
+  
+      <div>
+        <label
+          for="email"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Your Email</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+          >
+            <svg
+              aria-hidden="true"
+              class="w-5 h-5 text-gray-500 dark:text-gray-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+              ></path>
+              <path
+                d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
+              ></path>
+            </svg>
+          </div>
+          {{ form.email(class_="bg-gray-50 border border-teal-300 text-gray-900
+          text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block
+          w-full pl-10 p-2.5 dark:bg-gray-800 dark:border-teal-400
+          dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
+          dark:focus:border-teal-500", value=user.email) }}
+        </div>
+      </div>
+  
+      <div>
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Password</label
+        >
+        {{ form.password(class_="bg-gray-50 border border-teal-300 text-gray-900
+        text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full
+        p-2.5 dark:bg-gray-800 dark:border-teal-400 dark:placeholder-gray-400
+        dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500",
+        placeholder="•••••••••") }}
+      </div>
+  
+      <div>
+        <label
+          for="confirm_password"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Confirm password</label
+        >
+        {{ form.confirm_password(class_="bg-gray-50 border border-teal-300
+        text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500
+        block w-full p-2.5 dark:bg-gray-800 dark:border-teal-400
+        dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500
+        dark:focus:border-teal-500", placeholder="•••••••••") }}
+      </div>
+  
+      <div>
+        <div class="mb-2"></div>
+        {{ form.submit(class_="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800")}}
+      </div>
+    </form>
+  
+  
+  </div>
+  
+  <script src="{{ url_for('static', filename='javascript/settings.js') }}"></script>
+  
+  
+  {% endblock %}
