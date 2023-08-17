@@ -72,8 +72,8 @@ def login():
                         "category": "Login",
                     },
                 )
-            elif not xcaptcha.verify():
-                flash("xCaptcha verification failed. Please try again.", "error")
+            # elif not xcaptcha.verify():
+            #     flash("xCaptcha verification failed. Please try again.", "error")
             elif not user.check_password(password):
                 user.increment_login_attempts()
                 current_app.logger.info(
