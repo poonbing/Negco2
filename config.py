@@ -1,15 +1,13 @@
 import os
 import logging
-import secrets, os
+import secrets
 
 
 class Config:
     # Security configuration
     DEBUG = True
-    SECRET_KEY = "pf9Wlove4IKEAXvy-cQkeDPhv9Az3Ay-zqGILbp_ySc"
-    ENCRYPTION_KEY = b"hRqDT_oQOosfS5GZHd8-C7hfo4jClUyn7kdZT-HBt6I="
-    key = secrets.token_urlsafe(16)
-    SECRET_KEY = key
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
@@ -17,22 +15,22 @@ class Config:
     PERMANENT_SESSION_LIFETIME = 1800
 
     # xCaptcha configuration
-    XCAPTCHA_SITE_KEY = "906a1dab-2e2c-4c80-880a-9fb359a89b73"
-    XCAPTCHA_SECRET_KEY = "0xF9Eb4ffE0304E994f169619C85a0cbe3ca803D9B"
+    XCAPTCHA_SITE_KEY = os.environ.get("XCAPTCHA_SITE_KEY")
+    XCAPTCHA_SECRET_KEY = os.environ.get("XCAPTCHA_SECRET_KEY")
     XCAPTCHA_VERIFY_URL = "https://hcaptcha.com/siteverify"
     XCAPTCHA_API_URL = "https://hcaptcha.com/1/api.js"
     XCAPTCHA_DIV_CLASS = "h-captcha"
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://Negco_Admin:Forehead_Gang@it2555.mysql.database.azure.com/neggo2"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
 
     # Flask-Mail configuration
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = "negco2lewis@gmail.com"
-    MAIL_PASSWORD = "beshzazmbzfokmig"
-    MAIL_DEFAULT_SENDER = ("NEGCO2", "negco2lewis@gmail.com")
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = ("NEGCO2", os.environ.get("MAIL_USERNAME"))
 
     # Path Configuration
     APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "app"))
@@ -40,12 +38,10 @@ class Config:
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "images")
 
     # Oauth Configuration
-    GOOGLE_CLIENT_ID = (
-        "43510388979-2l3aedm3mce7trakvl09n9rcblcm1lco.apps.googleusercontent.com"
-    )
-    GOOGLE_CLIENT_SECRET = "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"
-    AZURE_CLIENT_ID = "2853d287-14c5-45dd-97f7-89d9bd06f37c"
-    AZURE_CLIENT_SECRET = "8304bf93-0a20-459d-89a9-0fff0b169e0f"
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+    AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
+    AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
 
     # Logging Configuration
     LOG_FILE = "record.log"
