@@ -117,7 +117,7 @@ def login():
                 if user.is_secret_empty():
                     user.reset_login_attempts()
                     login_user(user)
-                    return redirect(url_for("management.dashboard"))
+                    return redirect(url_for("index"))
 
                 else:
                     token = user.get_otp_token()
