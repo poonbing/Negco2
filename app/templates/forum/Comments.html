@@ -6,7 +6,7 @@
         <div class="flex flex-col space-y-4">
             <div class="bg-white p-4 rounded-lg shadow-md">
                 {% if current_user.id == comment.commenter %}
-            <!-- Edit button for the comment -->
+
                     <button class="text-blue-500 hover:underline mr-2" onclick="openEditForm({{ comment.id }})">Edit</button>
                     <form class="delete-form" method="POST" action="{{ url_for('forum.delete_comment', comment_id=comment.id) }}">
                     {{ form.csrf_token }}
