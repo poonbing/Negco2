@@ -30,16 +30,10 @@ import re
 from .validators import *
 
 
-# def validate_image(_, field):
-#      mime = magic.Magic()
-#      mime_type = mime.from_buffer(field.data.read(1024))
-
-#      if not mime_type.startswith("image/jpeg") and not mime_type.startswith("image/png"):
-#          raise ValidationError("File is not an allowed image type")
-
 def no_special_characters(form, field):
     if re.search(r"[~\!@#$%^&*()_+{}\":;'\[\]]", field.data):
         raise ValidationError("Special characters are not allowed.")
+
 
 def validate_password(_, field):
     password = field.data
@@ -82,7 +76,9 @@ class SettingsForm(FlaskForm):
     last_name = StringField(
         "Last Name", validators=[InputRequired(), Length(min=1, max=100), validate_name]
     )
-    phone = StringField("Phone Number", validators=[Length(min=8, max=16)])
+    phone = IntegerField(
+        "Phone Number", validators=[Length(min=8, max=16), validate_phone]
+    )
     gender = SelectField(
         "Gender", choices=[("male", "Male"), ("female", "Female"), ("other", "Other")]
     )
@@ -117,10 +113,12 @@ class createArticle(FlaskForm):
 
 class createProduct(FlaskForm):
     brand = StringField(
-        "Brand of Product:", validators=[InputRequired(), Length(min=2, max=50), no_special_characters]
+        "Brand of Product:",
+        validators=[InputRequired(), Length(min=2, max=50), no_special_characters],
     )
     name = StringField(
-        "Name of Product:", validators=[InputRequired(), Length(min=3, max=50), no_special_characters]
+        "Name of Product:",
+        validators=[InputRequired(), Length(min=3, max=50), no_special_characters],
     )
     description = TextAreaField(
         "Description:",
@@ -146,14 +144,18 @@ class createProduct(FlaskForm):
 
 class Comment_Submission(FlaskForm):
     content = TextAreaField("Content", validators=[InputRequired()])
-    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
+    image = FileField(
+        "Image", validators=[FileAllowed(["jpg", "png", "jpeg", "gif"], "Images only!")]
+    )
     submit = SubmitField("Create Post")
 
 
 class Post_Submission(FlaskForm):
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content", validators=[InputRequired()])
-    image = FileField("Image", validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
+    image = FileField(
+        "Image", validators=[FileAllowed(["jpg", "png", "jpeg", "gif"], "Images only!")]
+    )
     submit = SubmitField("Create Post")
 
 
@@ -200,7 +202,7 @@ class SignUpForm(FlaskForm):
             NumberRange(min=0, max=200, message="Age must be between 0 and 200."),
         ],
     )
-    phone = StringField("Phone", validators=[InputRequired(), validate_phone])
+    phone = IntegerField("Phone", validators=[InputRequired(), validate_phone])
     submit = SubmitField("Sign Up")
 
 
@@ -292,17 +294,25 @@ class GenerateApiKeyForm(FlaskForm):
 
 
 class QuestionForm(FlaskForm):
-    question_one = StringField("Question 1: What is name of your mother's pre-school?")
-    question_two = StringField("Question 2: What is the nickname you had?")
+    question_one = StringField(
+        "Question 1: What is name of your mother's pre-school?",
+        validators=[validate_name],
+    )
+    question_two = StringField(
+        "Question 2: What is the nickname you had?", validators=[validate_name]
+    )
     question_three = StringField(
-        "Question 3: What your favorite food to eat during winter?"
+        "Question 3: What your favorite food to eat during winter?",
+        validators=[validate_name],
     )
     submit = SubmitField("Submit")
 
+
 class EditCommentForm(FlaskForm):
-    content = TextAreaField('Edit Content:', validators=[DataRequired()])
-    image = FileField('Upload Image')
-    submit = SubmitField('Save Changes')
+    content = TextAreaField("Edit Content:", validators=[DataRequired()])
+    image = FileField("Upload Image")
+    submit = SubmitField("Save Changes")
+
 
 class MFAForm(FlaskForm):
     submit = SubmitField("Generate")

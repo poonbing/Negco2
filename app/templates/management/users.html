@@ -45,7 +45,7 @@ content %} {% for message in get_flashed_messages() %}
 {% endfor %}
 
 <div class="py-8 mx-auto max-w-4xl lg:py-16">
-  <h1 class="text-3xl font-bold mt-4">All Users</h1>
+  <h1 class="text-3xl font-bold mt-4">All Logs</h1>
   <br />
 
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -112,7 +112,7 @@ content %} {% for message in get_flashed_messages() %}
             <a
               href="#"
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-              >Delete User</a
+              >Delete Logs</a
             >
           </div>
         </div>
@@ -138,15 +138,15 @@ content %} {% for message in get_flashed_messages() %}
         </div>
         <input
           type="text"
-          id="table-search-users"
+          id="table-search-logs"
           class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Search for users"
+          placeholder="Search for logs"
         />
       </div>
     </div>
 
     <table
-      id="users-table"
+      id="logs-table"
       class="w-full text-sm text-left text-gray-500 dark:text-gray-400 shadow animate-pulse dark:divide-gray-700"
     >
       <thead
@@ -163,11 +163,12 @@ content %} {% for message in get_flashed_messages() %}
               <label for="checkbox-all" class="sr-only">checkbox</label>
             </div>
           </th>
-          <th scope="col" class="px-6 py-3">Username</th>
-          <th scope="col" class="px-6 py-3">Name</th>
-          <th scope="col" class="px-6 py-3">Role</th>
-          <th scope="col" class="px-6 py-3">Email</th>
-          <th scope="col" class="px-6 py-3">Action</th>
+          <th scope="col" class="px-6 py-3">Timestamp</th>
+          <th scope="col" class="px-6 py-3">Source</th>
+          <th scope="col" class="px-6 py-3">Logged User</th>
+          <th scope="col" class="px-6 py-3">Address</th>
+          <th scope="col" class="px-6 py-3">Category</th>
+          <th scope="col" class="px-6 py-3">Text</th>
         </tr>
       </thead>
       <tbody>
@@ -190,6 +191,9 @@ content %} {% for message in get_flashed_messages() %}
           <td class="px-6 py-4">
             <div class="w-20 h-6 bg-gray-300 rounded"></div>
           </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
         </tr>
         <tr class="bg-gray-100">
           <td class="px-6 py-4">
@@ -206,6 +210,9 @@ content %} {% for message in get_flashed_messages() %}
           </td>
           <td class="px-6 py-4">
             <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
           </td>
           <td class="px-6 py-4">
             <div class="w-20 h-6 bg-gray-300 rounded"></div>
@@ -230,6 +237,9 @@ content %} {% for message in get_flashed_messages() %}
           <td class="px-6 py-4">
             <div class="w-20 h-6 bg-gray-300 rounded"></div>
           </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
+          </td>
         </tr>
         <tr class="bg-gray-100">
           <td class="px-6 py-4">
@@ -246,6 +256,9 @@ content %} {% for message in get_flashed_messages() %}
           </td>
           <td class="px-6 py-4">
             <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="w-20 h-6 bg-gray-300 rounded"></div>
           </td>
           <td class="px-6 py-4">
             <div class="w-20 h-6 bg-gray-300 rounded"></div>
@@ -256,5 +269,5 @@ content %} {% for message in get_flashed_messages() %}
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='javascript/users.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/logs.js') }}"></script>
 {% endblock %}

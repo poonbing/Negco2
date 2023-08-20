@@ -225,15 +225,15 @@ class User(
         self.phone = phone
         self.password_expires = date.today() + timedelta(days=30)
 
-    # def set_secret(self, key):
-    #     f = Fernet(key)
-    #     self.secret = f.encrypt(str(pyotp.random_base32()).encode())
-    #     print(f"The type of secret IS {type(self.secret)}!!!!!!!!")
+    def set_secret(self, key):
+        f = Fernet(key)
+        self.secret = f.encrypt(str(pyotp.random_base32()).encode())
+        print(f"The type of secret IS {type(self.secret)}!!!!!!!!")
 
-    # def decrypt_secret(self, key):
-    #     f = Fernet(key)
-    #     decrypted_secret = f.decrypt(self.secret).decode()
-    #     return decrypted_secret
+    def decrypt_secret(self, key):
+        f = Fernet(key)
+        decrypted_secret = f.decrypt(self.secret).decode()
+        return decrypted_secret
 
     def is_secret_empty(self):
         return not bool(self.secret)

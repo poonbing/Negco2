@@ -18,7 +18,7 @@ import hashlib
 from app import limiter
 from app.management import bp
 from .utils import role_required, compress_and_resize, check_image_format
-from ..models import User, LockedUser, Session, APIKey
+from ..models import User, LockedUser, Session, APIKey, Log
 from ..extensions import db
 from ..forms import (
     SettingsForm,
@@ -51,6 +51,38 @@ def profile_picture():
         return "Invalid image format"
 
     return send_file(BytesIO(profile_picture_bytes), mimetype=mimetype)
+
+
+@bp.route("/show_logs", methods=["GET", "POST"])
+@login_required
+@role_required("admin")
+@limiter.limit("4/second")
+def logs_settings():
+    return render_template("management/logs.html")
+
+
+@bp.route("/get_logs_data", methods=["GET"])
+@login_required
+@role_required("admin")
+@limiter.limit("4/second")
+def get_logs_data():
+    all_logs = Log.query.all()
+    logs_data = []
+
+    for log in all_logs:
+        logs_data.append(
+            {
+                "id": log.id,
+                "timestamp": log.timestamp,
+                "source": log.source,
+                "logged user": log.logged_user,
+                "address": log.address,
+                "category": log.category,
+                "log text": log.text,
+            }
+        )
+
+    return jsonify(logs_data)
 
 
 @bp.route("/show_users", methods=["GET"])
@@ -208,7 +240,6 @@ def security_settings():
     )
 
 
-@bp.route("/")
 @bp.route("/settings/general", methods=["GET", "POST"])
 @login_required
 @limiter.limit("4/second")
