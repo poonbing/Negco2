@@ -92,7 +92,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Project Link: [https://github.com/poonbing/IT2555---Application-Security](https://github.com/poonbing/IT2555---Application-Security)
+Project Link: [https://github.com/poonbing/IT2555---Application-Security](https://github.com/poonbing/Negco2)
 
 ## Acknowledgments
 
